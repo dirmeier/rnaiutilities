@@ -26,7 +26,8 @@ import os
 import numpy as np
 import pandas
 
-from rnai_query.globals import WELL, GENE, SIRNA, SAMPLE
+from rnaiquery.globals import WELL, GENE, SIRNA, SAMPLE
+from rnaiquery.io.io import IO
 
 logging.basicConfig(
   level=logging.INFO,
@@ -60,12 +61,12 @@ class ResultSet:
         
         :param fh: either str or None(default)
         """
-        self._print_header = True
-        for tablefile in self._tablefile_set:
-            self._dump(fh, tablefile)
+        with IO(fh) as io:
+            for tablefile in self._tablefile_set:
+                self._dump(tablefile, io)
         logger.info("Successfully wrote table files!")
 
-    def _dump(self, fh, tablefile):
+    def _dump(self, tablefile, io):
         """
         Dumbs a table file to tsv. 
          
@@ -80,7 +81,9 @@ class ResultSet:
         # test if the data file can be found
         if os.path.isfile(tablefile.filename):
             # read the data file
-            data = pandas.read_csv(tablefile.filename, sep="\t", header=0)
+            data = pandas.read_csv(tablefile.filename,
+                                   sep="\t",
+                                   header=0)
             # filter on well/sirna/gene
             data = self._filter_data(data)
             if len(data) == 0:
@@ -89,7 +92,7 @@ class ResultSet:
             data = self._sample_data(data)
             # append study/pathogen/library/..
             data = self._append_to_data(data, tablefile)
-            self._to_tsv(data, fh)
+            io.dump(data, tablefile.filesuffix)
         else:
             logger.warning("Could not find file: {}".format(tablefile))
 
@@ -98,7 +101,7 @@ class ResultSet:
             data.well.str.contains(self.__getattribute__("_" + WELL)) &
             data.gene.str.contains(self.__getattribute__("_" + GENE)) &
             data.sirna.str.contains(self.__getattribute__("_" + SIRNA))
-            ]
+        ]
         return data
 
     def _sample_data(self, data):
@@ -128,11 +131,3 @@ class ResultSet:
                 fls.append(v)
         return fls
 
-    def _to_tsv(self, data, fh):
-        if fh is None:
-            print(
-              data.to_csv(fh, sep="\t", header=self._print_header, index=False))
-        else:
-            data.to_csv(
-              fh, sep="\t", mode="a", header=self._print_header, index=False)
-        self._print_header = False
