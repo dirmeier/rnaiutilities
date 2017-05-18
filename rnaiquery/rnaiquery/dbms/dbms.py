@@ -22,10 +22,10 @@
 
 import logging
 
-from rnai_query.dbms._db_query import DatabaseQuery
-from rnai_query.dbms._db_setup import DatabaseInserter
-from rnai_query.dbms._postgres_connection import PostgresConnection
-from rnai_query.dbms._sqlite_connection import SQLiteConnection
+from rnaiquery.dbms._db_query import DatabaseQuery
+from rnaiquery.dbms._db_setup import DatabaseInserter
+from rnaiquery.dbms._postgres_connection import PostgresConnection
+from rnaiquery.dbms._sqlite_connection import SQLiteConnection
 
 logging.basicConfig(
   level=logging.INFO,

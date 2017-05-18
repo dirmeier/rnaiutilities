@@ -19,4 +19,5 @@
 # @author = 'Simon Dirmeier'
 # @email = 'mail@simon-dirmeier.net'
 
-from rnai_query.filesets.table_file_sets import TableFileSets
+
+from rnaiquery.query import Query

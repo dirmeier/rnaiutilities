@@ -1,5 +1,5 @@
 **********
-rnai-query
+rnaiquery
 **********
 
 Easily query and sample  from a large set of CellProfiler-based RNAi screen
@@ -35,7 +35,7 @@ Having the interpreter started, querying is easy:
 .. code-block:: python
 
   # load the query module
-  from rnai_query import Query
+  from rnaiquery import Query
   # create a query object
   q = Query(<your db file>)
   # do a query

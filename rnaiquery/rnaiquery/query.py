@@ -20,7 +20,7 @@
 # @email = 'mail@simon-dirmeier.net'
 
 
-from rnai_query.controller import Controller
+from rnaiquery.controller import Controller
 
 
 class Query:
@@ -85,7 +85,7 @@ class Query:
                                  featureclass=featureclass)
 
 if __name__ == "__main__":
-    q = Query("/Users/simondi/PROJECTS/target_infect_x_project/src/tix_util/rnai-query/tix.db")
+    q = Query("/Users/simondi/PROJECTS/target_infect_x_project/src/tix_util/rnaiquery/tix.db")
     res = q.query(study="infectx",
                   well="a01", library="d",
                   replicate=1, featureclass="cells",

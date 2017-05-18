@@ -20,4 +20,4 @@
 # @email = 'mail@simon-dirmeier.net'
 
 
-from rnai_query.query import Query
+from rnaiquery.dbms.dbms import DBMS

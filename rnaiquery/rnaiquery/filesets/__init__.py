@@ -19,5 +19,4 @@
 # @author = 'Simon Dirmeier'
 # @email = 'mail@simon-dirmeier.net'
 
-
-from rnai_query.dbms.dbms import DBMS
+from rnaiquery.filesets.table_file_sets import TableFileSets

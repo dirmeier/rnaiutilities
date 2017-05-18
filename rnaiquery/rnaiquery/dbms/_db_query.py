@@ -22,10 +22,10 @@
 
 import logging
 
-from rnai_query.filesets.table_file import TableFile
-from rnai_query.globals import FEATURECLASS
-from rnai_query.globals import GENE, SIRNA, LIBRARY, DESIGN
-from rnai_query.globals import REPLICATE, PLATE, STUDY, PATHOGEN
+from rnaiquery.filesets.table_file import TableFile
+from rnaiquery.globals import FEATURECLASS
+from rnaiquery.globals import GENE, SIRNA, LIBRARY, DESIGN
+from rnaiquery.globals import REPLICATE, PLATE, STUDY, PATHOGEN
 
 logging.basicConfig(
   level=logging.INFO,

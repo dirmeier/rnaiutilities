@@ -6,8 +6,8 @@ import logging
 
 import psycopg2
 
-from rnai_query.dbms._database_connection import DatabaseConnection
-from rnai_query.globals import GENE, SIRNA, WELL
+from rnaiquery.dbms._database_connection import DatabaseConnection
+from rnaiquery.globals import GENE, SIRNA, WELL
 
 logging.basicConfig(
   level=logging.INFO,

@@ -20,7 +20,7 @@
 # @email = 'mail@simon-dirmeier.net'
 
 
-from rnai_query.dbms.dbms import DBMS
+from rnaiquery.dbms.dbms import DBMS
 
 
 class TableFileSets:

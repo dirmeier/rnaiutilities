@@ -11,12 +11,12 @@ def readme():
 
 
 setup(
-  name='rnai_query',
+  name='rnaiquery',
   version='0.0.1',
   author='Simon Dirmeier',
   author_email='simon.dirmeier@bsse.ethz.ch',
   license='GPLv3',
-  packages=['rnai_query', 'rnai_query.filesets', 'rnai_query.dbms'],
+  packages=['rnaiquery', 'rnaiquery.filesets', 'rnaiquery.dbms'],
   install_requires=[
       'pandas>=0.20.1',
       'numpy>=1.10.0',

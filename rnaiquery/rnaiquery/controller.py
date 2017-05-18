@@ -22,8 +22,8 @@
 
 import logging
 
-from rnai_query.filesets import table_file_sets
-from rnai_query.result_set import ResultSet
+from rnaiquery.filesets import table_file_sets
+from rnaiquery.result_set import ResultSet
 
 logging.basicConfig(
   level=logging.INFO,
