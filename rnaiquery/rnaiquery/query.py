@@ -85,9 +85,9 @@ class Query:
                                  featureclass=featureclass)
 
 if __name__ == "__main__":
-    q = Query("/Users/simondi/PROJECTS/target_infect_x_project/src/tix_util/rnaiquery/tix.db")
+    q = Query()
     res = q.query(study="infectx",
                   well="a01", library="d",
                   replicate=1, featureclass="cells",
                   gene="atp6v1a", sirna="l-017590-01", sample=10)
-    res.dump()
+    res.dump("/Users/simondi/Desktop/simon.h5")
