@@ -22,7 +22,9 @@ setup(
       'numpy>=1.10.0',
       'pyyaml>=3.12',
       'psycopg2>=2.7.1',
-      'ipython>=5.1.0'
+      'ipython>=5.1.0',
+      'tables>=3.3.0',
+      'h5py>=2.7.0'
   ],
   classifiers=[
       'Development Status :: 3 - Alpha',
