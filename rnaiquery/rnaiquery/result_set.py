@@ -45,7 +45,7 @@ class ResultSet:
         self._print_header = True
         self._filters = self._set_filter(**kwargs)
         self._filter_fn = lambda x: x.loc[np.random.choice(
-          x.index, self.__getattribute__("_" + SAMPLE), False), :]
+          x.index, self.__getattribute__("_" + SAMPLE), False), :] if len(x) >= self.__getattribute__("_" + SAMPLE) else x 
 
     def __repr__(self):
         return self.__str__()
