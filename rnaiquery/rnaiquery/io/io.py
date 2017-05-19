@@ -43,13 +43,13 @@ class IO:
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
-    def dump(self, df, filename):
+    def dump(self, df, filesuffix):
         if not isinstance(df, pandas.DataFrame):
             raise TypeError("Please provide a resultset object")
         if self._format is None or self._format == IO._flat_:
             self._to_tsv(df)
         elif self._format == IO._h5_:
-            self._to_h5(df, filename)
+            self._to_h5(df, filesuffix)
         else:
             raise ValueError("What?")
 
