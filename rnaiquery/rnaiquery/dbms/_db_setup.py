@@ -118,7 +118,7 @@ class DatabaseInserter:
           self._insert_into_statement)
 
     def _insert_features(self, file, meta):
-        tab = file.replace("_meta.tsv", "").split("/")[-1].replace("-", "_")
+        tab = self.feature_table_name(file)
         if not self._exists(tab):
             self._create_file_feature_table(tab)
             self.__connection.insert_many(meta, tab)
@@ -188,3 +188,7 @@ class DatabaseInserter:
         s = "INSERT INTO {} ({}, filename) VALUES('{}', '{}')" \
             .format(k, k, v, file)
         return s
+
+    @staticmethod
+    def feature_table_name(file):
+        return file.replace("_meta.tsv", "").split("/")[-1].replace("-", "_")

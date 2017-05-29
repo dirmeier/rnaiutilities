@@ -20,7 +20,13 @@
 # @email = 'mail@simon-dirmeier.net'
 
 
+import logging
 import pandas
+
+logging.basicConfig(
+  level=logging.INFO,
+  format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
+logger = logging.getLogger(__name__)
 
 
 class IO:
@@ -29,9 +35,12 @@ class IO:
 
     def __init__(self, f):
         if f is None:
+            logger.info("Writing to stdout")
             self._format = None
         else:
-            self._format = IO._flat_ if f.endswith(IO._flat_) else IO._h5_
+            out = IO._flat_ if f.endswith(IO._flat_) else IO._h5_
+            logger.info("Writing to {} ".format(out))
+            self._format = out
         self._filename = f
         self._fh, self._dataset = None, None
         self._print_header = True
@@ -60,7 +69,7 @@ class IO:
         if self._format is None:
             print(
               data.to_csv(
-                self._format,
+                None,
                 sep="\t",
                 header=self._print_header,
                 index=False
@@ -68,7 +77,7 @@ class IO:
             )
         else:
             data.to_csv(
-              self._format,
+              self._filename,
               sep="\t",
               mode="a",
               header=self._print_header,

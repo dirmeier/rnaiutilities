@@ -20,8 +20,13 @@
 # @email = 'mail@simon-dirmeier.net'
 
 
+import logging
 from rnaiquery.controller import Controller
 
+logging.basicConfig(
+  level=logging.INFO,
+  format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
+logger = logging.getLogger(__name__)
 
 class Query:
     def __init__(self, db=None):
@@ -71,6 +76,10 @@ class Query:
         :return: returns a lazy ResultSet
         :rtype: ResultSet
         """
+
+        if featureclass is None:
+            logger.error("Currently using no featureclass it not supported.")
+            exit(0)
 
         return self.__ctrl.query(sample=sample,
                                  study=study,

@@ -22,6 +22,7 @@
 
 import logging
 
+from rnaiquery.dbms._db_setup import DatabaseInserter
 from rnaiquery.filesets.table_file import TableFile
 from rnaiquery.globals import FEATURECLASS
 from rnaiquery.globals import GENE, SIRNA, LIBRARY, DESIGN
@@ -48,7 +49,7 @@ class DatabaseQuery:
 
     def _query(self, q, **kwargs):
         res = self.__connection.query(q)
-        fls = {TableFile(x, **kwargs) for x in res}
+        fls = {TableFile(x, self._feature_query(x[-1]), **kwargs) for x in res}
         return fls
 
     def _build_query(self, **kwargs):
@@ -95,3 +96,11 @@ class DatabaseQuery:
                 s = "SELECT filename FROM {} WHERE {}='{}'" \
                     .format(el, el, kwargs[el])
         return s
+
+    def _feature_query(self, filename):
+        d = DatabaseInserter.feature_table_name(filename)
+        res = self.__connection.query("SELECT * FROM {}".format(d))
+        res = list(map(lambda x: x[0], res))
+        return res
+
+

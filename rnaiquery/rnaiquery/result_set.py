@@ -25,6 +25,7 @@ import os
 
 import numpy as np
 import pandas
+import sys
 
 from rnaiquery.globals import WELL, GENE, SIRNA, SAMPLE
 from rnaiquery.io.io import IO
@@ -41,11 +42,13 @@ class ResultSet:
 
     def __init__(self, files, sample, **kwargs):
         self._tablefile_set = files
-        self._sample = sample
         self._print_header = True
         self._filters = self._set_filter(**kwargs)
+        self._sample = sample if sample is not None else ((2**31) - 1)
         self._filter_fn = lambda x: x.loc[np.random.choice(
-          x.index, self.__getattribute__("_" + SAMPLE), False), :] if len(x) >= self.__getattribute__("_" + SAMPLE) else x 
+          x.index, self._sample, False), :] if len(x) >= self._sample else x
+        # TODO: use this for printing
+        self._shared_features = self._get_shared_features()
 
     def __repr__(self):
         return self.__str__()
@@ -61,6 +64,7 @@ class ResultSet:
         
         :param fh: either str or None(default)
         """
+
         with IO(fh) as io:
             for tablefile in self._tablefile_set:
                 self._dump(tablefile, io)
@@ -68,7 +72,7 @@ class ResultSet:
 
     def _dump(self, tablefile, io):
         """
-        Dumbs a table file to tsv. 
+        Dumbs a table file to tsv/h5/stdout
          
         This is arguably not very efficient, since it first reads a tsv, then 
         does filtering, grouping and sampling and then prints to tsv again.
@@ -101,7 +105,7 @@ class ResultSet:
             data.well.str.contains(self.__getattribute__("_" + WELL)) &
             data.gene.str.contains(self.__getattribute__("_" + GENE)) &
             data.sirna.str.contains(self.__getattribute__("_" + SIRNA))
-        ]
+            ]
         return data
 
     def _sample_data(self, data):
@@ -131,3 +135,12 @@ class ResultSet:
                 fls.append(v)
         return fls
 
+    def _get_shared_features(self):
+        features_set = set()
+        # TODO; take intersect or union here?
+        for tablefile in self._tablefile_set:
+            if not features_set:
+                features_set |= tablefile.features
+            else:
+                features_set &= tablefile.features
+        return features_set

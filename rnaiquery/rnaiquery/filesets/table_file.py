@@ -21,12 +21,13 @@
 
 
 class TableFile:
-    def __init__(self, query_result, **kwargs):
+    def __init__(self, query_result, features, **kwargs):
         f = query_result[-1].replace("_meta.tsv", "")
         self._filename = f + "_data.tsv"
         self._feature_class = f.split("_")[-1]
         self._filesuffix = f.split("/")[-1]
         self._feature_list_table = self._filesuffix.replace("-", "_")
+        self._features = set(features)
         self._filter = kwargs
         self._study, self._pathogen, self._lib, \
           self._design, self._replicate,\
@@ -45,6 +46,11 @@ class TableFile:
 
     def __hash__(self):
         return hash(self._filename)
+
+
+    @property
+    def features(self):
+        return self._features
 
     @property
     def filename(self):
