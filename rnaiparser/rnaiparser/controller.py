@@ -6,6 +6,7 @@
 import multiprocessing as mp
 import logging
 
+from rnaiparser._globals import USABLE_FEATURES
 from .config import Config
 from .plate_parser import PlateParser
 from .plate_writer import PlateWriter
@@ -27,8 +28,6 @@ class Controller:
     features.
 
     """
-
-    __FEATURES__ = ["bacteria", "cells", "nuclei", "perinuclei", "expandednuclei"]
 
     def __init__(self, config):
         """
@@ -110,7 +109,7 @@ class Controller:
                 # create a list of relevant files for the plateset
                 fls = [
                     self._writer.data_filename(platefileset.outfile + "_" + x)
-                    for x in Controller.__FEATURES__
+                    for x in USABLE_FEATURES
                 ]
                 # if all the files exist, we just skip the creation of the files
                 if any(not Path(x).exists() for x in fls):

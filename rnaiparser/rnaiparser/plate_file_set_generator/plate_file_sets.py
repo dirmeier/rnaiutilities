@@ -7,8 +7,6 @@ import logging
 import os
 import re
 
-from rnaiparser import Controller
-
 from rnaiparser.utility import parse_plate_info, regex
 from rnaiparser.utility import parse_screen_details
 from ._plate_file import PlateFile
@@ -25,9 +23,14 @@ class PlateFileSets:
     Class for keeping all the filenames of plates stored as a map.
 
     """
-    _feature_names_ = Controller.__FEATURES__
+    _feature_names_ = ["Batch_handles.",
+                       "Neighbors.",
+                       "Bacteria.SubObjectFlag.",
+                       "CometTails.",
+                       "DAPIFG.",
+                       "BlobBacteria."]
     # these are feature file names we dont use
-    _features_starts = [x.lower() for x in _feature_names_]
+    _skippable_features_starts = [x.lower() for x in _feature_names_]
     # name of the file that has the sirna-entrez mapping information
     _image_ = "Image.".lower()
     _skip_reg_ = [re.compile(".*_subcell.*"), re.compile(".*subobjectflag.*")]
@@ -121,9 +124,9 @@ class PlateFileSets:
     @staticmethod
     def _skip_feature(basename):
         b = basename.lower()
-        for skip in PlateFileSets._features_starts:
+        for skip in PlateFileSets._skippable_features_starts:
             if b.startswith(skip):
-                return False
+                return True
         for skip in PlateFileSets._skip_reg_:
             if skip.match(b):
                 return True
