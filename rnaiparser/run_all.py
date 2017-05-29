@@ -9,8 +9,8 @@ import argparse
 import sys
 import logging
 
-from tix_parser import Controller
-from tix_parser import Config
+from rnaiparser import Controller
+from rnaiparser import Config
 
 
 def parse_options(args):

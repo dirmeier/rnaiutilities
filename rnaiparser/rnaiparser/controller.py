@@ -28,7 +28,7 @@ class Controller:
 
     """
 
-    __FEATURES__ = ["bacteria", "cells", "nuclei"]
+    __FEATURES__ = ["bacteria", "cells", "nuclei", "perinuclei", "expandednuclei"]
 
     def __init__(self, config):
         """
