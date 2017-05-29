@@ -14,6 +14,7 @@ The packages are designed for the following workflow:
 * Download raw `mat` files from an openBIS instance or whereever your data lie. The `mat` files are supposed to be created by `CellProfiler`, i.e. platewise data-sets, where every file describes a single features for single cells.
 * Parse the downloaded data using `rnaiparser`: install the package, and process as described in the package folder.
 This generates a list of raw `tsvs` files or a bundled `h5` file. Until now the parser writes featuresets for `cells`, `perinuclei`, `nuclei`,  `expandednuclei`,  `bacteria` and `invasomes`.
+* Finally cells can be queried using `rnaiquery`. For that first meta files generated from the step above are written into a database. Then the DB can be queried against to subset single genes, sirnas, pathogens, etc. efficiently. 
 
 ## Author
 
