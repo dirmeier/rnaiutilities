@@ -25,9 +25,8 @@ import os
 
 import numpy as np
 import pandas
-import sys
 
-from rnaiquery.globals import WELL, GENE, SIRNA, SAMPLE
+from rnaiquery.globals import WELL, GENE, SIRNA, SAMPLE, ADDED_COLUMNS_FOR_PRINTING
 from rnaiquery.io.io import IO
 
 logging.basicConfig(
@@ -47,7 +46,6 @@ class ResultSet:
         self._sample = sample if sample is not None else ((2**31) - 1)
         self._filter_fn = lambda x: x.loc[np.random.choice(
           x.index, self._sample, False), :] if len(x) >= self._sample else x
-        # TODO: use this for printing
         self._shared_features = self._get_shared_features()
 
     def __repr__(self):
@@ -88,6 +86,9 @@ class ResultSet:
             data = pandas.read_csv(tablefile.filename,
                                    sep="\t",
                                    header=0)
+            # only take subset of columns that every thingy has
+            data = self._get_columns(data)
+            data = data.reindex_axis(sorted(data.columns), axis=1)
             # filter on well/sirna/gene
             data = self._filter_data(data)
             if len(data) == 0:
@@ -137,10 +138,17 @@ class ResultSet:
 
     def _get_shared_features(self):
         features_set = set()
-        # TODO; take intersect or union here?
         for tablefile in self._tablefile_set:
             if not features_set:
                 features_set |= tablefile.features
             else:
                 features_set &= tablefile.features
-        return features_set
+        return sorted(list(features_set))
+
+    def _get_columns(self, data):
+        data = data[self._shared_features]
+        for col in ADDED_COLUMNS_FOR_PRINTING:
+            if col not in data:
+                # this zero might be incorrect. maybe a NA fits better
+                data[col] = 0
+        return data

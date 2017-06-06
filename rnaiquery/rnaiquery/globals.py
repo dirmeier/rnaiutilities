@@ -41,3 +41,6 @@ SAMPLE = "sample"
 
 FILE_FEATURES_PATTERNS = re.compile(
       "(\w+)-(\w+)-(\w+)-(\w+)-(\w+)-(\d+)-(.*)_(\w+)")
+
+
+ADDED_COLUMNS_FOR_PRINTING = ['parent_nuclei']
