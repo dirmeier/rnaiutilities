@@ -26,7 +26,8 @@ import os
 import numpy as np
 import pandas
 
-from rnaiquery.globals import WELL, GENE, SIRNA, SAMPLE, ADDED_COLUMNS_FOR_PRINTING
+from rnaiquery.globals import WELL, GENE, SIRNA, SAMPLE, \
+    ADDED_COLUMNS_FOR_PRINTING
 from rnaiquery.io.io import IO
 
 logging.basicConfig(
@@ -43,7 +44,7 @@ class ResultSet:
         self._tablefile_set = files
         self._print_header = True
         self._filters = self._set_filter(**kwargs)
-        self._sample = sample if sample is not None else ((2**31) - 1)
+        self._sample = sample if sample is not None else ((2 ** 31) - 1)
         self._filter_fn = lambda x: x.loc[np.random.choice(
           x.index, self._sample, False), :] if len(x) >= self._sample else x
         self._shared_features = self._get_shared_features()
@@ -87,8 +88,13 @@ class ResultSet:
                                    sep="\t",
                                    header=0)
             # only take subset of columns that every thingy has
-            data = self._get_columns(data)
-            data = data.reindex_axis(sorted(data.columns), axis=1)
+            # additionally return the columns in order to check for bad format
+            data, feat_cols = self._get_columns(data, tablefile.feature_class)
+            if len(feat_cols) != len(self._shared_features):
+                logger.warning(
+                  "{} does not have the correct number of features. Skipping."
+                      .format(tablefile.filename))
+                return
             # filter on well/sirna/gene
             data = self._filter_data(data)
             if len(data) == 0:
@@ -145,10 +151,17 @@ class ResultSet:
                 features_set &= tablefile.features
         return sorted(list(features_set))
 
-    def _get_columns(self, data):
-        data = data[self._shared_features]
+    def _get_columns(self, data, feature_class):
+        # get the columns in data that are feature coluns
+        feat_cols = set(
+          filter(lambda x: x.startswith(feature_class), data.columns))
+        # get the columns that are meta columns, such as gene/well/etc.
+        meta_cols = list(
+          filter(lambda x: not x.startswith(feature_class), data.columns))
+        feat_cols &= set(self._shared_features)
+        feat_cols = sorted(list(feat_cols))
+        data = data[meta_cols + feat_cols]
         for col in ADDED_COLUMNS_FOR_PRINTING:
             if col not in data:
-                # this zero might be incorrect. maybe a NA fits better
                 data[col] = 0
-        return data
+        return [data, feat_cols]

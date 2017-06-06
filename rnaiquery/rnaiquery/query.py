@@ -99,4 +99,4 @@ if __name__ == "__main__":
                   well="a01", library="d",
                   replicate=1, featureclass="cells",
                   gene="atp6v1a", sirna="l-017590-01", sample=10)
-    res.dump("/Users/simondi/Desktop/simon.h5")
+    res.dump("/Users/simondi/Desktop/simon.tsv")
