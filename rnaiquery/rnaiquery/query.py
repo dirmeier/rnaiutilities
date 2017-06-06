@@ -20,6 +20,7 @@
 # @email = 'mail@simon-dirmeier.net'
 
 
+import sys
 import logging
 from rnaiquery.controller import Controller
 
@@ -27,6 +28,7 @@ logging.basicConfig(
   level=logging.INFO,
   format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
 logger = logging.getLogger(__name__)
+
 
 class Query:
     def __init__(self, db=None):
@@ -79,7 +81,7 @@ class Query:
 
         if featureclass is None:
             logger.error("Currently using no featureclass it not supported.")
-            exit(0)
+            sys.exit(0)
 
         return self.__ctrl.query(sample=sample,
                                  study=study,
@@ -97,6 +99,6 @@ if __name__ == "__main__":
     q = Query()
     res = q.query(study="infectx",
                   well="a01", library="d",
-                  replicate=1, featureclass="cells",
+                  replicate=1,
                   gene="atp6v1a", sirna="l-017590-01", sample=10)
     res.dump("/Users/simondi/Desktop/simon.tsv")
