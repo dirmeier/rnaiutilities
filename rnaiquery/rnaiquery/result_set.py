@@ -47,7 +47,7 @@ class ResultSet:
         self._sample = sample if sample is not None else ((2 ** 31) - 1)
         self._filter_fn = lambda x: x.loc[np.random.choice(
           x.index, self._sample, False), :] if len(x) >= self._sample else x
-        # TODO: this is solved to badly
+        # TODO: this is solved so badly
         self._shared_features = self._get_shared_features()
 
     def __repr__(self):
@@ -96,8 +96,6 @@ class ResultSet:
                   "{} does not have the correct number of features. Skipping."
                       .format(tablefile.filename))
                 return
-            # sort columns
-
             # filter on well/sirna/gene
             data = self._filter_data(data)
             if len(data) == 0:
