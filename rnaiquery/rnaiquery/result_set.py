@@ -168,14 +168,19 @@ class ResultSet:
           filter(lambda x: not x.startswith(feature_class), data.columns))
         # make sure to only take columns that are in the
         feat_cols = list(feat_cols & set(self._shared_features))
+        # get the new data
         data = data[meta_cols + feat_cols]
+        # add features that are explicitely desired but not found in every screen :(
         if feature_class in ADDED_COLUMNS_FOR_PRINTING:
             for col in ADDED_COLUMNS_FOR_PRINTING[feature_class]:
                 add_col = feature_class + "." + col
                 if add_col not in data:
-                    data.loc[:, add_col] = 0
+                    # add the new column
+                    data.insert(len(data.columns), add_col, 0)
+                    # add the column to the new feature set for later check
                     feat_cols.append(add_col)
         # sort columns
         feat_cols = sorted(feat_cols)
+        # reindex the data set
         data = data.reindex_axis(meta_cols + feat_cols, axis=1, copy=False)
         return [data, feat_cols]
