@@ -82,6 +82,9 @@ class Query:
         if featureclass is None:
             logger.error("Currently using no featureclass it not supported.")
             sys.exit(0)
+        if featureclass != "cells":
+            logger.error("Currently only featureclass 'cells' is supported. :(")
+            sys.exit(0)
 
         return self.__ctrl.query(sample=sample,
                                  study=study,
@@ -99,6 +102,6 @@ if __name__ == "__main__":
     q = Query()
     res = q.query(study="infectx",
                   well="a01", library="d",
-                  replicate=1,
+                  replicate=1, featureclass="cells",
                   gene="atp6v1a", sirna="l-017590-01", sample=10)
     res.dump("/Users/simondi/Desktop/simon.tsv")

@@ -47,6 +47,7 @@ class ResultSet:
         self._sample = sample if sample is not None else ((2 ** 31) - 1)
         self._filter_fn = lambda x: x.loc[np.random.choice(
           x.index, self._sample, False), :] if len(x) >= self._sample else x
+        # TODO: this is solved to badly
         self._shared_features = self._get_shared_features()
 
     def __repr__(self):
@@ -149,6 +150,11 @@ class ResultSet:
                 features_set |= tablefile.features
             else:
                 features_set &= tablefile.features
+        # add all required columns that we most definitely want to cell
+        for feature_class, cols in ADDED_COLUMNS_FOR_PRINTING.items():
+            for col in cols:
+                add_col = feature_class + "." + col
+                features_set.add(add_col)
         return sorted(list(features_set))
 
     def _get_columns(self, data, feature_class):
@@ -158,10 +164,14 @@ class ResultSet:
         # get the columns that are meta columns, such as gene/well/etc.
         meta_cols = list(
           filter(lambda x: not x.startswith(feature_class), data.columns))
+        # make sure to only take columns that are in the
         feat_cols &= set(self._shared_features)
-        feat_cols = sorted(list(feat_cols))
+        feat_cols = list(feat_cols)
         data = data[meta_cols + feat_cols]
-        for col in ADDED_COLUMNS_FOR_PRINTING:
-            if col not in data:
-                data[col] = 0
-        return [data, feat_cols]
+        if feature_class in ADDED_COLUMNS_FOR_PRINTING:
+            for col in ADDED_COLUMNS_FOR_PRINTING[feature_class]:
+                add_col = feature_class + "." + col
+                if add_col not in data:
+                    data.loc[:, add_col] = 0
+                    feat_cols.append(add_col)
+        return [data, sorted(feat_cols)]

@@ -34,12 +34,17 @@ REPLICATE = "replicate"
 PLATE = "plate"
 FEATURECLASS = "featureclass"
 
-
 FEATURES = "features"
 ELEMENTS = "elements"
 SAMPLE = "sample"
 
 FILE_FEATURES_PATTERNS = re.compile(
-      "(\w+)-(\w+)-(\w+)-(\w+)-(\w+)-(\d+)-(.*)_(\w+)")
+  "(\w+)-(\w+)-(\w+)-(\w+)-(\w+)-(\d+)-(.*)_(\w+)")
 
-ADDED_COLUMNS_FOR_PRINTING = ['cells.parent_nuclei']
+ADDED_COLUMNS_FOR_PRINTING = {
+    'cells': [
+        'parent_nuclei',
+        'children_invasomes_count',
+        'children_bacteria_count'
+    ]
+}

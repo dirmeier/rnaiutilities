@@ -16,7 +16,7 @@ from ._plate_list import PlateList
 
 logging.basicConfig(
   level=logging.INFO,
-                    format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
+  format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
 logger = mp.log_to_stderr()
 
 from pathlib import Path
@@ -44,8 +44,8 @@ class Controller:
         # read the plate list files
         # oly take files with regex pooled/unpooled genome/kinome
         self._plate_list = PlateList(
-            config.plate_id_file,
-            ".*\/\w+\-\w[P|U]\-[G|K]\d+(-\w+)*\/.*"
+          config.plate_id_file,
+          ".*\/\w+\-\w[P|U]\-[G|K]\d+(-\w+)*\/.*"
         )
         # parse the folder into a map of (classifier-plate) pairs
         self._layout = MetaLayout(config.layout_file)
@@ -76,8 +76,8 @@ class Controller:
     def _parse(self, plate):
         try:
             platefilesets = self.filesets(
-                self._output_path + "/" + plate,
-                self._output_path
+              self._output_path + "/" + plate,
+              self._output_path
             )
             if len(platefilesets) > 1:
                 logger.warn("Found multiple plate identifiers for: " + plate)
