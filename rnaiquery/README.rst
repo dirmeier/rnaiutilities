@@ -9,9 +9,8 @@ Installation
 ============
 
 Make sure to have ``python 3`` installed. ``rnai-query`` does not support
-previous versions. The best way to do that is to download `anaconda
-https://www.continuum.io/downloads` and setup a virtual `environment
-https://conda.io/docs/using/envs.html`.
+previous versions. The best way to do that is to download anaconda_
+virtual environment_.
 
 I recommend installing the library using:
 
@@ -78,3 +77,6 @@ Author
 ======
 
 - Simon Dirmeier <simon.dirmeier@bsse.ethz.ch>
+
+_anaconda: https://www.continuum.io/downloads
+_environment: https://conda.io/docs/using/envs.html
