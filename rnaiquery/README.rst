@@ -78,5 +78,5 @@ Author
 
 - Simon Dirmeier <simon.dirmeier@bsse.ethz.ch>
 
-_anaconda: https://www.continuum.io/downloads
-_environment: https://conda.io/docs/using/envs.html
+.. _anaconda: https://www.continuum.io/downloads
+.. _environment: https://conda.io/docs/using/envs.html
