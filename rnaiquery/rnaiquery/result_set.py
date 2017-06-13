@@ -64,7 +64,6 @@ class ResultSet:
         
         :param fh: either str or None(default)
         """
-
         with IO(fh) as io:
             for tablefile in self._tablefile_set:
                 self._dump(tablefile, io)
