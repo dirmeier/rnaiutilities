@@ -40,11 +40,11 @@ class IO:
             self._format = None
         else:
             out = IO._flat_ if f.endswith(IO._flat_) else IO._h5_
-            logger.info("Writing to {} ".format(out))
             if pathlib.Path(f).is_file():
-                logger.error(
-                  "File {} already exists. Please delete/rename the file first to avoid erroneously overwriting.")
-                sys.exit(-1)
+                raise ValueError(
+                  "File {} already exists. Please delete/rename the file first"
+                  " to avoid erroneously overwriting.".format(f))
+            logger.info("Writing to {} ".format(out))
             self._format = out
         self._filename = f
         self._fh, self._dataset = None, None
