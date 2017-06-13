@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 from sys import version_info, exit
 
 if version_info[0] == 2:
@@ -16,7 +16,7 @@ setup(
   author='Simon Dirmeier',
   author_email='simon.dirmeier@bsse.ethz.ch',
   license='GPLv3',
-  packages=find_packages(),
+  packages=['rnaiquery', 'rnaiquery.filesets', 'rnaiquery.dbms', 'rnaiquery.io'],
   install_requires=[
       'pandas>=0.20.1',
       'numpy>=1.10.0',
