@@ -22,6 +22,7 @@
 
 import logging
 import pandas
+import pathlib
 
 logging.basicConfig(
   level=logging.INFO,
@@ -76,6 +77,8 @@ class IO:
               )
             )
         else:
+            if pathlib.Path(self._filename).is_file():
+                self._print_header = False
             data.to_csv(
               self._filename,
               sep="\t",
