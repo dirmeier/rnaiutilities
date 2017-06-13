@@ -9,13 +9,15 @@ Installation
 ============
 
 Make sure to have ``python 3`` installed. ``rnai-query`` does not support
-previous versions.
+previous versions. The best way to do that is to download `anaconda
+https://www.continuum.io/downloads` and setup a virtual `environment
+https://conda.io/docs/using/envs.html`.
 
 I recommend installing the library using:
 
 .. code-block:: bash
 
-   python setup.py install
+   pip install rnaiquery
 
 This also installs ``ipython`` and all required dependencies.
 
