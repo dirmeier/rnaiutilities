@@ -3,8 +3,6 @@
 # __date__   = 22/09/16
 
 
-from __future__ import print_function, absolute_import
-
 import argparse
 import sys
 import logging

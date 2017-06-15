@@ -1,5 +1,3 @@
-# Copyright (C) 2016 Simon Dirmeier
-#
 # This file is part of rnaiquery.
 #
 # rnaiquery is free software: you can redistribute it and/or modify
