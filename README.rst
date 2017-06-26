@@ -1,82 +1,97 @@
-<h1 align="center"> rnai-utilities </h1>
+**********
+rnaiutilities
+**********
 
-A collection of python packages for processing image-based RNAi screens.
+A collection of python modules and command line toole for processing
+image-based RNAi screens.
 
-## Introduction
+Introduction
+============
 
-`rnai-utilies` provide a set of python packages that can be used to process, convert, query and analyse
-imaged-based RNAi-screens.
-
-## Usage
+`rnaiutilies` provide a set of python modules that can be used to process,
+convert, query and analyse imaged-based RNAi-screens.
 
 The packages are designed for the following workflow:
 
-* Download raw `mat` files from an openBIS instance or whereever your data lie. The `mat` files are supposed to be created by `CellProfiler`, i.e. platewise data-sets, where every file describes a single features for single cells.
-* Parse the downloaded data using `rnaiparser`: install the package, and process as described in the package folder.
-This generates a list of raw `tsvs` files or a bundled `h5` file. Until now the parser writes featuresets for `cells`, `perinuclei`, `nuclei`,  `expandednuclei`,  `bacteria` and `invasomes`.
-* Finally cells can be queried using `rnaiquery`. For that first meta files generated from the step above are written into a database. Then the DB can be queried against to subset single genes, sirnas, pathogens, etc. efficiently.
-
-## Author
-
-* Simon Dirmeier <a href="mailto:simon.dirmeier@bsse.ethz.ch">simon.dirmeier@bsse.ethz.ch</a>
-
-The `tix_parser` combines several subpackages for parsing tix matlab files
-into tsvs:
-
-### Run
-
-Run the complete thing with:
-
-```sh
-  pip install -r requirements.txt
-  python run_all.py ...
-```
-
-If you get errors, I probably forgot some dependency.
-Just email me to noreply@simon-dirmeier.net
-
-
-
-
-**********
-rnaiquery
-**********
-
-Easily query and sample  from a large set of CellProfiler-based RNAi screen
-file-sets into flat ``tsvs``.
+* Download raw `mat` files from an openBIS instance or where ever your data lie.
+ The `mat` files are supposed to be created by `CellProfiler`, i.e. platewise
+  data-sets, where every file describes a single features for single cells.
+* Parse the downloaded data using `rnai-parse`: install the package, and
+ process as described in the package folder.
+ This generates a list of raw `tsvs` files or a bundled `h5` file. Until now
+ the parser writes featuresets for `cells`, `perinuclei`, `nuclei`,  `expandednuclei`,  `bacteria` and `invasomes`.
+* Finally cells can be queried using `rnai-query`. For that first meta files
+ generated from the step above are written into a database. Then the DB can
+ be queried against to subset single genes, sirnas, pathogens, etc. efficiently.
 
 Installation
 ============
 
-Make sure to have ``python 3`` installed. ``rnai-query`` does not support
+Make sure to have ``python 3`` installed. ``rnaiutilities`` does not support
 previous versions. The best way to do that is to download anaconda_
 virtual environment_.
 
-I recommend installing the library using:
+Download the latest release first and then install using:
 
 .. code-block:: bash
 
-   pip install rnaiquery
+   pip install .
 
-This also installs ``ipython`` and all required dependencies.
+If you get errors, I probably forgot some dependency.
 
 Usage
 =====
 
-First start an ``ipython`` session with:
+rnai-parse
+----------
+
+
+TODO
+
+rnai-query
+----------
+
+First a database with meta files has to be setup. For that we use either
+``postgres`` or ``sqlite``. You can either
+
+* start ``postgres`` with a database called ``tix`` and make it listen to port
+5432,
+* or provide a filename to the script and we use it as an stand-alone ``sqlite``
+database (use a filename with suffix ``.db``).
+
+
+ TODO
+
+For postgres:
 
 .. code-block:: bash
 
-  ipython
+  rnai-query --insert --path /i/am/a/path/to/data
 
-If you have not worked with ``python`` before, this is similar to an `R`-session.
-Having the interpreter started, querying is easy:
+For sqlite:
+
+.. code-block:: bash
+
+  rnai-query --insert --path /i/am/a/path/to/data --db /i/am/a/file/called/tix.db
+
+
+Having the database set up, we can query for custom features.
+
+.. code-block:: bash
+
+  rnai-query --query ....
+
+
+Alternatively you can just use the python API, for example with ``ipython``.
+If you have not worked with ``python`` before, this is similar to an
+``R``-session. Having the interpreter started (using ``ipython`` on the
+command line), querying is easy:
 
 
 .. code-block:: python
 
   # load the query module
-  from rnaiquery import Query
+  from rnaiutilities import Query
   # create a query object
   q = Query(<your db file>)
   # do a query
@@ -111,6 +126,9 @@ The complete list of possible queries is shown below.
             featureclass=None,
             sample=100)
 
+If any argument is not set, i.e. set to ``None``, all the database will be
+searched and no filters applied.
+
 There are probably still bugs, so patches are welcome.
 
 Author
@@ -120,25 +138,3 @@ Author
 
 .. _anaconda: https://www.continuum.io/downloads
 .. _environment: https://conda.io/docs/using/envs.html
-
-### Tix database
-
-Add meta files to the target infect x database. **A `postgres` database
-called `tix` must be running if no sqlite file is provided.** I.e if you want
- to use `postgres` for inserting the meta files, start the postgres service, and
- create a db called `tix`. If you want to use `sqlite3` just provide a file
- name as argument.
-
-
-This uses a postgres db:
-
-```python
-  python dbms.py --path /i/am/a/path/to/data
-```
-
-
-```python
-  python dbms.py --path /i/am/a/path/to/data --db  /i/am/a/file/called/tix.db
-```
-
-

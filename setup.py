@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 from sys import version_info, exit
 
+
 if version_info[0] == 2:
     exit("Sorry, Python 2 is not supported")
 
@@ -12,7 +13,7 @@ def readme():
 setup(
   name='rnaiutilities',
   version='0.1.0',
-  description='A collection of useful commandline tools and libraries '
+  description='A collection of commandline tools and python modules '
               'for working with image-based RNAi screens.',
   long_description=readme(),
   url='https://github.com/dirmeier/rnaiutilities',
