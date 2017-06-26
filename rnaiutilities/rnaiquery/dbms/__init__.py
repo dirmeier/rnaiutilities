@@ -20,4 +20,4 @@
 # @email = 'mail@simon-dirmeier.net'
 
 
-from rnaiquery.dbms.dbms import DBMS
+from .dbms import DBMS

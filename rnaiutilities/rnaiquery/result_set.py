@@ -26,9 +26,9 @@ import os
 import numpy as np
 import pandas
 
-from rnaiquery.globals import WELL, GENE, SIRNA, SAMPLE, \
+from .globals import WELL, GENE, SIRNA, SAMPLE, \
     ADDED_COLUMNS_FOR_PRINTING
-from rnaiquery.io.io import IO
+from .io.io import IO
 
 logging.basicConfig(
   level=logging.INFO,
@@ -58,10 +58,10 @@ class ResultSet:
 
     def dump(self, fh=None):
         """
-        Print the result set of the database query to tsv or stdout. If a string 
+        Print the result set of the database query to tsv or stdout. If a string
         is given as param *fh* prints to file, otherwise if None is given prints
         to stdout.
-        
+
         :param fh: either str or None(default)
         """
         with IO(fh) as io:
@@ -72,13 +72,13 @@ class ResultSet:
     def _dump(self, tablefile, io):
         """
         Dumbs a table file to tsv/h5/stdout
-         
-        This is arguably not very efficient, since it first reads a tsv, then 
+
+        This is arguably not very efficient, since it first reads a tsv, then
         does filtering, grouping and sampling and then prints to tsv again.
         For the time being this suffices.
-        
+
         Ideally at some point Nicolas' DB is used.
-        
+
         """
 
         # test if the data file can be found

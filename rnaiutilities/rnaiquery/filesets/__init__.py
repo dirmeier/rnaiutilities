@@ -19,4 +19,4 @@
 # @author = 'Simon Dirmeier'
 # @email = 'mail@simon-dirmeier.net'
 
-from rnaiquery.filesets.table_file_sets import TableFileSets
+from .table_file_sets import TableFileSets

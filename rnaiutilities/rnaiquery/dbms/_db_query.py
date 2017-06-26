@@ -22,11 +22,11 @@
 
 import logging
 
-from rnaiquery.dbms._db_setup import DatabaseInserter
-from rnaiquery.filesets.table_file import TableFile
-from rnaiquery.globals import FEATURECLASS
-from rnaiquery.globals import GENE, SIRNA, LIBRARY, DESIGN
-from rnaiquery.globals import REPLICATE, PLATE, STUDY, PATHOGEN
+from ._db_setup import DatabaseInserter
+from ..filesets.table_file import TableFile
+from ..globals import FEATURECLASS
+from ..globals import GENE, SIRNA, LIBRARY, DESIGN
+from ..globals import REPLICATE, PLATE, STUDY, PATHOGEN
 
 logging.basicConfig(
   level=logging.INFO,

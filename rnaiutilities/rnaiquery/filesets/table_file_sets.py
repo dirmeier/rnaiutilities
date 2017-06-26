@@ -20,7 +20,7 @@
 # @email = 'mail@simon-dirmeier.net'
 
 
-from rnaiquery.dbms.dbms import DBMS
+from ..dbms import DBMS
 
 
 class TableFileSets:
@@ -38,9 +38,9 @@ class TableFileSets:
 
     def filter(self, **kwargs):
         """
-        Get a set of files that meets some criteria. Kwargs is a names list, 
+        Get a set of files that meets some criteria. Kwargs is a names list,
         that can have the following form:
-         
+
          {
                 study="infectx",
                 pathogen="salmonella",
@@ -50,7 +50,7 @@ class TableFileSets:
                 replicate=1,
                 library="d"
          }
-        
+
         :return: returns a set of TableFile
         :rtype: set(TableFile)
         """

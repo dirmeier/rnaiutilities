@@ -6,8 +6,8 @@
 import logging
 import sqlite3
 
-from rnaiquery.dbms._database_connection import DatabaseConnection
-from rnaiquery.globals import GENE, SIRNA, WELL
+from ._database_connection import DatabaseConnection
+from ..globals import GENE, SIRNA, WELL
 
 logging.basicConfig(
   level=logging.INFO,
