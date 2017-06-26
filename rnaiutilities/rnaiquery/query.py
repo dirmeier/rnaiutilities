@@ -22,7 +22,8 @@
 
 import sys
 import logging
-from rnaiquery.controller import Controller
+from .filesets import table_file_sets
+from .result_set import ResultSet
 
 logging.basicConfig(
   level=logging.INFO,
@@ -34,11 +35,12 @@ class Query:
     def __init__(self, db=None):
         """
         Create an instance to query a data.base
-        
+
         :param db: if provided the filename of a sqlite database
         :type db: str
         """
-        self.__ctrl = Controller(db)
+        # filesets of meta files
+        self._table = table_file_sets.TableFileSets(db)
 
     def query(self,
               study=None,
@@ -53,17 +55,17 @@ class Query:
               featureclass=None,
               sample=100):
         """
-        
-        Query a database of image-based RNAi screening features for 
+
+        Query a database of image-based RNAi screening features for
          cells/bacteria/nuclei.
-        The query can use filters, so that only a subset is selected. 
+        The query can use filters, so that only a subset is selected.
         A lazy result set is returned, i.e. a set of plate files that meets the
         filtered criteria.
-        
-        :param study: filters by study, e.g. 
+
+        :param study: filters by study, e.g.
          'infectx'/'group_cossart'/'infectx_published'
         :param pathogen: filters by pathogen, e.g.
-         'salmonella'/'adeno'/'bartonella'/'brucella'/'listeria' 
+         'salmonella'/'adeno'/'bartonella'/'brucella'/'listeria'
         :param library: filters by library, e.g. 'a'/'d'/'q'
         :param design: filters by design, e.g.: 'p'/'u'
         :param replicate: filters by replicate, i.e. a number
@@ -71,10 +73,10 @@ class Query:
         :param gene: filters by gene, i.e.: 'star'
         :param sirna: filters by gene, i.e.: 'l-019369-00'
         :param well: filters by gene, i.e.: 'a01'
-        :param featureclass: filters by featureclass, 
+        :param featureclass: filters by featureclass,
          e.g. 'nuclei'/'cells'/'bacteria'
         :param sample: sample from every well x times
-         
+
         :return: returns a lazy ResultSet
         :rtype: ResultSet
         """
@@ -86,21 +88,26 @@ class Query:
             logger.error("Currently only featureclass 'cells' is supported. :(")
             sys.exit(0)
 
-        return self.__ctrl.query(sample=sample,
-                                 study=study,
-                                 pathogen=pathogen,
-                                 library=library,
-                                 design=design,
-                                 replicate=replicate,
-                                 plate=plate,
-                                 gene=gene,
-                                 sirna=sirna,
-                                 well=well,
-                                 featureclass=featureclass)
+        return self._query(sample=sample,
+                           study=study,
+                           pathogen=pathogen,
+                           library=library,
+                           design=design,
+                           replicate=replicate,
+                           plate=plate,
+                           gene=gene,
+                           sirna=sirna,
+                           well=well,
+                           featureclass=featureclass)
 
-if __name__ == "__main__":
-    q = Query()
-    res = q.query(library="d",
-                 featureclass="cells",
-                  gene="star", sample=10)
-    res.dump("/Users/simondi/Desktop/simon.tsv")
+    def _query(self, **kwargs):
+        """
+        Get a lazy file result set from some filtering criteria and a fixed
+        sample size.
+
+        :param kwargs: the filtering criteria.
+        :return: returns a lazy ResultSet
+        :rtype: ResultSet
+        """
+        fls = self._table.filter(**kwargs)
+        return ResultSet(fls, **kwargs)

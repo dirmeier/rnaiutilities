@@ -3,26 +3,26 @@
 # __date__   = 22/09/16
 
 
-import multiprocessing as mp
 import logging
+from pathlib import Path
 
-from rnaiparser._globals import USABLE_FEATURES
+import multiprocessing as mp
+
+from ._globals import USABLE_FEATURES
+from ._plate_list import PlateList
 from .config import Config
-from .plate_parser import PlateParser
-from .plate_writer import PlateWriter
 from .plate_file_set_generator.plate_file_sets import PlateFileSets
 from .plate_layout import MetaLayout
-from ._plate_list import PlateList
+from .plate_parser import PlateParser
+from .plate_writer import PlateWriter
 
 logging.basicConfig(
   level=logging.INFO,
   format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
 logger = mp.log_to_stderr()
 
-from pathlib import Path
 
-
-class Controller:
+class Parser:
     """
     Class for parsing a folder of plates containing matlab files for the
     features.
@@ -75,13 +75,13 @@ class Controller:
 
     def _parse(self, plate):
         try:
-            platefilesets = self.filesets(
+            platefilesets = self._filesets(
               self._output_path + "/" + plate,
               self._output_path
             )
             if len(platefilesets) > 1:
                 logger.warn("Found multiple plate identifiers for: " + plate)
-            ret = self.parse_plate_file_sets(platefilesets)
+            ret = self._parse_plate_file_sets(platefilesets)
         except Exception as e:
             logger.error("Found error parsing: " + str(plate) + ". " +
                          "Error:" + str(e))
@@ -89,7 +89,7 @@ class Controller:
         return ret
 
     @staticmethod
-    def filesets(folder, output_path):
+    def _filesets(folder, output_path):
         """
         Create a list of platefile sets contained in a folder. Recursively go
         through all the folders and add the found matlab files into the
@@ -101,7 +101,7 @@ class Controller:
         """
         return PlateFileSets(folder, output_path)
 
-    def parse_plate_file_sets(self, platefilesets):
+    def _parse_plate_file_sets(self, platefilesets):
         if not isinstance(platefilesets, PlateFileSets):
             raise TypeError("no PlateFileSets object given")
         try:
