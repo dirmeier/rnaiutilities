@@ -7,8 +7,8 @@ import argparse
 import sys
 import logging
 
-from rnaiparser import Controller
-from rnaiparser import Config
+from rnaiutilities import Controller
+from rnaiutilities import Config
 
 
 def parse_options(args):
