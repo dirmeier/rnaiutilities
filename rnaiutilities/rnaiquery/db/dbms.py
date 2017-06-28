@@ -64,33 +64,3 @@ class DBMS:
     def insert(self, path):
         d = DatabaseInserter(self.__connection)
         d.insert(path)
-
-
-if __name__ == "__main__":
-    import sys
-    import argparse
-
-    def parse_options(args):
-        parser = argparse.ArgumentParser(
-          description='Write files from image-based RNAi screens.')
-        parser.add_argument(
-          '--db',
-          type=str,
-          help='The filename of a database if a sqlite connection is intended. '
-               'If db is not provided a postgres DB will be used. This requires'
-               "a postgres DB called 'tix' to be running listening on port 5432.",
-          required=False,
-          metavar='database')
-        parser.add_argument(
-          '--path',
-          type=str,
-          help='The path(!) to the meta files, i.e. the info files of the '
-               'parsed plates. Provide only the path and not the file names.',
-          required=True,
-          metavar='meta-path')
-        opts = parser.parse_args(args)
-        return opts.db, opts.path
-
-    db, path = parse_options(sys.argv[1:])
-    with DBMS(db) as d:
-        d.insert(path)

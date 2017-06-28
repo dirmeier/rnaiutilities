@@ -1,10 +1,49 @@
 #!/usr/bin/env python3
 
+# Copyright (C) 2016 Simon Dirmeier
+#
+# This file is part of rnaiutilities.
+#
+# rnaiutilities is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# rnaiutilities is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with rnaiutilities. If not, see <http://www.gnu.org/licenses/>.
+#
+# @author = 'Simon Dirmeier'
+# @email = 'simon.dirmeier@bsse.ethz.ch'
+
+
 import click
 from rnaiutilities import Query
 
 
-@click.command()
+@click.group()
+def cli():
+    pass
+
+
+@cli.command()
+@click.argument("path", type=str)
+@click.option("--db", default=None,
+              help="Sqlite database file."
+                   " If unset uses a postgres database listening on port 5432."
+                   " Otherwise, if set, uses the database file and opens a "
+                   "connection to sqlite.")
+def insert(path, db):
+    """Insert meta data to a database."""
+    q = Query()
+    q.insert(path, db)
+
+
+@cli.command()
 @click.argument("outfile", type=str)
 @click.option("--db", default=None,
               help="Sqlite database file."
@@ -46,9 +85,9 @@ from rnaiutilities import Query
 @click.option("--sample", default=100, type=int,
               help="The amount of single cells that are sampled per well, "
                    "like '100'. If unset defaults to all cells in the well.")
-def main(outfile, db,
-         study, pathogen, library, design, replicate, gene, sirna, well,
-         featureclass, sample):
+def query(outfile, db,
+          study, pathogen, library, design, replicate, gene, sirna, well,
+          featureclass, sample):
     """Query and sample single cells or bacteria."""
     q = Query(db)
     res = q.query(study=study,
@@ -63,5 +102,6 @@ def main(outfile, db,
                   sample=sample)
     res.dump(outfile)
 
+
 if __name__ == "__main__":
-    main()
+    cli()

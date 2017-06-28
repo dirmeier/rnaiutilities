@@ -32,7 +32,8 @@ setup(
       'pandas>=0.20.1',
       'psycopg2>=2.7.1',
       'pyyaml>=3.12',
-      'tables>=3.3.0'
+      'tables>=3.3.0',
+      'click>=6.7'
   ],
   classifiers=[
       'Development Status :: 3 - Alpha',

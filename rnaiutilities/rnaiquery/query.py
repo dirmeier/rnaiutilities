@@ -21,8 +21,10 @@
 
 import sys
 import logging
-from .filesets import table_file_sets
-from .result_set import ResultSet
+
+from rnaiutilities.rnaiquery.filesets import table_file_sets
+from rnaiutilities.rnaiquery.db.dbms import DBMS
+from rnaiutilities.rnaiquery.result_set import ResultSet
 
 logging.basicConfig(
   level=logging.INFO,
@@ -110,3 +112,20 @@ class Query:
         """
         fls = self._table.filter(**kwargs)
         return ResultSet(fls, **kwargs)
+
+    @staticmethod
+    def insert(path, db):
+        """
+        Insert meta information of an platewise RNAi screen to a database.
+        For insertion the path leading to the meta files has to be provided.
+        Meta information is then written to either a sqlite database if `db`
+        is set, otherwise the DB connection defaults to a postgres DB that listens on port 5432/.
+
+        :param path: the folder to the meta files
+        :type path: str
+        :param db: filename of the sqlite database. If not set defaults to a postgres DB.
+        :type db: str
+        :return:
+        """
+        with DBMS(db) as d:
+            d.insert(path)

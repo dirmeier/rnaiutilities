@@ -18,8 +18,7 @@
 # @author = 'Simon Dirmeier'
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
-
-from ..dbms import DBMS
+from rnaiutilities.rnaiquery.db.dbms import DBMS
 
 
 class TableFileSets:

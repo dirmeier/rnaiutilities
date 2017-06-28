@@ -1,6 +1,6 @@
-**********
+**************
 rnaiutilities
-**********
+**************
 
 A collection of python modules and command line toole for processing
 image-based RNAi screens.
@@ -66,20 +66,20 @@ For postgres:
 
 .. code-block:: bash
 
-  rnai-query --insert --path /i/am/a/path/to/data
+  rnai-query insert /i/am/a/path/to/data
 
 For sqlite:
 
 .. code-block:: bash
 
-  rnai-query --insert --path /i/am/a/path/to/data --db /i/am/a/file/called/tix.db
+  rnai-query insert --db /i/am/a/file/called/tix.db /i/am/a/path/to/data
 
 
 Having the database set up, we can query for custom features.
 
 .. code-block:: bash
 
-  rnai-query --query ....
+  rnai-query query ....
 
 
 Alternatively you can just use the python API, for example with ``ipython``.
