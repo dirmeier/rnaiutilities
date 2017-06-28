@@ -39,6 +39,7 @@ def cli():
                    "connection to sqlite.")
 def insert(path, db):
     """Insert meta data to a database."""
+
     q = Query()
     q.insert(path, db)
 

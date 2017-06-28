@@ -33,7 +33,7 @@ from .plate_parser import PlateParser
 from .plate_writer import PlateWriter
 
 logging.basicConfig(
-  level=logging.INFO,
+  level=logging.WARNING,
   format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
 logger = mp.log_to_stderr()
 
