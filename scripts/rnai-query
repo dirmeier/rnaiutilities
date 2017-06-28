@@ -38,7 +38,9 @@ def cli():
                    " Otherwise, if set, uses the database file and opens a "
                    "connection to sqlite.")
 def insert(path, db):
-    """Insert meta data to a database."""
+    """
+    Inserts meta data from PATH to a database.
+    """
 
     q = Query()
     q.insert(path, db)
@@ -89,7 +91,10 @@ def insert(path, db):
 def query(outfile, db,
           study, pathogen, library, design, replicate, gene, sirna, well,
           featureclass, sample):
-    """Query and sample single cells or bacteria."""
+    """
+    Query and sample single cells or bacteria and write to an OUTFILE.
+    """
+
     q = Query(db)
     res = q.query(study=study,
                   pathogen=pathogen,
