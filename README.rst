@@ -1,28 +1,19 @@
-**********
+*************
 rnaiutilities
-**********
+*************
 
-A collection of python modules and command line toole for processing
-image-based RNAi screens.
+A collection of python modules and command line toole for processing image-based RNAi screens.
 
 Introduction
 ============
 
-`rnaiutilies` provide a set of python modules that can be used to process,
-convert, query and analyse imaged-based RNAi-screens.
+`rnaiutilies` provide a set of python modules that can be used to process, convert, query and analyse imaged-based RNAi-screens.
 
 The packages are designed for the following workflow:
 
-* Download raw `mat` files from an openBIS instance or where ever your data lie.
- The `mat` files are supposed to be created by `CellProfiler`, i.e. platewise
-  data-sets, where every file describes a single features for single cells.
-* Parse the downloaded data using `rnai-parse`: install the package, and
- process as described in the package folder.
- This generates a list of raw `tsvs` files or a bundled `h5` file. Until now
- the parser writes featuresets for `cells`, `perinuclei`, `nuclei`,  `expandednuclei`,  `bacteria` and `invasomes`.
-* Finally cells can be queried using `rnai-query`. For that first meta files
- generated from the step above are written into a database. Then the DB can
- be queried against to subset single genes, sirnas, pathogens, etc. efficiently.
+* Download raw `mat` files from an openBIS instance or where ever your data lie. The `mat` files are supposed to be created by `CellProfiler`, i.e. platewise data-sets, where every file describes a single features for single cells.
+* Parse the downloaded data using `rnai-parse`: install the package, and process as described in the package folder. This generates a list of raw `tsvs` files or a bundled `h5` file. Until now the parser writes featuresets for `cells`, `perinuclei`, `nuclei`,  `expandednuclei`,  `bacteria` and `invasomes`.
+* Finally cells can be queried using `rnai-query`. For that first meta files generated from the step above are written into a database. Then the DB can be queried against to subset single genes, sirnas, pathogens, etc. efficiently.
 
 Installation
 ============
@@ -54,10 +45,8 @@ rnai-query
 First a database with meta files has to be setup. For that we use either
 ``postgres`` or ``sqlite``. You can either
 
-* start ``postgres`` with a database called ``tix`` and make it listen to port
-5432,
-* or provide a filename to the script and we use it as an stand-alone ``sqlite``
-database (use a filename with suffix ``.db``).
+* start ``postgres`` with a database called ``tix`` and make it listen to port 5432,
+* or provide a filename to the script and we use it as an stand-alone ``sqlite`` database (use a filename with suffix ``.db``).
 
 
  TODO
@@ -126,8 +115,7 @@ The complete list of possible queries is shown below.
             featureclass=None,
             sample=100)
 
-If any argument is not set, i.e. set to ``None``, all the database will be
-searched and no filters applied.
+If any argument is not set, i.e. set to ``None``, the whole database will be searched and no filters applied.
 
 There are probably still bugs, so patches are welcome.
 
