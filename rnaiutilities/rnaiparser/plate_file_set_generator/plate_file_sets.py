@@ -28,9 +28,9 @@ from rnaiparser.utility import parse_screen_details
 from ._plate_file import PlateFile
 from .plate_file_set import PlateFileSet
 
-logging.basicConfig(level=logging.INFO,
-                    format='[%(levelname)-1s/%(processName)-1s/%('
-                           'name)-1s]: %(message)s')
+logging.basicConfig(
+  level=logging.WARNING,
+  format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
 logger = logging.getLogger(__name__)
 
 

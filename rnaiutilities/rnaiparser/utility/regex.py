@@ -22,9 +22,9 @@
 import re
 import logging
 
-logging.basicConfig(level=logging.INFO,
-                    format='[%(levelname)-1s/%(processName)-1s/%('
-                           'name)-1s]: %(message)s')
+logging.basicConfig(
+  level=logging.WARNING,
+  format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
 logger = logging.getLogger(__name__)
 
 __screen_regex__ = re.compile("^(\S+-?\S+)-(\w+)-(\w)(\w)-(\w+)(\d+)(-(.*))?$")
@@ -51,7 +51,7 @@ def parse_screen_details(screen):
                pat.group(5), pat.group(6), \
                pat.group(8) if pat.group(8) is not None else __NA__
     except AttributeError:
-        logger.warn("Could not parse: " + str(screen))
+        logger.warning("Could not parse: " + str(screen))
         return None
 
 

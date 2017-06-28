@@ -22,9 +22,9 @@
 import logging
 import re
 
-logging.basicConfig(level=logging.INFO,
-                    format='[%(levelname)-1s/%(processName)-1s/%('
-                           'name)-1s]: %(message)s')
+logging.basicConfig(
+  level=logging.WARNING,
+  format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
 logger = logging.getLogger(__name__)
 
 
@@ -45,8 +45,8 @@ class PlateList:
         self._pattern = pattern
         # regex that automatically excludes files
         self._regex = re.compile(
-            ".*((BACKUP)|(INVASIN)|(OLIGOPROFILE)|(TITRATION)|"
-            "(RHINO-TEST)|(1PMOL)).*".upper())
+          ".*((BACKUP)|(INVASIN)|(OLIGOPROFILE)|(TITRATION)|"
+          "(RHINO-TEST)|(1PMOL)).*".upper())
         logger.info("Loading experiments...")
         self._plate_files = self._load()
 

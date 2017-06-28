@@ -24,7 +24,9 @@ import re
 
 from .utility import load_matlab
 
-logging.basicConfig(level=logging.INFO, filemode="w")
+logging.basicConfig(
+  level=logging.WARNING,
+  format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
 logger = logging.getLogger(__name__)
 
 

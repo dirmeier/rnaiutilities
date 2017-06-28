@@ -27,9 +27,9 @@ from .utility import load_matlab
 from ._plate_sirna_gene_mapping import PlateSirnaGeneMapping
 from ._plate_cell_features import PlateCellFeature
 
-logging.basicConfig(level=logging.INFO,
-                    format='[%(levelname)-1s/%(processName)-1s/%('
-                           'name)-1s]: %(message)s')
+logging.basicConfig(
+  level=logging.WARNING,
+  format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
 logger = logging.getLogger(__name__)
 
 __NA__ = "NA"

@@ -28,7 +28,7 @@ from ..globals import GENE, SIRNA, LIBRARY, DESIGN
 from ..globals import REPLICATE, PLATE, STUDY, PATHOGEN
 
 logging.basicConfig(
-  level=logging.INFO,
+  level=logging.WARNING,
   format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
 logger = logging.getLogger(__name__)
 
