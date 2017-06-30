@@ -139,3 +139,26 @@ class Parser:
         except Exception as e:
             logger.error("Some error idk anythin can happen here: " + str(e))
         return 0
+
+    def report(self):
+        for plate in self._plate_list:
+            platefilesets = self._filesets(
+              self._output_path + "/" + plate,
+              self._output_path
+            )
+            if len(platefilesets) == 0:
+                print("{} is missing entirely".format(plate))
+            for platefileset in platefilesets:
+                fls = [
+                    self._writer.data_filename(platefileset.outfile + "_" + x)
+                    for x in USABLE_FEATURES
+                ]
+                cnt_all_files = len(fls)
+                cnt_avail_files = sum([Path(x).exists() for x in fls])
+                # if cnt_all_files != cnt_avail_files:
+                print(
+                    "{} has not been parsed completely -> only "
+                    "{}/{} files there.".format(
+                        plate, cnt_avail_files, cnt_all_files))
+
+        logger.info("All's well that ends well")

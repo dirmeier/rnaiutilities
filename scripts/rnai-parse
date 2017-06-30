@@ -26,7 +26,22 @@ from rnaiutilities import Parser
 from rnaiutilities import Config
 
 
-@click.command()
+@click.group()
+def cli():
+    pass
+
+
+@cli.command()
+@click.argument("config", type=str)
+def report(config):
+    """
+    Creates a report if all files from CONFIG have been parsed correctly.
+    """
+    c = Config(config)
+    Parser(c).report()
+
+
+@cli.command()
 @click.argument("config", type=str)
 def parse(config):
     """
@@ -38,4 +53,4 @@ def parse(config):
 
 
 if __name__ == "__main__":
-    parse()
+    cli()
