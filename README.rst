@@ -47,7 +47,7 @@ files. First you need to create a config file in ``yaml`` format like this:
   layout_file: "/path/to/layout.tsv"
   plate_folder: "/path/to/plates"
   output_path: "/path/to/outfolder"
-  plate_id_file: "/path/to/experiment_meta_files/experiment_meta_file.tsv"
+  plate_id_file: "/path/to/experiment_meta_file.tsv"
   multiprocessing: False
 
 
