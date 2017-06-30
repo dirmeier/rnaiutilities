@@ -33,49 +33,87 @@ If you get errors, I probably forgot some dependency.
 Usage
 =====
 
+With ``rnaiutilities`` first all matlab files are parsed and then queried by
+meta information. Check out the documentation on ``docs``.
+
 rnai-parse
 ----------
 
+``rnai-parse`` parses matlab files of CellProfiler features as raw tsvs or h5
+files. First you need to create a config file in ``yaml`` format like this:
 
-TODO
+.. code-block:: yaml
+
+  layout_file: "/path/to/layout.tsv"
+  plate_folder: "/path/to/plates"
+  output_path: "/path/to/outfolder"
+  plate_id_file: "/path/to/experiment_meta_files/experiment_meta_file.tsv"
+  multiprocessing: False
+
+
+``layout_file`` describes the placement of siRNAs and genes on the plates,
+``plate_folder`` points to the collection of matlab files, ``output_path`` is
+the target directory where files are written to. ``plate_id_file`` is a list
+of ids of plates that are going to be parsed in case only a subset of
+``plate_folder`` should get parsed. ``multiprocessing`` is a boolean
+determining whether python uses multiple processes or not.
+Check out the ``data`` folder for some example datasets.
+
+You can use ``rnai-parse`` from the commandline like this:
+
+.. code-block:: bash
+
+  rnai-parse parse CONFIG
+
+If parsing is complete, you can create a report if all files have been parsed
+or if some are missing:
+
+.. code-block:: bash
+
+  rnai-parse report CONFIG
+
+The result of the parsing process should be a set of files for every plate.
+For example every plate should create ``*data.tsv`` files and a respective
+``*meta.tsv`` for it.
 
 rnai-query
 ----------
 
-First a database with meta files has to be setup. For that we use either
-``postgres`` or ``sqlite``. You can either
+The parsed files can be used for quickly subsetting the complete dataset. For
+that first a database with meta files has to be setup. For that you can
+either use ``postgres`` or ``sqlite``. So either
 
 * start ``postgres`` with a database called ``tix`` and make it listen to port 5432,
 * or provide a filename to the script and we use it as an stand-alone ``sqlite`` database (use a filename with suffix ``.db``).
 
-
- TODO
-
-For postgres:
+For postgres run:
 
 .. code-block:: bash
 
-  rnai-query insert /i/am/a/path/to/data
+  rnai-query insert /i/am/a/path/to/parsed/data
 
 For sqlite:
 
 .. code-block:: bash
 
-  rnai-query insert --db /i/am/a/file/called/tix.db /i/am/a/path/to/data
+  rnai-query insert --db /i/am/a/file/called/tix.db /i/am/a/path/to/parsed/data
 
+Where ``/i/am/a/path/to/parsed/data`` points to the folder where the ``meta.tsv``s and ``data.tsv``s lie.
 
 Having the database set up, we can query for custom features.
 
 .. code-block:: bash
 
-  rnai-query query ....
+  rnai-query query --sample 10
 
+In this case, since no DB is specified, we expect a postgres DB to be running.
+The query would return 10 single cells randomly sampled from each well from
+all plates.
 
 Alternatively you can just use the python API, for example with ``ipython``.
 If you have not worked with ``python`` before, this is similar to an
 ``R``-session. Having the interpreter started (using ``ipython`` on the
 command line), querying is easy:
-
 
 .. code-block:: python
 
@@ -90,13 +128,11 @@ command line), querying is easy:
 
 In this example we use a sqlite database called ``<your db file>``. If you do
 not provide an argument to the constructor, we assume that there is a Postgres
-database running called ``tix`` that listens on port ``5432``.
+database running.
 
 The query should get all ``cell``-features where gene ``star`` has been
-transturbed using ``dharmacon`` libraries. From every well that has been
-found ``10`` cells are randomly sampled. You can create the database (file)
-yourself or just use mine. Documentation how the DB is created is found under
- ``/rnai_query/dbms``.
+transturbed using ``dharmacon`` libraries. You can create the database (file)
+yourself or just use mine.
 
 The complete list of possible queries is shown below.
 
