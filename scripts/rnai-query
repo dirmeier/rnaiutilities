@@ -63,7 +63,9 @@ def select(select, db):
     """
 
     q = Query(db)
-    q.select(select)
+    res = q.select(select)
+    for r in res:
+        print(r)
 
 
 @cli.command()

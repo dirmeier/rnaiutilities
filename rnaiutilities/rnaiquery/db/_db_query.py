@@ -44,6 +44,7 @@ class DatabaseQuery:
         q = self._build_select_statement(select)
         logger.info(q)
         res = self.__connection.query(q)
+        res = map(lambda x: x[0], res)
         return res
 
     def query(self, **kwargs):
