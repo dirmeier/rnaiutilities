@@ -88,8 +88,15 @@ class DatabaseQuery:
         ar = []
         for k, v in kwargs.items():
             if v is not None:
+                if isinstance(v, str):
+                    varr = v.split(",")
+                else:
+                    varr = v
+                els = []
                 if k in DatabaseQuery._descr_:
-                    ar.append("{}='{}'".format(k, v))
+                    for vel in varr:
+                        els.append("{}='{}'".format(k, vel))
+                    ar.append("(" + " OR ".join(els) + ")")
         if len(ar) > 0:
             s += " WHERE " + " and ".join(ar)
         return s
@@ -99,8 +106,12 @@ class DatabaseQuery:
         s = None
         if el in kwargs.keys():
             if kwargs[el] is not None:
-                s = "SELECT filename FROM {} WHERE {}='{}'" \
-                    .format(el, el, kwargs[el])
+                varr = kwargs[el].split(",")
+                els = []
+                for vel in varr:
+                    els.append("{}='{}'".format(el, vel))
+                eq = "(" + " OR ".join(els) + ")"
+                s = "SELECT filename FROM {} WHERE {}".format(el, eq)
         return s
 
     def _feature_query(self, filename):
@@ -114,6 +125,3 @@ class DatabaseQuery:
             return "SELECT distinct({}) from {};".format(select, select)
         else:
             return "SELECT distinct({}) from meta;".format(select)
-
-
-

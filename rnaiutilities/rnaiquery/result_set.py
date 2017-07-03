@@ -133,8 +133,9 @@ class ResultSet:
         for k, v in kwargs.items():
             if k in ResultSet._filter_attributes_:
                 if v is not None:
+                    reg = "^" + "|".join(v.split(",")) + "$"
                     # user provided gene/sirna/well regex to match
-                    self.__setattr__("_" + k, v)
+                    self.__setattr__("_" + k, reg)
                 else:
                     # if user didnt provide anything match all
                     self.__setattr__("_" + k, ResultSet._sar_)

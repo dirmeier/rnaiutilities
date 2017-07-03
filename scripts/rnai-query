@@ -110,9 +110,9 @@ def select(select, db):
 @click.option("--sample", default=100, type=int,
               help="The amount of single cells that are sampled per well, "
                    "like '100'. If unset defaults to all cells in the well.")
-def dump(outfile, db,
-          study, pathogen, library, design, replicate, gene, sirna, well,
-          featureclass, sample):
+def query(outfile, db,
+         study, pathogen, library, design, replicate, gene, sirna, well,
+         featureclass, sample):
     """
     Query and sample single cells or bacteria and write to an OUTFILE.
     """
