@@ -33,6 +33,16 @@ def cli():
 
 @cli.command()
 @click.argument("config", type=str)
+def checkdownload(config):
+    """
+    Checks if all files from CONFIG have been downloaded correctly.
+    """
+    c = Config(config)
+    Parser(c).check_download()
+
+
+@cli.command()
+@click.argument("config", type=str)
 def report(config):
     """
     Creates a report if all files from CONFIG have been parsed correctly.
