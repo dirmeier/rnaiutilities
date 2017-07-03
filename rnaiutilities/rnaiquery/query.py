@@ -129,3 +129,6 @@ class Query:
         """
         with DBMS(db) as d:
             d.insert(path)
+
+    def select(self, select):
+        raise RuntimeError("Not implemented yet")

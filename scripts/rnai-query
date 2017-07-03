@@ -32,7 +32,8 @@ def cli():
 
 @cli.command()
 @click.argument("path", type=str)
-@click.option("--db", default=None,
+@click.option("--db",
+              default=None,
               help="Sqlite database file."
                    " If unset uses a postgres database listening on port 5432."
                    " Otherwise, if set, uses the database file and opens a "
@@ -44,6 +45,25 @@ def insert(path, db):
 
     q = Query()
     q.insert(path, db)
+
+
+@cli.command()
+@click.argument("select",
+                type=click.Choice(["study", "pathogen", "library",
+                                   "design", "gene", "sirna", "well",
+                                   "featureclass"]))
+@click.option("--db", default=None,
+              help="Sqlite database file."
+                   " If unset uses a postgres database listening on port 5432."
+                   " Otherwise, if set, uses the database file and opens a "
+                   "connection to sqlite.")
+def select(select, db):
+    """
+    Submits a SELECT query to the database.
+    """
+
+    q = Query(db)
+    q.select(select)
 
 
 @cli.command()
@@ -88,7 +108,7 @@ def insert(path, db):
 @click.option("--sample", default=100, type=int,
               help="The amount of single cells that are sampled per well, "
                    "like '100'. If unset defaults to all cells in the well.")
-def query(outfile, db,
+def dump(outfile, db,
           study, pathogen, library, design, replicate, gene, sirna, well,
           featureclass, sample):
     """

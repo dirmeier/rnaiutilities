@@ -59,7 +59,14 @@ of ids of plates that are going to be parsed in case only a subset of
 determining whether python uses multiple processes or not.
 Check out the ``data`` folder for some example datasets.
 
-You can use ``rnai-parse`` from the commandline like this:
+As a first step it makes sense to check if all kinome and genomes plates from
+your meta plate file exist:
+
+.. code-block:: bash
+
+  rnai-parse checkdownload CONFIG
+
+If the files are downloaded as intended, parse them to tsv:
 
 .. code-block:: bash
 
