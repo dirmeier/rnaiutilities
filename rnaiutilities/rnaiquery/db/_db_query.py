@@ -40,6 +40,12 @@ class DatabaseQuery:
     def __init__(self, connection):
         self.__connection = connection
 
+    def select(self, select):
+        q = self._build_select_statement(select)
+        logger.info(q)
+        res = self.__connection.query(q)
+        return res
+
     def query(self, **kwargs):
         q = self._build_query(**kwargs)
         logger.info(q)
@@ -101,5 +107,12 @@ class DatabaseQuery:
         res = self.__connection.query("SELECT * FROM {}".format(d))
         res = list(map(lambda x: x[0], res))
         return res
+
+    def _build_select_statement(self, select):
+        if select in ["gene", "sirna", "well"]:
+            return "SELECT distinct({}) from {};".format(select, select)
+        else:
+            return "SELECT distinct({}) from meta;".format(select)
+
 
 

@@ -40,6 +40,8 @@ class Query:
         :param db: if provided the filename of a sqlite database
         :type db: str
         """
+
+        self._db = db
         # filesets of meta files
         self._table = table_file_sets.TableFileSets(db)
 
@@ -131,4 +133,34 @@ class Query:
             d.insert(path)
 
     def select(self, select):
-        raise RuntimeError("Not implemented yet")
+        """
+        Submits a select query to a database of image-based RNAi screening meta
+        features to get an overview over meta information. The query returns
+        the result as a list of strings.
+
+        Parameter <i>select</i> can be any of the following choices:
+          * study
+          * pathogen
+          * library
+          * design
+          * gene
+          * sirna
+          * well
+          * featureclass
+
+        :param select: the meta feature to select
+        :type select: str
+        :return: returns a list of strings from the query
+        :rtype: list(str)
+        """
+
+        fts = ["study", "pathogen", "library",
+               "design", "gene", "sirna", "well",
+               "featureclass"
+               ]
+        if select not in fts:
+            raise ValueError(
+              "Please provide one of: ({})".format(",".join(fts)))
+        with DBMS(self._db) as d:
+            res = d.select(select)
+        return res
