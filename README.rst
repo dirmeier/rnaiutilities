@@ -10,6 +10,9 @@ rnaiutilities
    :target: https://codecov.io/gh/cbg-ethz/dataframe
 .. image:: https://api.codacy.com/project/badge/Grade/3787d3068c2f472bb337665ff67d7068
    :target: https://www.codacy.com/app/simon-dirmeier/dataframe?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dirmeier/dataframe&amp;utm_campaign=Badge_Grade
+.. image:: https://readthedocs.org/projects/rnaiutilities/badge/?version=latest
+   :target: http://rnaiutilities.readthedocs.io/en/latest/?badge=latest
+   :alt: doc
 
 A collection of python modules and command line tools for processing
 image-based RNAi screens.
@@ -43,8 +46,7 @@ If you get errors, I probably forgot some dependency.
 Documentation
 =============
 
-Check out the documentation in ``docs``.
-
+Check out the documentation in readthedocs_.
 
 Author
 ======
@@ -53,4 +55,4 @@ Author
 
 .. _anaconda: https://www.continuum.io/downloads
 .. _environment: https://conda.io/docs/using/envs.html
-.. _readthedocs: http://pythonhosted.org/dataframe/
+.. _readthedocs: https://rnaiutilities.readthedocs.io/en/latest/
