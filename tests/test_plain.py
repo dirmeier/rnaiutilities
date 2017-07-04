@@ -35,6 +35,6 @@ class TestPlain(unittest.TestCase):
         unittest.TestCase.setUp(self)
         self._q = Query()
 
-    def test_has_elems_error(self):
+    def test_no_featurclass_raises_error(self):
         with pytest.raises(ValueError):
             self._q.query()
