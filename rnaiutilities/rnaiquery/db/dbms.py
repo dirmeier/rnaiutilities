@@ -21,10 +21,11 @@
 
 import logging
 
-from ._db_query import DatabaseQuery
-from ._db_setup import DatabaseInserter
-from ._postgres_connection import PostgresConnection
-from ._sqlite_connection import SQLiteConnection
+from rnaiutilities.rnaiquery.db.db_query import DatabaseQuery
+from rnaiutilities.rnaiquery.db.db_setup import DatabaseInserter
+from rnaiutilities.rnaiquery.db.postgres_connection import PostgresConnection
+from rnaiutilities.rnaiquery.db.sqlite_connection import SQLiteConnection
+
 
 logging.basicConfig(
   level=logging.WARNING,

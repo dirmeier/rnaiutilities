@@ -19,12 +19,10 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
-import re
 import logging
-import numpy
+import re
 from pathlib import Path
-
-from .utility import check_feature_group
+from rnaiutilities.rnaiparser.utility import check_feature_group
 
 logging.basicConfig(
   level=logging.WARNING,

@@ -22,8 +22,8 @@
 import logging
 import sqlite3
 
-from ._database_connection import DatabaseConnection
-from ..globals import GENE, SIRNA, WELL
+from rnaiutilities.rnaiquery.db.database_connection import DatabaseConnection
+from rnaiutilities.rnaiquery.globals import GENE, SIRNA, WELL
 
 logging.basicConfig(
   level=logging.WARNING,

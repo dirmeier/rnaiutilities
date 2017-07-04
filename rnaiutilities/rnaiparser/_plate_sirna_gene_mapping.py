@@ -22,7 +22,7 @@
 import logging
 import re
 
-from .utility import load_matlab
+from rnaiutilities.rnaiparser.utility import load_matlab
 
 logging.basicConfig(
   level=logging.WARNING,

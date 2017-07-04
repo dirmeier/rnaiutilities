@@ -23,10 +23,12 @@ import logging
 import os
 import re
 
-from rnaiparser.utility import parse_plate_info, regex
-from rnaiparser.utility import parse_screen_details
-from ._plate_file import PlateFile
-from .plate_file_set import PlateFileSet
+from rnaiutilities.rnaiparser.utility import parse_plate_info, regex
+from rnaiutilities.rnaiparser.utility import parse_screen_details
+from rnaiutilities.rnaiparser.plate_file_set_generator._plate_file import \
+    PlateFile
+from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_set import \
+    PlateFileSet
 
 logging.basicConfig(
   level=logging.WARNING,
@@ -112,7 +114,7 @@ class PlateFileSets:
         if self._skip_feature(b):
             return True
         if b.startswith(PlateFileSets._image_) and \
-                not b.startswith(PlateFileSets._mapping_file_):
+          not b.startswith(PlateFileSets._mapping_file_):
             return True
         return False
 

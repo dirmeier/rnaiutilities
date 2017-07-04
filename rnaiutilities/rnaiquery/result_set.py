@@ -25,9 +25,9 @@ import os
 import numpy as np
 import pandas
 
-from .globals import WELL, GENE, SIRNA, SAMPLE, \
+from rnaiutilities.rnaiquery.globals import WELL, GENE, SIRNA, SAMPLE,\
     ADDED_COLUMNS_FOR_PRINTING
-from .io.io import IO
+from rnaiutilities.rnaiquery.io.io import IO
 
 logging.basicConfig(
   level=logging.WARNING,

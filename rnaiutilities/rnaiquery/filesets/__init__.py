@@ -17,6 +17,3 @@
 #
 # @author = 'Simon Dirmeier'
 # @email = 'simon.dirmeier@bsse.ethz.ch'
-
-
-from .table_file_sets import TableFileSets

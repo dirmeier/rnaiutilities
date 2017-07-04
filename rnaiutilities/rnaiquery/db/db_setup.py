@@ -23,10 +23,10 @@ import logging
 import os
 import yaml
 
-from ..globals import FEATURECLASS, FEATURES, ELEMENTS
-from ..globals import FILE_FEATURES_PATTERNS
-from ..globals import GENE, SIRNA, WELL, LIBRARY, DESIGN
-from ..globals import REPLICATE, PLATE, STUDY, PATHOGEN
+from rnaiutilities.rnaiquery.globals import FEATURECLASS, FEATURES, ELEMENTS
+from rnaiutilities.rnaiquery.globals import FILE_FEATURES_PATTERNS
+from rnaiutilities.rnaiquery.globals import GENE, SIRNA, WELL, LIBRARY, DESIGN
+from rnaiutilities.rnaiquery.globals import REPLICATE, PLATE, STUDY, PATHOGEN
 
 logging.basicConfig(
   level=logging.WARNING,

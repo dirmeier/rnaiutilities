@@ -24,13 +24,13 @@ from pathlib import Path
 
 import multiprocessing as mp
 
-from ._globals import USABLE_FEATURES
-from ._plate_list import PlateList
-from .config import Config
-from .plate_file_set_generator.plate_file_sets import PlateFileSets
-from .plate_layout import MetaLayout
-from .plate_parser import PlateParser
-from .plate_writer import PlateWriter
+from rnaiutilities.rnaiparser._globals import USABLE_FEATURES
+from rnaiutilities.rnaiparser._plate_list import PlateList
+from rnaiutilities.rnaiparser.config import Config
+from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_sets import PlateFileSets
+from rnaiutilities.rnaiparser.plate_layout import MetaLayout
+from rnaiutilities.rnaiparser.plate_parser import PlateParser
+from rnaiutilities.rnaiparser.plate_writer import PlateWriter
 
 logging.basicConfig(
   level=logging.WARNING,

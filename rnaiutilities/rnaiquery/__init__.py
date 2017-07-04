@@ -19,4 +19,4 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
-from .query import Query
+from rnaiutilities.rnaiquery.query import Query

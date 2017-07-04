@@ -19,11 +19,10 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
-import sys
 import logging
 
-from rnaiutilities.rnaiquery.filesets import table_file_sets
 from rnaiutilities.rnaiquery.db.dbms import DBMS
+from rnaiutilities.rnaiquery.filesets import table_file_sets
 from rnaiutilities.rnaiquery.result_set import ResultSet
 
 logging.basicConfig(

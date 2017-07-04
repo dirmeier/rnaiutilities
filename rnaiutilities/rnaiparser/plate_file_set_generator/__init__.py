@@ -19,5 +19,7 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
-from .plate_file_sets import PlateFileSets
-from .plate_file_set import PlateFileSet
+from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_sets import \
+    PlateFileSets
+from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_set import \
+    PlateFileSet

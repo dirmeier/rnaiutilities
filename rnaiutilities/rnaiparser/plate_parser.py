@@ -22,10 +22,10 @@
 import logging
 import numpy
 
-from .plate_file_set_generator import PlateFileSet
-from .utility import load_matlab
-from ._plate_sirna_gene_mapping import PlateSirnaGeneMapping
-from ._plate_cell_features import PlateCellFeature
+from rnaiutilities.rnaiparser.plate_file_set_generator import PlateFileSet
+from rnaiutilities.rnaiparser.utility import load_matlab
+from rnaiutilities.rnaiparser._plate_sirna_gene_mapping import PlateSirnaGeneMapping
+from rnaiutilities.rnaiparser._plate_cell_features import PlateCellFeature
 
 logging.basicConfig(
   level=logging.WARNING,

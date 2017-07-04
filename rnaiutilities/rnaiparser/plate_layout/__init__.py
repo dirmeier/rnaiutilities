@@ -19,4 +19,4 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
-from .layout import MetaLayout
+from rnaiutilities.rnaiparser.plate_layout.layout import MetaLayout
