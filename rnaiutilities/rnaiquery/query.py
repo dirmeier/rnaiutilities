@@ -85,11 +85,9 @@ class Query:
         """
 
         if featureclass is None:
-            logger.error("Currently using no featureclass it not supported.")
-            sys.exit(0)
+            raise ValueError("Currently using no featureclass it not supported.")
         if featureclass != "cells":
-            logger.error("Currently only featureclass 'cells' is supported. :(")
-            sys.exit(0)
+            raise ValueError("Currently only featureclass 'cells' is supported.")
 
         return self._query(sample=sample,
                            study=study,
