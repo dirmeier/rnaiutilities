@@ -33,7 +33,8 @@ setup(
       'psycopg2>=2.7.1',
       'pyyaml>=3.12',
       'tables>=3.3.0',
-      'click>=6.7'
+      'click>=6.7',
+      'pytest>=3.0.5'
   ],
   classifiers=[
       'Development Status :: 3 - Alpha',

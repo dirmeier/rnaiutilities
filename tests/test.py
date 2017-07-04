@@ -18,7 +18,7 @@
 # along with rnaiutilities. If not, see <http://www.gnu.org/licenses/>.
 #
 # @author = 'Simon Dirmeier'
-# @email = 'simon.dirmeier@bsse.ethz.ch'
+# @email = 'simon.dirmeier@bssae.ethz.ch'
 
 
 import unittest

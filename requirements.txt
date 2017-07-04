@@ -8,3 +8,4 @@ pyyaml>=3.12
 tables>=3.3.0
 h5py>=2.7.0
 click>=6.7
+pytest>=3.0.5
