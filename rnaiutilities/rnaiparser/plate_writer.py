@@ -63,12 +63,12 @@ class PlateWriter:
         filename = pfs.outfile + "_" + feature_group
         try:
             if not Path(self.data_filename(filename)).exists():
-                logger.info("Writing to: " + filename)
+                logger.info("Writing to: {}".format(filename))
                 self._write_file(filename, features, mapping, layout)
             else:
                 logger.info(filename + " already exists. Skipping")
         except Exception as e:
-            logger.error("Could not integrate: " + filename)
+            logger.error("Could not integrate: {}".format(filename))
             logger.error(str(e))
 
     def _write_file(self, filename, features, mapping, layout):
@@ -119,11 +119,14 @@ class PlateWriter:
             with open(meat_file, "w") as m:
                 yaml.dump(h, m, default_flow_style=False)
         except Exception as e:
-            logger.error("Some IO-error writing to meta file: + ", meat_file)
+            logger.error("Some IO-error writing to meta file: {}"
+                         .format(meat_file))
             logger.error(str(e))
 
-    def data_filename(self, filename):
+    @staticmethod
+    def data_filename(filename):
         return filename + "_data.tsv"
 
-    def _meta_filename(self, filename):
+    @staticmethod
+    def _meta_filename(filename):
         return filename + "_meta.tsv"

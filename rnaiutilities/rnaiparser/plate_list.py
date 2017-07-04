@@ -30,7 +30,8 @@ logger = logging.getLogger(__name__)
 
 class PlateList:
     """
-    Class that stores plate file names as array and removes lines that should not be used
+    Class that stores plate file names as array and removes lines that
+    should not be used.
 
     """
 

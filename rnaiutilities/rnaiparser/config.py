@@ -19,8 +19,8 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
-import yaml
 import logging
+import yaml
 
 logging.basicConfig(
   level=logging.WARNING,

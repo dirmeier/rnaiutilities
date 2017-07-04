@@ -7,8 +7,8 @@ if version_info[0] == 2:
 
 
 def readme():
-    with open('README.rst') as f:
-        return f.read()
+    with open('README.rst') as fl:
+        return fl.read()
 
 setup(
   name='rnaiutilities',

@@ -24,8 +24,9 @@ import numpy
 
 from rnaiutilities.rnaiparser.plate_file_set_generator import PlateFileSet
 from rnaiutilities.rnaiparser.utility import load_matlab
-from rnaiutilities.rnaiparser._plate_sirna_gene_mapping import PlateSirnaGeneMapping
-from rnaiutilities.rnaiparser._plate_cell_features import PlateCellFeature
+from rnaiutilities.rnaiparser.plate_sirna_gene_mapping import \
+    PlateSirnaGeneMapping
+from rnaiutilities.rnaiparser.plate_cell_features import PlateCellFeature
 
 logging.basicConfig(
   level=logging.WARNING,
@@ -83,8 +84,8 @@ class PlateParser:
         matrix = None
         try:
             matrix = self._alloc(load_matlab(file), file, featurename)
-        except ValueError or TypeError or AssertionError as e:
-            logger.error("Could not parse: %s", file, " ->" + str(e))
+        except (ValueError,  TypeError, AssertionError) as e:
+            logger.error("Could not parse: {} -> {}".format(file, str(e)))
         return matrix
 
     @staticmethod
@@ -99,7 +100,7 @@ class PlateParser:
             mat = numpy.full(shape=(n_row, max_n_col),
                              fill_value=numpy.Infinity,
                              dtype="float64")
-            for i in range(len(arr)):
+            for i,_ in enumerate(arr):
                 try:
                     row = arr[i]
                     mat[i][:len(row)] = row.flatten()

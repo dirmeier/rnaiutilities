@@ -25,7 +25,7 @@ import re
 
 from rnaiutilities.rnaiparser.utility import parse_plate_info, regex
 from rnaiutilities.rnaiparser.utility import parse_screen_details
-from rnaiutilities.rnaiparser.plate_file_set_generator._plate_file import \
+from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file import \
     PlateFile
 from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_set import \
     PlateFileSet

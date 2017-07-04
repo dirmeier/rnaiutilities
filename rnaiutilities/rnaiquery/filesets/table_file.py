@@ -22,7 +22,7 @@
 class TableFile:
     def __init__(self, query_result, features, **kwargs):
         f = query_result[-1].replace("_meta.tsv", "")
-        self._filename = f + "_data.tsv"
+        self.file_name = f + "_data.tsv"
         self._feature_class = f.split("_")[-1]
         self._filesuffix = f.split("/")[-1]
         self._feature_list_table = self._filesuffix.replace("-", "_")
@@ -41,11 +41,10 @@ class TableFile:
     def __eq__(self, other):
         if not isinstance(other, TableFile):
             return False
-        return self._filename == other._filename
+        return self.file_name == other.file_name
 
     def __hash__(self):
-        return hash(self._filename)
-
+        return hash(self.file_name)
 
     @property
     def features(self):
@@ -53,7 +52,7 @@ class TableFile:
 
     @property
     def filename(self):
-        return self._filename
+        return self.file_name
 
     @property
     def feature_class(self):

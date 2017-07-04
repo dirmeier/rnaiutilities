@@ -19,6 +19,9 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
-USABLE_FEATURES = ["bacteria", "cells",
-                   "nuclei", "perinuclei",
-                   "expandednuclei", "invasomes"]
+USABLE_FEATURES = ["bacteria",
+                   "cells",
+                   "nuclei",
+                   "perinuclei",
+                   "expandednuclei",
+                   "invasomes"]

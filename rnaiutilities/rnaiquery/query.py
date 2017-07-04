@@ -84,9 +84,9 @@ class Query:
         """
 
         if featureclass is None:
-            raise ValueError("Currently using no featureclass it not supported.")
+            raise ValueError("Currently using no featureclass not supported.")
         if featureclass != "cells":
-            raise ValueError("Currently only featureclass 'cells' is supported.")
+            raise ValueError("Currently only featureclass 'cells' supported.")
 
         return self._query(sample=sample,
                            study=study,
@@ -118,11 +118,13 @@ class Query:
         Insert meta information of an platewise RNAi screen to a database.
         For insertion the path leading to the meta files has to be provided.
         Meta information is then written to either a sqlite database if `db`
-        is set, otherwise the DB connection defaults to a postgres DB that listens on port 5432/.
+        is set, otherwise the DB connection defaults to a postgres DB that
+        listens on port 5432/.
 
         :param path: the folder to the meta files
         :type path: str
-        :param db: filename of the sqlite database. If not set defaults to a postgres DB.
+        :param db: filename of the sqlite database. If not set defaults to
+         postgres DB.
         :type db: str
         :return:
         """

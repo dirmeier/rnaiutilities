@@ -39,6 +39,7 @@ class DBMS:
 
     def __init__(self, db=None):
         self._db_path = db
+        self.__connection = None
         if db is None:
             self._db = DBMS._postgres_
         else:

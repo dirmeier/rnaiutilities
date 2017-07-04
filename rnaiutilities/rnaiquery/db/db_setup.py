@@ -60,7 +60,7 @@ class DatabaseInserter:
         try:
             # parse file name meta information
             ma = FILE_FEATURES_PATTERNS.match(file.replace("_meta.tsv", ""))
-            stu, pat, lib, des, ome, rep, pl, feature = ma.groups()
+            stu, pat, lib, des, _, rep, pl, feature = ma.groups()
             self._insert_file_suffixes(
               filename, stu, pat, lib,
               des, rep, pl, feature
@@ -71,9 +71,8 @@ class DatabaseInserter:
                 meta = yaml.load(fh)
             self._insert_meta(filename, meta)
 
-        except ValueError as e:
-            logger.error("Could not match meta file {} and value {}"
-                         .format(file, e, file))
+        except ValueError:
+            logger.error("Could not match meta file {}".format(file))
 
     def _insert_file_suffixes(self, file, study, bacteria, library,
                               design, replicate, plate, featureclass):
@@ -88,23 +87,25 @@ class DatabaseInserter:
       file, study, bacteria, library,
       design, replicate, plate, featureclass):
         return "INSERT INTO meta " \
-               "({}, {}, {}, {}, {}, {}, {}, {}) ".format(STUDY,
-                                                          PATHOGEN,
-                                                          LIBRARY,
-                                                          DESIGN,
-                                                          REPLICATE,
-                                                          PLATE,
-                                                          FEATURECLASS,
-                                                          "filename") + \
+               "({}, {}, {}, {}, {}, {}, {}, {}) " \
+                   .format(STUDY,
+                           PATHOGEN,
+                           LIBRARY,
+                           DESIGN,
+                           REPLICATE,
+                           PLATE,
+                           FEATURECLASS,
+                           "filename") + \
                "VALUES (" + \
-               "'{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');".format(study,
-                                                                         bacteria,
-                                                                         library,
-                                                                         design,
-                                                                         replicate,
-                                                                         plate,
-                                                                         featureclass,
-                                                                         file)
+               "'{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');" \
+                   .format(study,
+                           bacteria,
+                           library,
+                           design,
+                           replicate,
+                           plate,
+                           featureclass,
+                           file)
 
     def _insert_meta(self, file, meta):
         self._insert_elements(file, meta[ELEMENTS])

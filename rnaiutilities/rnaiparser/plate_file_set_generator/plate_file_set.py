@@ -23,6 +23,10 @@ import random
 
 
 class PlateFileSet:
+    """
+    Class that stores filenames and meta info for a single plate.
+    """
+
     def __init__(self, classifier, outfile, study, pathogen, library, design,
                  screen, replicate, suffix, plate):
         self._classifier = classifier

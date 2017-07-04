@@ -31,7 +31,7 @@ def check_feature_group(fg):
     if not isinstance(fg, list):
         raise "Please provide a list"
     f1_cells = fg[0].ncells
-    for j, f in enumerate(fg):
+    for f in fg:
         fj_cells = f.ncells
         for i, fj_cells_i in enumerate(fj_cells):
             try:

@@ -56,14 +56,14 @@ class PlateSirnaGeneMapping:
 
         :param plate_file_set: plate file set object
         """
-        cf = load_matlab(plate_file_set.mapping.filename)
-        if cf is None:
+        mlfile = load_matlab(plate_file_set.mapping.filename)
+        if mlfile is None:
             return
         # create mapping array of same length
-        self._mapping = [None] * len(cf)
+        self._mapping = [None] * len(mlfile)
         # pattern for every line: we are instested in a char, followed by 2
         # numbers
-        for i, e in enumerate(cf):
+        for i, e in enumerate(mlfile):
             self._load_entry(i, self._pattern.match(e[0]))
 
     def _load_entry(self, i, mat):

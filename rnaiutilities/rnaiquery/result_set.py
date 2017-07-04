@@ -119,7 +119,8 @@ class ResultSet:
             data = data.groupby([WELL, GENE, SIRNA]).apply(self._filter_fn)
         return data
 
-    def _append_to_data(self, data, table):
+    @staticmethod
+    def _append_to_data(data, table):
         data.insert(0, "plate", table.plate)
         data.insert(0, "replicate", table.replicate)
         data.insert(0, "design", table.design)
@@ -167,7 +168,8 @@ class ResultSet:
         feat_cols = list(feat_cols & set(self._shared_features))
         # get the new data
         data = data[meta_cols + feat_cols]
-        # add features that are explicitely desired but not found in every screen :(
+        # add features that are explicitely desired
+        # but not found in every screen :(
         if feature_class in ADDED_COLUMNS_FOR_PRINTING:
             for col in ADDED_COLUMNS_FOR_PRINTING[feature_class]:
                 add_col = feature_class + "." + col

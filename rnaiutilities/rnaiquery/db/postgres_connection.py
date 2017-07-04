@@ -74,4 +74,3 @@ class PostgresConnection(DatabaseConnection):
             " WHERE table_name = '{}');".format(tab)
         bol = self.query(s)
         return bol[0][0]
-

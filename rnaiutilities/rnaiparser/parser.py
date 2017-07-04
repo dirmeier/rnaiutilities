@@ -24,8 +24,8 @@ from pathlib import Path
 
 import multiprocessing as mp
 
-from rnaiutilities.rnaiparser._globals import USABLE_FEATURES
-from rnaiutilities.rnaiparser._plate_list import PlateList
+from rnaiutilities.rnaiparser.globals import USABLE_FEATURES
+from rnaiutilities.rnaiparser.plate_list import PlateList
 from rnaiutilities.rnaiparser.config import Config
 from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_sets import PlateFileSets
 from rnaiutilities.rnaiparser.plate_layout import MetaLayout
@@ -96,11 +96,11 @@ class Parser:
               self._output_path
             )
             if len(platefilesets) > 1:
-                logger.warn("Found multiple plate identifiers for: " + plate)
+                logger.warning("Found multiple plate identifiers for: " + plate)
             ret = self._parse_plate_file_sets(platefilesets)
-        except Exception as e:
+        except Exception as ex:
             logger.error("Found error parsing: " + str(plate) + ". " +
-                         "Error:" + str(e))
+                         "Error:" + str(ex))
             ret = -1
         return ret
 
@@ -136,8 +136,8 @@ class Parser:
                 else:
                     logger.info(" ".join(map(str, platefileset.meta)) +
                                 " already exists. Skipping.")
-        except Exception as e:
-            logger.error("Some error idk anythin can happen here: " + str(e))
+        except Exception as ex:
+            logger.error("Some error idk anythin can happen here: " + str(ex))
         return 0
 
     def report(self):
@@ -172,4 +172,3 @@ class Parser:
             else:
                 logger.info("{} is available".format(platefile_path))
         logger.setLevel(logging.WARNING)
-

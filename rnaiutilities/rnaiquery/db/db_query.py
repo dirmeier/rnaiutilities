@@ -125,3 +125,4 @@ class DatabaseQuery:
             return "SELECT distinct({}) from {};".format(select, select)
         else:
             return "SELECT distinct({}) from meta;".format(select)
+
