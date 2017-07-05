@@ -4,12 +4,12 @@ rnaiutilities
 
 .. image:: http://www.repostatus.org/badges/latest/active.svg
    :target: http://www.repostatus.org/#active
-.. image:: https://travis-ci.org/dirmeier/rnaiutilities.svg?branch=master
-   :target: https://travis-ci.org/dirmeier/rnaiutilities/
-.. image:: https://codecov.io/gh/dirmeier/rnaiutilities/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/dirmeier/rnaiutilities
-.. image:: https://api.codacy.com/project/badge/Grade/451bb1a5b6bb46a499713f048f296ed4
-   :target: https://www.codacy.com/app/simon-dirmeier/rnaiutilities?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dirmeier/rnaiutilities&amp;utm_campaign=Badge_Grade
+.. image:: https://travis-ci.org/cbg-ethz/rnaiutilities.svg?branch=master
+   :target: https://travis-ci.org/cbg-ethz/rnaiutilities/
+.. image:: https://codecov.io/gh/cbg-ethz/rnaiutilities/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/cbg-ethz/rnaiutilities
+.. image:: https://api.codacy.com/project/badge/Grade/1822ba83768d4d7389ba667a9c839638    
+   :target: https://www.codacy.com/app/simon-dirmeier/rnaiutilities_2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=cbg-ethz/rnaiutilities&amp;utm_campaign=Badge_Grade
 .. image:: https://readthedocs.org/projects/rnaiutilities/badge/?version=latest
    :target: http://rnaiutilities.readthedocs.io/en/latest/?badge=latest
    :alt: doc
