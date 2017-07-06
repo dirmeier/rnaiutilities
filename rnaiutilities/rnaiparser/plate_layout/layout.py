@@ -24,6 +24,7 @@ import logging
 from rnaiutilities.rnaiparser.plate_layout.plate_layout import PlateLayout
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class MetaLayout:

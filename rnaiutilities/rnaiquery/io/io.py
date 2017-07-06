@@ -23,9 +23,6 @@ import logging
 import pandas
 import pathlib
 
-logging.basicConfig(
-  level=logging.WARNING,
-  format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
 logger = logging.getLogger(__name__)
 
 

@@ -32,10 +32,9 @@ from rnaiutilities.rnaiparser.plate_layout import MetaLayout
 from rnaiutilities.rnaiparser.plate_parser import PlateParser
 from rnaiutilities.rnaiparser.plate_writer import PlateWriter
 
-logging.basicConfig(
-  level=logging.WARNING,
-  format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
+
 logger = mp.log_to_stderr()
+logger.setLevel(logging.INFO)
 
 
 class Parser:

@@ -27,10 +27,8 @@ from rnaiutilities.rnaiquery.db.postgres_connection import PostgresConnection
 from rnaiutilities.rnaiquery.db.sqlite_connection import SQLiteConnection
 
 
-logging.basicConfig(
-  level=logging.WARNING,
-  format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class DBMS:

@@ -25,10 +25,8 @@ import sqlite3
 from rnaiutilities.rnaiquery.db.database_connection import DatabaseConnection
 from rnaiutilities.rnaiquery.globals import GENE, SIRNA, WELL
 
-logging.basicConfig(
-  level=logging.WARNING,
-  format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class SQLiteConnection(DatabaseConnection):

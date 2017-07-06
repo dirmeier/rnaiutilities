@@ -22,10 +22,8 @@
 import abc
 import logging
 
-logging.basicConfig(
-  level=logging.WARNING,
-  format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class DatabaseConnection(metaclass=abc.ABCMeta):

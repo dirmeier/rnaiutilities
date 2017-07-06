@@ -21,13 +21,16 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
+import logging
 import click
+
 from rnaiutilities import Query
 
 
 @click.group()
 def cli():
-    pass
+    logging.basicConfig(
+      format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
 
 
 @cli.command()

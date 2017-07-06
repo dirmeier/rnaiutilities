@@ -22,10 +22,9 @@
 import re
 import logging
 
-logging.basicConfig(
-  level=logging.WARNING,
-  format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
+
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 __screen_regex__ = re.compile("^(\S+-?\S+)-(\w+)-(\w)(\w)-(\w+)(\d+)(-(.*))?$")
 __screen_plate_regex__ = re.compile(".*/(.*)/.*/(.*)/(.*)/.*/.*/.+mat?$")

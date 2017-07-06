@@ -28,9 +28,7 @@ from rnaiutilities.rnaiquery.globals import FILE_FEATURES_PATTERNS
 from rnaiutilities.rnaiquery.globals import GENE, SIRNA, WELL, LIBRARY, DESIGN
 from rnaiutilities.rnaiquery.globals import REPLICATE, PLATE, STUDY, PATHOGEN
 
-logging.basicConfig(
-  level=logging.WARNING,
-  format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 

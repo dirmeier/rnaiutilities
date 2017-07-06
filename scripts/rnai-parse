@@ -22,13 +22,16 @@
 
 
 import click
+import logging
+
 from rnaiutilities import Parser
 from rnaiutilities import Config
 
 
 @click.group()
 def cli():
-    pass
+    logging.basicConfig(
+      format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
 
 
 @cli.command()

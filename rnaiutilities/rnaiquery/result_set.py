@@ -29,10 +29,9 @@ from rnaiutilities.rnaiquery.globals import WELL, GENE, SIRNA, SAMPLE,\
     ADDED_COLUMNS_FOR_PRINTING
 from rnaiutilities.rnaiquery.io.io import IO
 
-logging.basicConfig(
-  level=logging.WARNING,
-  format='[%(levelname)-1s/%(processName)-1s/%(name)-1s]: %(message)s')
+
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class ResultSet:
