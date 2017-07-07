@@ -6,6 +6,11 @@
 
 * Set logging level to *info*
 
+#### 0.1.1.post1
+
+* Added `--plate` as `rnai-query` parameter 
+
+
 ### 0.1.0 
 
 * Scripts for parsing image-based cellprofiler files

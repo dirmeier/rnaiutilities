@@ -90,6 +90,10 @@ def select(select, db):
               help="The library to query for, e.g. like 'd', "
                    "or a comma-separated string of libraries, "
                    "such as 'd,q'.")
+@click.option("--plate", default=None,
+              help="The plate to query for, e.g. like 'dz03-1k', "
+                   "or a comma-separated string of plates, "
+                   "such as 'dz03-1k,dz04-1k'.")
 @click.option("--design", default=None,
               help="The design to query for, e.g. like 'p'.")
 @click.option("--replicate", default=None, type=int,
@@ -114,8 +118,9 @@ def select(select, db):
               help="The amount of single cells that are sampled per well, "
                    "like '100'. If unset defaults to all cells in the well.")
 def query(outfile, db,
-         study, pathogen, library, design, replicate, gene, sirna, well,
-         featureclass, sample):
+          study, pathogen, library, design, replicate, plate,
+          gene, sirna, well,
+          featureclass, sample):
     """
     Query and sample single cells or bacteria and write to an OUTFILE.
     """
@@ -126,6 +131,7 @@ def query(outfile, db,
                   library=library,
                   design=design,
                   replicate=replicate,
+                  plate=plate,
                   gene=gene,
                   sirna=sirna,
                   well=well,
