@@ -163,11 +163,11 @@ class Parser:
         logger.info("All's well that ends well")
 
     def check_download(self):
-        logger.setLevel(logging.INFO)
+        logger.setLevel(logging.WARNING)
         for plate in self._plate_list:
             platefile_path = self._config.plate_folder + "/" + plate
             if not Path(platefile_path).exists():
                 logger.warning("{} is missing".format(platefile_path))
             else:
                 logger.info("{} is available".format(platefile_path))
-        logger.setLevel(logging.WARNING)
+        logger.setLevel(logging.INFO)
