@@ -20,18 +20,19 @@
 
 
 import logging
+import os
+import re
 from pathlib import Path
-
 import multiprocessing as mp
 
 from rnaiutilities.rnaiparser.globals import USABLE_FEATURES
 from rnaiutilities.rnaiparser.plate_list import PlateList
 from rnaiutilities.rnaiparser.config import Config
-from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_sets import PlateFileSets
+from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_sets import \
+    PlateFileSets
 from rnaiutilities.rnaiparser.plate_layout import MetaLayout
 from rnaiutilities.rnaiparser.plate_parser import PlateParser
 from rnaiutilities.rnaiparser.plate_writer import PlateWriter
-
 
 logger = mp.log_to_stderr()
 logger.setLevel(logging.INFO)
@@ -155,10 +156,9 @@ class Parser:
                 cnt_all_files = len(fls)
                 cnt_avail_files = sum([Path(x).exists() for x in fls])
                 # if cnt_all_files != cnt_avail_files:
-                print(
-                    "{} has not been parsed completely -> only "
-                    "{}/{} files there.".format(
-                        plate, cnt_avail_files, cnt_all_files))
+                print("{} has not been parsed completely -> only "
+                      "{}/{} files there.".format(
+                  plate, cnt_avail_files, cnt_all_files))
         logger.info("All's well that ends well")
 
     def check_download(self):
@@ -168,5 +168,23 @@ class Parser:
             if not Path(platefile_path).exists():
                 logger.warning("{} is missing".format(platefile_path))
             else:
-                logger.info("{} is available".format(platefile_path))
+                if self.has_correct_file_count(platefile_path):
+                    logger.info(
+                      "{} is available".format(platefile_path))
         logger.setLevel(logging.INFO)
+
+    def has_correct_file_count(self, platefile_path):
+        for d, s, f in os.walk(platefile_path):
+            if any(re.match("20\d+-\d+", el) for el in s):
+                if len(s) > 1:
+                    logger.warning(
+                        "{} has multiple downloaded platefilesets".format(
+                            platefile_path))
+                    return False
+            if len(s):
+                continue
+            files = list(filter(lambda x: x.endswith(".mat"), f))
+            if len(files) == 0:
+                logger.warning("{} has no files".format(platefile_path))
+                return False
+        return True
