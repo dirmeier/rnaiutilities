@@ -159,7 +159,6 @@ class Parser:
                     "{} has not been parsed completely -> only "
                     "{}/{} files there.".format(
                         plate, cnt_avail_files, cnt_all_files))
-
         logger.info("All's well that ends well")
 
     def check_download(self):
