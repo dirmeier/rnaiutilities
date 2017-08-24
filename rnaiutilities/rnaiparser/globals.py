@@ -18,7 +18,7 @@
 # @author = 'Simon Dirmeier'
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
-
+# TODO: that is dumb
 USABLE_FEATURES = ["bacteria",
                    "cells",
                    "nuclei",

@@ -34,6 +34,10 @@ __NA__ = "NA"
 
 
 class PlateParser:
+    """
+    Plate Parser class.
+    """
+
     def parse(self, pfs):
         """
         Parse the PlateFileSets (i.e.: all parsed folders) into tsvs.

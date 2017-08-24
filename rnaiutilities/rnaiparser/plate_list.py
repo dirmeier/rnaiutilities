@@ -43,6 +43,7 @@ class PlateList:
         self._meta_file = file
         self._pattern = pattern
         # regex that automatically excludes files
+        # maybe i should remove this and remove these plates beforehand
         self._regex = re.compile(
           ".*((BACKUP)|(INVASIN)|(OLIGOPROFILE)|(TITRATION)|"
           "(RHINO-TEST)|(1PMOL)).*".upper())

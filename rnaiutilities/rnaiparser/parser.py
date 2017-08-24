@@ -23,6 +23,7 @@ import logging
 import os
 import re
 from pathlib import Path
+import numpy as np
 import multiprocessing as mp
 
 from rnaiutilities.rnaiparser.globals import USABLE_FEATURES
@@ -123,6 +124,7 @@ class Parser:
         try:
             for platefileset in platefilesets:
                 # create a list of relevant files for the plateset
+                # it would make more sense to compare this to the AVAILABLE files and put usable features in the XML file :)
                 fls = [
                     self._writer.data_filename(platefileset.outfile + "_" + x)
                     for x in USABLE_FEATURES
@@ -140,6 +142,7 @@ class Parser:
             logger.error("Some error idk anythin can happen here: " + str(ex))
         return 0
 
+    # change this by looking into available files and count byt that and not by  the usable features
     def report(self):
         for plate in self._plate_list:
             platefilesets = self._filesets(
@@ -147,19 +150,35 @@ class Parser:
               self._output_path
             )
             if len(platefilesets) == 0:
-                print("{} is missing entirely".format(plate))
+                k = 1
+                # logger.warning("{} is missing entirely".format(plate))
             for platefileset in platefilesets:
-                fls = [
-                    self._writer.data_filename(platefileset.outfile + "_" + x)
-                    for x in USABLE_FEATURES
-                ]
-                cnt_all_files = len(fls)
-                cnt_avail_files = sum([Path(x).exists() for x in fls])
+                usable_feature_files = self._usable_feature_files(platefileset)
+                cnt_all_files = len(usable_feature_files)
+                cnt_avail_files = sum(
+                  [Path(x).exists() for x in usable_feature_files])
                 # if cnt_all_files != cnt_avail_files:
-                print("{} has not been parsed completely -> only "
-                      "{}/{} files there.".format(
+                logger.warning("{} has not been parsed completely -> only "
+                               "{}/{} files there.".format(
                   plate, cnt_avail_files, cnt_all_files))
         logger.info("All's well that ends well")
+
+    def _available_files(self, platefileset):
+        return np.unique(list(map(lambda x: x.split(".")[0],
+                                  [x.featurename.lower() for x in
+                                   platefileset.files])))
+
+    def _usable_feature_files(self, platefileset):
+        available_feature_files = self._available_files(platefileset)
+        fls = [
+            self._writer.data_filename(platefileset.outfile + "_" + x) for x in
+            USABLE_FEATURES
+        ]
+        usable_feature_files = []
+        for fl in fls:
+            if any(fl.endswith("_" + av + "_data.tsv") for av in available_feature_files):
+                usable_feature_files.append(fl)
+        return usable_feature_files
 
     def check_download(self):
         logger.setLevel(logging.WARNING)
@@ -178,8 +197,8 @@ class Parser:
             if any(re.match("20\d+-\d+", el) for el in s):
                 if len(s) > 1:
                     logger.warning(
-                        "{} has multiple downloaded platefilesets".format(
-                            platefile_path))
+                      "{} has multiple downloaded platefilesets".format(
+                        platefile_path))
                     return False
             if len(s):
                 continue
