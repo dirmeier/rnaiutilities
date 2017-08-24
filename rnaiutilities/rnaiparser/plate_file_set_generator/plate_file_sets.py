@@ -30,9 +30,9 @@ from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file import \
 from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_set import \
     PlateFileSet
 
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
 
 class PlateFileSets:
     """
@@ -42,16 +42,17 @@ class PlateFileSets:
 
     # feature names of features to skip
     _skippable_feature_names_ = ["Batch_handles.",
-                       "Neighbors.",
-                       "Bacteria.SubObjectFlag.",
-                       "CometTails.",
-                       "DAPIFG.",
-                       "BlobBacteria."]
+                                 "Neighbors.",
+                                 "Bacteria.SubObjectFlag.",
+                                 "CometTails.",
+                                 "DAPIFG.",
+                                 "BlobBacteria."]
     # these are feature file names we dont use
     _skippable_features_starts = [x.lower() for x in _skippable_feature_names_]
     # name of the file that has the sirna-entrez mapping information
     _image_ = "Image.".lower()
-    _skippable_feature_regex_ = [re.compile(".*_subcell.*"), re.compile(".*subobjectflag.*")]
+    _skippable_feature_regex_ = [re.compile(".*_subcell.*"),
+                                 re.compile(".*subobjectflag.*")]
     # name of the well index mappings
     _mapping_file_ = "Image.FileName_OrigDNA".lower()
     # the pattern for screen, replicate
