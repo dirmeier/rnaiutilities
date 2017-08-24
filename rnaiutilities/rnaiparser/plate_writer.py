@@ -57,8 +57,8 @@ class PlateWriter:
         screen = pfs.screen
         design = pfs.design
         plate = pfs.plate
-        layout = self._layout.get(pathogen, library, design, screen,
-                                  replicate, plate)
+        layout = self._layout.get(pathogen, library, design,
+                                  screen, replicate, plate)
         if layout is None and pfs.pathogen.lower() != "mock":
             logger.warning("Could not load layout for: " + pfs.classifier)
             return
@@ -88,9 +88,10 @@ class PlateWriter:
             for iimg in range(nimg):
                 well = mapping[iimg]
                 meta[0] = well
-                meta[1] = layout.gene(well)
-                meta[2] = layout.sirna(well)
-                meta[3] = layout.welltype(well)
+                if layout is not None:
+                    meta[1] = layout.gene(well)
+                    meta[2] = layout.sirna(well)
+                    meta[3] = layout.welltype(well)
                 meta[4] = iimg + 1
                 meat_hash[";".join(map(str, meta[:4]))] = 1
                 for cell in range(features[0].ncells[iimg]):

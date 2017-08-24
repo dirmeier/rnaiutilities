@@ -77,6 +77,7 @@ class MetaLayout:
         :return: returns a PlateLayout
         """
 
+        #TODO: this should be ok, but maybe i should checl
         cl = "-".join([pathogen,
                        "".join([library, design]),
                        "".join([screen, replicate]),
