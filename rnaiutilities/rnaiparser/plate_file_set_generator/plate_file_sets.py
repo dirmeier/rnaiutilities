@@ -39,17 +39,19 @@ class PlateFileSets:
     Class for keeping all the filenames of plates stored as a map.
 
     """
-    _feature_names_ = ["Batch_handles.",
+
+    # feature names of features to skip
+    _skippable_feature_names_ = ["Batch_handles.",
                        "Neighbors.",
                        "Bacteria.SubObjectFlag.",
                        "CometTails.",
                        "DAPIFG.",
                        "BlobBacteria."]
     # these are feature file names we dont use
-    _skippable_features_starts = [x.lower() for x in _feature_names_]
+    _skippable_features_starts = [x.lower() for x in _skippable_feature_names_]
     # name of the file that has the sirna-entrez mapping information
     _image_ = "Image.".lower()
-    _skip_reg_ = [re.compile(".*_subcell.*"), re.compile(".*subobjectflag.*")]
+    _skippable_feature_regex_ = [re.compile(".*_subcell.*"), re.compile(".*subobjectflag.*")]
     # name of the well index mappings
     _mapping_file_ = "Image.FileName_OrigDNA".lower()
     # the pattern for screen, replicate
@@ -143,7 +145,7 @@ class PlateFileSets:
         for skip in PlateFileSets._skippable_features_starts:
             if b.startswith(skip):
                 return True
-        for skip in PlateFileSets._skip_reg_:
+        for skip in PlateFileSets._skippable_feature_regex_:
             if skip.match(b):
                 return True
         return False
