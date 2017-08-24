@@ -32,12 +32,15 @@ __NA__ = "NA"
 
 
 class PlateWriter:
-    def __init__(self, layout):
-
-        self._layout = layout
+    """
+    Write a plate to tsv or any other format.
+    """
 
     _meta_ = ["well", "gene", "sirna", "well_type", "image_idx", "object_idx"]
     _well_regex = re.compile("(\w)(\d+)")
+
+    def __init__(self, layout):
+        self._layout = layout
 
     def write(self, pfs, feature_groups, mapping):
         logger.info("Integrating the different feature sets to matrices for "
@@ -56,7 +59,7 @@ class PlateWriter:
         plate = pfs.plate
         layout = self._layout.get(pathogen, library, design, screen,
                                   replicate, plate)
-        if layout is None:
+        if layout is None and pfs.pathogen.lower() != "mock":
             logger.warning("Could not load layout for: " + pfs.classifier)
             return
         filename = pfs.outfile + "_" + feature_group

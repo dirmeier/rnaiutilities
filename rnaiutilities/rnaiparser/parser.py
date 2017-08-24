@@ -124,11 +124,7 @@ class Parser:
         try:
             for platefileset in platefilesets:
                 # create a list of relevant files for the plateset
-                # it would make more sense to compare this to the AVAILABLE files and put usable features in the XML file :)
-                fls = [
-                    self._writer.data_filename(platefileset.outfile + "_" + x)
-                    for x in USABLE_FEATURES
-                ]
+                fls = self._usable_feature_files(platefileset)
                 # if all the files exist, we just skip the creation of the files
                 if any(not Path(x).exists() for x in fls):
                     logger.info("Doing: " + " ".join(platefileset.meta))
@@ -142,7 +138,6 @@ class Parser:
             logger.error("Some error idk anythin can happen here: " + str(ex))
         return 0
 
-    # change this by looking into available files and count byt that and not by  the usable features
     def report(self):
         for plate in self._plate_list:
             platefilesets = self._filesets(

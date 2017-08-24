@@ -49,7 +49,6 @@ class PlateFileSets:
                                  "BlobBacteria."]
     # these are feature file names we dont use
     _skippable_features_starts = [x.lower() for x in _skippable_feature_names_]
-    # name of the file that has the sirna-entrez mapping information
     _image_ = "Image.".lower()
     _skippable_feature_regex_ = [re.compile(".*_subcell.*"),
                                  re.compile(".*subobjectflag.*")]
@@ -100,7 +99,7 @@ class PlateFileSets:
             self._files.append(filename)
             if self._skip(basename):
                 continue
-                # decompose the file name
+            # decompose the file name
             self._parse_file_name(filename)
 
     def _parse_file_name(self, filename):
