@@ -67,6 +67,7 @@ class PlateWriter:
             if not Path(self.data_filename(filename)).exists():
                 logger.info("Writing to: {}".format(filename))
                 self._write_file(filename, features, mapping, layout)
+                logger.info("Success: {}".format(filename))
             else:
                 logger.info(filename + " already exists. Skipping")
         except Exception as e:
@@ -107,9 +108,7 @@ class PlateWriter:
                                           list(map(str, vals))).lower() + "\n")
                     except Exception:
                         f.write("\t".join([__NA__] * len(header)) + "\n")
-
         self._write_meta(filename, meat_hash, feature_names)
-
         return 0
 
     def _write_meta(self, filename, meat_hash, features):

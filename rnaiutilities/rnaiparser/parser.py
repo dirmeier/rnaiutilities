@@ -60,6 +60,8 @@ class Parser:
         self._multi_processing = config.multi_processing
         # read the plate list files
         # oly take files with regex pooled/unpooled genome/kinome
+        # TODO: this also needs to go to the config file
+        # why is this again: (-\w+)* ?
         self._plate_list = PlateList(
           config.plate_id_file,
           ".*\/\w+\-\w[P|U]\-[G|K]\d+(-\w+)*\/.*"
@@ -71,8 +73,7 @@ class Parser:
 
     def parse(self):
         """
-        Iterate over the experiments, download the files, parse them and
-        store to data-base.
+        Iterate over the experiments, download the files and parse them.
 
         """
         exps = list(self._plate_list.plate_files)
