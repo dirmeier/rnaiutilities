@@ -36,6 +36,16 @@ def cli():
 
 @cli.command()
 @click.argument("config", type=str)
+def featuresets(config):
+    """
+    Compares feature sets from different screens for overall
+    """
+    c = Config(config)
+    Parser(c).feature_sets()
+
+
+@cli.command()
+@click.argument("config", type=str)
 def checkdownload(config):
     """
     Checks if all files from CONFIG have been downloaded correctly.

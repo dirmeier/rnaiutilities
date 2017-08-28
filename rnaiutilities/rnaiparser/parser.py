@@ -34,6 +34,7 @@ from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_sets import \
 from rnaiutilities.rnaiparser.plate_layout import MetaLayout
 from rnaiutilities.rnaiparser.plate_parser import PlateParser
 from rnaiutilities.rnaiparser.plate_writer import PlateWriter
+from rnaiutilities.rnaiparser.utility.utility import get_base_filesnames
 
 logger = mp.log_to_stderr()
 logger.setLevel(logging.INFO)
@@ -203,3 +204,41 @@ class Parser:
                 logger.warning("{} has no files".format(platefile_path))
                 return False
         return True
+
+    def feature_sets(self):
+        """
+        Get the feature sets and overlaps of screens.
+        """
+        screen_map = self._screen_map()
+        file_map = self._file_map(screen_map)
+        for k1, v1 in screen_map.items():
+            for k2, v2 in screen_map.items():
+                l = 1
+
+    def _screen_map(self):
+        screen_map = {}
+        for plate in self._plate_list:
+            platefile_path = self._config.plate_folder + "/" + plate
+            screen = self._to_screen(plate)
+            if screen not in screen_map:
+                screen_map[screen] = set()
+            screen_map[screen].add(platefile_path)
+        return screen_map
+
+    def _to_screen(self, plate):
+        ma = re.match("^(/.+/\w+)/.+$", plate)
+        return ma.group(1)
+
+    def _file_map(self, screen_map):
+        for screen, filesets in screen_map.items():
+            size = len(filesets)
+            for fileset in filesets:
+                fl_suffixes = self._get_suffixes(fileset)
+        return None
+
+    def _get_suffixes(self, fileset):
+         return get_base_filesnames(fileset, ".mat")
+
+
+
+
