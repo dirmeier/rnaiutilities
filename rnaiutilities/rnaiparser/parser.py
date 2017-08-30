@@ -25,6 +25,7 @@ import re
 from pathlib import Path
 import numpy as np
 import multiprocessing as mp
+from tabulate import tabulate
 
 from rnaiutilities.rnaiparser.globals import USABLE_FEATURES
 from rnaiutilities.rnaiparser.plate_list import PlateList
@@ -69,10 +70,9 @@ class Parser:
           ".*\/\w+\-\w[P|U]\-[G|K]\d+(-\w+)*\/.*"
         )
         # parse the folder into a map of (classifier-plate) pairs
-        # TODO
-        # self._layout = MetaLayout(config.layout_file)
+        self._layout = MetaLayout(config.layout_file)
         self._parser = PlateParser()
-        # self._writer = PlateWriter(self._layout)
+        self._writer = PlateWriter(self._layout)
 
     def parse(self):
         """
@@ -216,13 +216,17 @@ class Parser:
 
         screen_map = self._screen_map()
         file_map = self._file_map(screen_map)
-        keys = list(file_map.keys())
-        print("\t" + "\t".join(keys))
-        for i in range(len(keys) - 1):
-            print(keys[i], end="\t")
-            for j in range(i + 1, len(keys)):
-                print(str(jaccard(file_map[keys[i]], file_map[keys[j]])), end="\t")
-            print("")
+        keys = sorted(list(file_map.keys()))
+        tab = []
+        for i in range(len(keys)):
+            row = [keys[i]]
+            for j in range(len(keys)):
+                if j > i:
+                    row.append("{:2.5f}".format(jaccard(file_map[keys[i]], file_map[keys[j]])))
+                else:
+                    row.append(str(0))
+            tab.append(row)
+        print(tabulate(tab, headers = [""] + keys ))
 
     def _screen_map(self):
         """
