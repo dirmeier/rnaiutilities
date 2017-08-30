@@ -24,7 +24,6 @@ import re
 from pathlib import Path
 from rnaiutilities.rnaiparser.utility import check_feature_group
 
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -97,7 +96,7 @@ class PlateWriter:
                 meat_hash[";".join(map(str, meta[:4]))] = 1
                 for cell in range(features[0].ncells[iimg]):
                     vals = [__NA__] * len(features)
-                    for p in range(len(features)):
+                    for p, _ in enumerate(features):
                         try:
                             vals[p] = features[p].values[iimg, cell]
                         except IndexError:

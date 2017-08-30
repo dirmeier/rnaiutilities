@@ -76,9 +76,10 @@ class Parser:
 
     def parse(self):
         """
-        Iterate over the experiments, download the files and parse them.
+        Parses the plate file sets into raw tsv files.
 
         """
+
         exps = list(self._plate_list.plate_files)
         # use globals vars for process pool
         if self._multi_processing:
@@ -143,14 +144,18 @@ class Parser:
         return 0
 
     def report(self):
+        """
+        Checks if all files have been parsed correctly.
+
+        """
+
         for plate in self._plate_list:
             platefilesets = self._filesets(
               self._output_path + "/" + plate,
               self._output_path
             )
             if len(platefilesets) == 0:
-                k = 1
-                # logger.warning("{} is missing entirely".format(plate))
+                logger.warning("{} is missing entirely".format(plate))
             for platefileset in platefilesets:
                 usable_feature_files = self._usable_feature_files(platefileset)
                 cnt_all_files = len(usable_feature_files)
@@ -162,7 +167,8 @@ class Parser:
                       plate, cnt_avail_files, cnt_all_files))
         logger.info("All's well that ends well")
 
-    def _available_files(self, platefileset):
+    @staticmethod
+    def _available_files(platefileset):
         return np.unique(list(map(lambda x: x.split(".")[0],
                                   [x.featurename.lower() for x in
                                    platefileset.files])))
@@ -181,18 +187,24 @@ class Parser:
         return usable_feature_files
 
     def check_download(self):
+        """
+        Checks if all files given in config have been downloaded correctly.
+
+        """
+
         logger.setLevel(logging.WARNING)
         for plate in self._plate_list:
             platefile_path = self._config.plate_folder + "/" + plate
             if not Path(platefile_path).exists():
                 logger.warning("{} is missing".format(platefile_path))
             else:
-                if self.has_correct_file_count(platefile_path):
+                if self._has_correct_file_count(platefile_path):
                     logger.info(
                       "{} is available".format(platefile_path))
         logger.setLevel(logging.INFO)
 
-    def has_correct_file_count(self, platefile_path):
+    @staticmethod
+    def _has_correct_file_count(platefile_path):
         for d, s, f in os.walk(platefile_path):
             if any(re.match("20\d+-\d+", el) for el in s):
                 if len(s) > 1:
@@ -210,7 +222,8 @@ class Parser:
 
     def feature_sets(self):
         """
-        Get the feature sets and overlaps of screens.
+        Checks between all possible screens for pairwise feature overlaps.
+        The overlaps can be taken to decide which screens to include in the analysis.
 
         """
 
@@ -245,7 +258,8 @@ class Parser:
             screen_map[screen].add(platefile_path)
         return screen_map
 
-    def _to_screen(self, plate):
+    @staticmethod
+    def _to_screen(plate):
         """
         Parses sth like this: "/(GROUP_COSSART)/LISTERIA_TEAM/(LISTERIA-DP-G)1/DZ44-1K"
 
@@ -265,7 +279,8 @@ class Parser:
             file_map[screen] = list(file_count_map.keys())
         return file_map
 
-    def _get_suffixes(self, fileset):
+    @staticmethod
+    def _get_suffixes(fileset):
         return get_base_filesnames(fileset, ".mat")
 
     def _get_screen_file_map(self, platesets):
@@ -280,7 +295,8 @@ class Parser:
                 file_map[fl_suffix] += 1
         return file_map
 
-    def _check_file_counts(self, file_map, size):
+    @staticmethod
+    def _check_file_counts(file_map, size):
         for fl_suffix in file_map:
             if file_map[fl_suffix] != size:
                 logger.warning(

@@ -118,7 +118,8 @@ class DatabaseQuery:
         res = list(map(lambda x: x[0], res))
         return res
 
-    def _build_select_statement(self, select):
+    @staticmethod
+    def _build_select_statement(select):
         if select in ["gene", "sirna", "well"]:
             return "SELECT distinct({}) from {};".format(select, select)
         else:
