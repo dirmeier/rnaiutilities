@@ -34,7 +34,7 @@ from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_sets import \
 from rnaiutilities.rnaiparser.plate_layout import MetaLayout
 from rnaiutilities.rnaiparser.plate_parser import PlateParser
 from rnaiutilities.rnaiparser.plate_writer import PlateWriter
-from rnaiutilities.rnaiparser.utility.utility import get_base_filesnames
+from rnaiutilities.rnaiparser.utility.io import get_base_filesnames
 
 logger = mp.log_to_stderr()
 logger.setLevel(logging.INFO)
@@ -68,9 +68,10 @@ class Parser:
           ".*\/\w+\-\w[P|U]\-[G|K]\d+(-\w+)*\/.*"
         )
         # parse the folder into a map of (classifier-plate) pairs
-        self._layout = MetaLayout(config.layout_file)
+        # TODO
+        # self._layout = MetaLayout(config.layout_file)
         self._parser = PlateParser()
-        self._writer = PlateWriter(self._layout)
+        # self._writer = PlateWriter(self._layout)
 
     def parse(self):
         """
@@ -157,7 +158,7 @@ class Parser:
                 if cnt_all_files != cnt_avail_files:
                     logger.warning("{} has not been parsed completely -> only "
                                    "{}/{} files there.".format(
-                  plate, cnt_avail_files, cnt_all_files))
+                      plate, cnt_avail_files, cnt_all_files))
         logger.info("All's well that ends well")
 
     def _available_files(self, platefileset):
@@ -173,7 +174,8 @@ class Parser:
         ]
         usable_feature_files = []
         for fl in fls:
-            if any(fl.endswith("_" + av + "_data.tsv") for av in available_feature_files):
+            if any(fl.endswith("_" + av + "_data.tsv") for av in
+                   available_feature_files):
                 usable_feature_files.append(fl)
         return usable_feature_files
 
@@ -209,13 +211,22 @@ class Parser:
         """
         Get the feature sets and overlaps of screens.
         """
+
         screen_map = self._screen_map()
         file_map = self._file_map(screen_map)
-        for k1, v1 in screen_map.items():
-            for k2, v2 in screen_map.items():
-                l = 1
+        for k1, v1 in file_map.items():
+            print(k1, end="\t")
+            for k2, v2 in file_map.items():
+                print(k2 + ":" + jaccard(v1, v2), end=",")
 
     def _screen_map(self):
+        """
+        Computes a mapping screen -> plate, i.e. sth like:
+        BRUCELLA-DP-K2 -> {plate1, plate2, plate }
+
+        :return: returns a mapping
+        :rtype: dict(str, str)
+        """
         screen_map = {}
         for plate in self._plate_list:
             platefile_path = self._config.plate_folder + "/" + plate
@@ -226,19 +237,43 @@ class Parser:
         return screen_map
 
     def _to_screen(self, plate):
-        ma = re.match("^(/.+/\w+)/.+$", plate)
-        return ma.group(1)
+        """
+        Parses sth like this: "/(GROUP_COSSART)/LISTERIA_TEAM/(LISTERIA-DP-G)1/DZ44-1K"
+
+        """
+        ma = re.match("^/(.+)/.+/(\w+-\w+-\w+)\d+.*/.+$", plate)
+        return ma.group(1) + "-" + ma.group(2)
 
     def _file_map(self, screen_map):
-        for screen, filesets in screen_map.items():
-            size = len(filesets)
-            for fileset in filesets:
-                fl_suffixes = self._get_suffixes(fileset)
-        return None
+        file_map = {}
+        for screen, platesets in screen_map.items():
+            # number of plate sets.
+            # so every feature file should be found size times
+            size = len(platesets)
+            # maps a feat
+            file_count_map = self._get_screen_file_map(platesets)
+            self._check_file_counts(file_count_map, size)
+            file_map[screen] = list(file_count_map.keys())
+        return file_map
 
     def _get_suffixes(self, fileset):
-         return get_base_filesnames(fileset, ".mat")
+        return get_base_filesnames(fileset, ".mat")
 
+    def _get_screen_file_map(self, platesets):
+        file_map = {}
+        for plateset in platesets:
+            # list of files ending in *mat
+            feature_list = self._get_suffixes(plateset)
+            for fl_suffix in feature_list:
+                if fl_suffix not in file_map:
+                    file_map[fl_suffix] = 0
+                # increment the number of times a feature has been found
+                file_map[fl_suffix] += 1
+        return file_map
 
-
-
+    def _check_file_counts(self, file_map, size):
+        for fl_suffix in file_map:
+            if file_map[fl_suffix] != size:
+                logger.warning(
+                  "Plate-set {} does not have {} files each."
+                      .format(fl_suffix, size))

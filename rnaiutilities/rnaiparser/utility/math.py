@@ -19,21 +19,4 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
-import os
-import logging
-from pathlib import Path
-
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-
-def get_base_filesnames(folder, suffix):
-    fls = []
-    if not Path(folder).exists():
-        logger.warning("{} does not exist.".format(folder))
-    for d, _, f in os.walk(folder):
-        for basename in f:
-            if basename.endswith(suffix):
-                fls.append(basename)
-    return fls
+def jaccard()
