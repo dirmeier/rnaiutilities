@@ -19,4 +19,21 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
-def jaccard()
+from numpy import intersect1d, union1d
+
+
+def jaccard(s, t):
+    """
+    Computes the Jaccard index between two lists.
+
+    :param s: list(str)
+    :param t: list(str)
+    :return: returns the Jaccard index between the two sets
+    :rtype: float
+    """
+
+    try:
+        intr =  len(intersect1d(s, t)) / len(union1d(s, t))
+    except ZeroDivisionError:
+        intr  = 0
+    return  intr

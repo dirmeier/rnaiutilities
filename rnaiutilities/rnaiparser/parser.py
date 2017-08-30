@@ -35,6 +35,7 @@ from rnaiutilities.rnaiparser.plate_layout import MetaLayout
 from rnaiutilities.rnaiparser.plate_parser import PlateParser
 from rnaiutilities.rnaiparser.plate_writer import PlateWriter
 from rnaiutilities.rnaiparser.utility.io import get_base_filesnames
+from rnaiutilities.rnaiparser.utility.math import jaccard
 
 logger = mp.log_to_stderr()
 logger.setLevel(logging.INFO)
@@ -210,14 +211,18 @@ class Parser:
     def feature_sets(self):
         """
         Get the feature sets and overlaps of screens.
+
         """
 
         screen_map = self._screen_map()
         file_map = self._file_map(screen_map)
-        for k1, v1 in file_map.items():
-            print(k1, end="\t")
-            for k2, v2 in file_map.items():
-                print(k2 + ":" + jaccard(v1, v2), end=",")
+        keys = list(file_map.keys())
+        print("\t" + "\t".join(keys))
+        for i in range(len(keys) - 1):
+            print(keys[i], end="\t")
+            for j in range(i + 1, len(keys)):
+                print(str(jaccard(file_map[keys[i]], file_map[keys[j]])), end="\t")
+            print("")
 
     def _screen_map(self):
         """

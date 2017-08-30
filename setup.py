@@ -34,7 +34,8 @@ setup(
       'pyyaml>=3.12',
       'tables>=3.3.0',
       'click>=6.7',
-      'pytest>=3.0.5'
+      'pytest>=3.0.5',
+      'tabulate>=0.7.7'
   ],
   classifiers=[
       'Development Status :: 3 - Alpha',
