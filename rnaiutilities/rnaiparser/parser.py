@@ -205,7 +205,7 @@ class Parser:
 
     @staticmethod
     def _has_correct_file_count(platefile_path):
-        for d, s, f in os.walk(platefile_path):
+        for _, s, f in os.walk(platefile_path):
             if any(re.match("20\d+-\d+", el) for el in s):
                 if len(s) > 1:
                     logger.warning(
@@ -231,15 +231,14 @@ class Parser:
         file_map = self._file_map(screen_map)
         keys = sorted(list(file_map.keys()))
         tab = []
-        for i in range(len(keys)):
+        for i, _ in enumerate(keys):
             row = [keys[i]]
-            for j in range(len(keys)):
-                if j > i:
-                    row.append("{:2.5f}".format(jaccard(file_map[keys[i]], file_map[keys[j]])))
-                else:
-                    row.append(str(0))
+            for j, _ in enumerate(keys):
+                row.append(
+                  "{:2.5f}".format(jaccard(file_map[keys[i]],
+                                           file_map[keys[j]])))
             tab.append(row)
-        print(tabulate(tab, headers = [""] + keys ))
+        print(tabulate(tab, headers=[""] + keys))
 
     def _screen_map(self):
         """

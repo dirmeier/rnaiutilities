@@ -32,7 +32,7 @@ def get_base_filesnames(folder, suffix):
     fls = []
     if not Path(folder).exists():
         logger.warning("{} does not exist.".format(folder))
-    for d, _, f in os.walk(folder):
+    for _, _, f in os.walk(folder):
         for basename in f:
             if basename.endswith(suffix):
                 fls.append(basename)

@@ -58,7 +58,7 @@ class MetaLayout:
                 self._add(tokens)
 
     def _add(self, tokens):
-        bar, expr, _, geneset, _, library, row, col, well, \
+        bar, expr, _, geneset, _, library, _, _, well, \
         well_type, gene, sirna = tokens
         classifier = (expr + "-" + bar)
         if classifier not in self._meta:
