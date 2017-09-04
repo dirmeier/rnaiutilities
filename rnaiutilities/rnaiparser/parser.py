@@ -274,7 +274,7 @@ class Parser:
             size = len(platesets)
             # maps a feat
             file_count_map = self._get_screen_file_map(platesets)
-            self._check_file_counts(file_count_map, size)
+            self._check_file_counts(file_count_map, size, screen)
             file_map[screen] = list(file_count_map.keys())
         return file_map
 
@@ -295,9 +295,12 @@ class Parser:
         return file_map
 
     @staticmethod
-    def _check_file_counts(file_map, size):
+    def _check_file_counts(file_map, size, screen):
         for fl_suffix in file_map:
             if file_map[fl_suffix] != size:
                 logger.warning(
-                  "Plate-set {} does not have {} files each."
-                      .format(fl_suffix, size))
+                  "Screen {} has only {}/{} files for feature {}."
+                      .format(screen,
+                              file_map[fl_suffix],
+                              size,
+                              fl_suffix))

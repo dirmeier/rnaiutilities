@@ -29,8 +29,7 @@ class PlateCellFeature:
     """
 
     def __init__(self, mat, n_images, n_max_cells_count,
-                 filename, n_cells_per_image,
-                 featurename):
+                 filename, n_cells_per_image, featurename):
         """
         :param mat: the parsed matrix
         :param n_images: the number of images * wells (this usually is 3456).
