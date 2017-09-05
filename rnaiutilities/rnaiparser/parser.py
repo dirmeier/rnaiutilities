@@ -59,6 +59,7 @@ class Parser:
         if not isinstance(config, Config):
             raise ValueError("Please provide a config object")
         self._config = config
+        self._plate_folder = config.plate_folder
         self._output_path = config.output_path
         self._multi_processing = config.multi_processing
         # read the plate list files
@@ -98,7 +99,7 @@ class Parser:
     def _parse(self, plate):
         try:
             platefilesets = self._filesets(
-              self._output_path + "/" + plate,
+              self._plate_folder + "/" + plate,
               self._output_path
             )
             if len(platefilesets) > 1:
