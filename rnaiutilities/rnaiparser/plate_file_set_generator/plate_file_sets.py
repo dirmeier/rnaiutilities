@@ -43,6 +43,8 @@ class PlateFileSets:
     # feature names of features to skip
     _skippable_feature_names_ = ["Batch_handles.",
                                  "Neighbors.",
+                                 "ERGIC53.",
+                                 "TGN46.",
                                  "Bacteria.SubObjectFlag.",
                                  "CometTails.",
                                  "DAPIFG.",
