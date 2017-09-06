@@ -234,6 +234,7 @@ class Parser:
         tab = []
         for i, _ in enumerate(keys):
             row = [keys[i]]
+            print("#" + keys[i] + "\t" + ",".join(file_map[keys[i]]))
             for j, _ in enumerate(keys):
                 row.append(
                   "{:2.5f}".format(jaccard(file_map[keys[i]],
