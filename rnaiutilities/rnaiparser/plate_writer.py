@@ -56,8 +56,9 @@ class PlateWriter:
         screen = pfs.screen
         design = pfs.design
         plate = pfs.plate
+        suffix = pfs.suffix
         layout = self._layout.get(pathogen, library, design,
-                                  screen, replicate, plate)
+                                  screen, replicate, plate, suffix)
         if layout is None and pfs.pathogen.lower() != "mock":
             logger.warning("Could not load layout for: " + pfs.classifier)
             return

@@ -25,12 +25,13 @@ from rnaiutilities.rnaiquery.db.dbms import DBMS
 from rnaiutilities.rnaiquery.filesets import table_file_sets
 from rnaiutilities.rnaiquery.result_set import ResultSet
 
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 
 
 class Query:
+    __selectable_features__ = ["cells", "perinuclei", "nuclei"]
+
     def __init__(self, db=None):
         """
         Create an instance to query a data.base
@@ -56,7 +57,6 @@ class Query:
               featureclass=None,
               sample=100):
         """
-
         Query a database of image-based RNAi screening features for
          cells/bacteria/nuclei.
         The query can use filters, so that only a subset is selected.
@@ -82,10 +82,15 @@ class Query:
         :rtype: ResultSet
         """
 
+        if featureclass is not None:
+            features = featureclass.split(",")
+            for feature in features:
+                if feature.lower() not in Query.__selectable_features__:
+                    raise ValueError(
+                      "Currently only featureclasses {} are supported.".format(
+                          "/".join(Query.__selectable_features__)))
         if featureclass is None:
-            raise ValueError("Currently using no featureclass not supported.")
-        if featureclass != "cells":
-            raise ValueError("Currently only featureclass 'cells' supported.")
+            featureclass = ",".join(Query.__selectable_features__)
 
         return self._query(sample=sample,
                            study=study,

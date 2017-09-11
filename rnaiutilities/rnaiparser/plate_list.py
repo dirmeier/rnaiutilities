@@ -71,6 +71,7 @@ class PlateList:
                     continue
                 filename, platetype = toks[0], toks[1]
                 if not (platetype.lower().startswith("screeningplate") or
+                        platetype.lower().startswith("checkerboard") or
                         platetype.lower().startswith("mockplate")):
                     continue
                 if self._regex.match(filename) or not pat.match(filename):
