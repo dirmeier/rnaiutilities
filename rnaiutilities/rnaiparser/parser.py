@@ -141,7 +141,7 @@ class Parser:
                     logger.info(" ".join(map(str, platefileset.meta)) +
                                 " already exists. Skipping.")
         except Exception as ex:
-            logger.error("Some error idk anythin can happen here: " + str(ex))
+            logger.error("Some error idk anything can happen here: " + str(ex))
         return 0
 
     def report(self):

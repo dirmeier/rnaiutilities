@@ -31,6 +31,7 @@ class TestPlain(unittest.TestCase):
     Little fake test to make travis happy
 
     """
+
     def setUp(self):
         unittest.TestCase.setUp(self)
         self._q = Query()

@@ -19,27 +19,28 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
-class TableFile:
-    def __init__(self, query_result, features, **kwargs):
-        f = query_result[-1].replace("_meta.tsv", "")
-        self.file_name = f + "_data.tsv"
-        self._feature_class = f.split("_")[-1]
-        self._filesuffix = f.split("/")[-1]
-        self._feature_list_table = self._filesuffix.replace("-", "_")
+class TableFileSet:
+    def __init__(self, key, query_result, features, **kwargs):
+        self._table_file_set_classifier = key
+        f = [x[-1].replace("_meta.tsv", "") for x in query_result]
+        self.file_name = [el + "_data.tsv" for el in f]
+        self._feature_classes = [x[7] for x in query_result]
+        self._filesuffixes = [x.split("/")[-1] for x in f]
+        self._feature_list_table = [suf.replace("-", "_") for suf in self._filesuffixes]
         self._features = set(features)
         self._filter = kwargs
         self._study, self._pathogen, self._lib, \
           self._design, self._replicate,\
-          self._plate = query_result[1:7]
+          self._plate = query_result[0][1:7]
 
     def __repr__(self):
         return self.__str__()
 
     def __str__(self):
-        return "Tablefile: " + self._feature_list_table
+        return "Tablefile: " + self._table_file_set_classifier
 
     def __eq__(self, other):
-        if not isinstance(other, TableFile):
+        if not isinstance(other, TableFileSet):
             return False
         return self.file_name == other.file_name
 

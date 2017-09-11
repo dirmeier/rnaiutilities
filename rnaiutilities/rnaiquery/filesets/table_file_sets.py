@@ -27,7 +27,7 @@ class TableFileSets:
         self._db = db
         # map of maps that hold file pointers
         # map - (1:n) -> [_gene_map , ...] - (1:m) -> filename
-        self._file_set = set()
+        self._file_set = []
 
     def __repr__(self):
         return self.__str__()

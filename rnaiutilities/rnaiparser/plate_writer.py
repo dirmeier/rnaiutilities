@@ -76,12 +76,12 @@ class PlateWriter:
 
     def _write_file(self, filename, features, mapping, layout):
         check_feature_group(features)
-        meta = [__NA__] * len(PlateWriter._meta_)
         meat_hash = {}
-
         feature_names = [feat.featurename.lower() for feat in features]
         header = PlateWriter._meta_ + feature_names
         dat_file = self.data_filename(filename)
+
+        meta = [__NA__] * len(PlateWriter._meta_)
         with open(dat_file, "w") as f:
             f.write("\t".join(header) + "\n")
             nimg = features[0].values.shape[0]
@@ -108,6 +108,7 @@ class PlateWriter:
                                           list(map(str, vals))).lower() + "\n")
                     except Exception:
                         f.write("\t".join([__NA__] * len(header)) + "\n")
+
         self._write_meta(filename, meat_hash, feature_names)
         return 0
 

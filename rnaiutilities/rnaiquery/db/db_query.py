@@ -20,9 +20,11 @@
 
 
 import logging
+import re
+from itertools import chain
 
 from rnaiutilities.rnaiquery.db.db_setup import DatabaseInserter
-from rnaiutilities.rnaiquery.filesets.table_file import TableFile
+from rnaiutilities.rnaiquery.filesets.table_file_set import TableFileSet
 from rnaiutilities.rnaiquery.globals import FEATURECLASS
 from rnaiutilities.rnaiquery.globals import GENE, SIRNA, LIBRARY, DESIGN
 from rnaiutilities.rnaiquery.globals import REPLICATE, PLATE, STUDY, PATHOGEN
@@ -51,11 +53,6 @@ class DatabaseQuery:
         res = self._query(q, **kwargs)
         return res
 
-    def _query(self, q, **kwargs):
-        res = self.__connection.query(q)
-        fls = {TableFile(x, self._feature_query(x[-1]), **kwargs) for x in res}
-        return fls
-
     def _build_query(self, **kwargs):
         mq = self._build_meta_query(**kwargs)
         gq = self._build_plate_query(GENE, **kwargs)
@@ -79,6 +76,40 @@ class DatabaseQuery:
         else:
             q = mq + ";"
         return q
+
+    def _query(self, q, **kwargs):
+        # get for relevant files
+        results = self.__connection.query(q)
+        # merge files of the same plate together
+        result_set_map = self._build_result_set(results)
+        # setup table file list
+        fls = [
+            TableFileSet(
+              # the key, i.e. file prefix for all the data files
+              k,
+              # the X table files
+              x,
+              # appended list of features
+              list(chain.from_iterable(
+                [self._feature_query(e[-1]) for e in x])),
+              # filtering information
+              **kwargs)
+            for k, x in result_set_map.items()
+        ]
+        return fls
+
+    @staticmethod
+    def _build_result_set(results):
+        result_set_map = {}
+        reg = re.compile("(.+)_\w+_meta.tsv")
+        for result in results:
+            mat = reg.match(result[-1])
+            if mat is not None:
+                desc = mat.group(1)
+                if desc not in result_set_map:
+                    result_set_map[desc] = []
+            result_set_map[desc].append(result)
+        return result_set_map
 
     @staticmethod
     def _build_meta_query(**kwargs):
@@ -124,4 +155,3 @@ class DatabaseQuery:
             return "SELECT distinct({}) from {};".format(select, select)
         else:
             return "SELECT distinct({}) from meta;".format(select)
-
