@@ -64,8 +64,6 @@ class MetaLayout:
         if classifier not in self._meta:
             self._meta[classifier] = PlateLayout(classifier, geneset, library)
         self._meta[classifier].add(gene, sirna, well, well_type)
-        # if classifier == "mock-dp-g1-basel-bzok-12":
-        #    l = self._meta[classifier]
 
     def get(self, pathogen, library, design, screen, replicate, plate, suffix):
         """
@@ -80,7 +78,8 @@ class MetaLayout:
         :return: returns a PlateLayout
         """
 
-        # TODO: this should be ok, but maybe i should checl
+        # TODO: this should be ok, but is potentially
+        #  buggy with the suffix thing.
         if suffix is None:
             cl = "-".join([pathogen,
                            "".join([library, design]),

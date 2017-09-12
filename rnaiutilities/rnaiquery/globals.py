@@ -37,7 +37,7 @@ FEATURES = "features"
 ELEMENTS = "elements"
 SAMPLE = "sample"
 
-FILE_FEATURES_PATTERNS = re.compile(
+FILE_FEATURES_REGEX = re.compile(
   "(\w+)-(\w+)-(\w+)-(\w+)-(\w+)-(\d+)-(.*)_(\w+)")
 
 ADDED_COLUMNS_FOR_PRINTING = {

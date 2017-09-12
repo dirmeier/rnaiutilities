@@ -132,6 +132,7 @@ class Query:
         :type db: str
         :return:
         """
+
         with DBMS(db) as d:
             d.insert(path)
 
@@ -159,8 +160,7 @@ class Query:
 
         fts = ["study", "pathogen", "library",
                "design", "gene", "sirna", "well",
-               "featureclass"
-               ]
+               "featureclass"]
         if select not in fts:
             raise ValueError(
               "Please provide one of: ({})".format(",".join(fts)))

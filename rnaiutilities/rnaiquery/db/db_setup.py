@@ -24,10 +24,9 @@ import os
 import yaml
 
 from rnaiutilities.rnaiquery.globals import FEATURECLASS, FEATURES, ELEMENTS
-from rnaiutilities.rnaiquery.globals import FILE_FEATURES_PATTERNS
+from rnaiutilities.rnaiquery.globals import FILE_FEATURES_REGEX
 from rnaiutilities.rnaiquery.globals import GENE, SIRNA, WELL, LIBRARY, DESIGN
 from rnaiutilities.rnaiquery.globals import REPLICATE, PLATE, STUDY, PATHOGEN
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -41,86 +40,31 @@ class DatabaseInserter:
         self.__connection = connection
 
     def insert(self, path):
+        """
+        Insert meta information from parsed imaging data into a database.
+        Creates a couple of different databases for all created meta files
+        containing information about plates, filenames, siRNAs, genes, etc.
+
+        :param path: the path where the parsed files are placed
+        """
+
+        # creates meta file database and one file for every plate
+        # and feature type
         self._create_dbs()
+        # reads file names ending with meta.tsv into memory
         fls = list(
           filter(
             lambda x: x.endswith("_meta.tsv"), [f for f in os.listdir(path)]
           )
         )
         le = len(fls)
+        # iterates over meta files and puts their info into the db
         for i, file in enumerate(fls):
             if i % 100 == 0:
                 logger.info("Doing file {} of {}".format(i, le))
             self._insert(path, file)
+        # puts indexes on all databases for fast file retrieval
         self._create_indexes()
-
-    def _insert(self, path, file):
-        filename = os.path.join(path, file)
-        try:
-            # parse file name meta information
-            ma = FILE_FEATURES_PATTERNS.match(file.replace("_meta.tsv", ""))
-            stu, pat, lib, des, _, rep, pl, feature = ma.groups()
-            self._insert_file_suffixes(
-              filename, stu, pat, lib,
-              des, rep, pl, feature
-            )
-
-            # read the meta file
-            with open(filename, "r") as fh:
-                meta = yaml.load(fh)
-            self._insert_meta(filename, meta)
-
-        except ValueError:
-            logger.error("Could not match meta file {}".format(file))
-
-    def _insert_file_suffixes(self, file, study, bacteria, library,
-                              design, replicate, plate, featureclass):
-        ins = self._insert_meta_into_statement(
-          file, study, bacteria, library, design,
-          replicate, plate, featureclass
-        )
-        self.__connection.execute(ins)
-
-    @staticmethod
-    def _insert_meta_into_statement(
-      file, study, bacteria, library,
-      design, replicate, plate, featureclass):
-        return "INSERT INTO meta " \
-               "({}, {}, {}, {}, {}, {}, {}, {}) " \
-                   .format(STUDY,
-                           PATHOGEN,
-                           LIBRARY,
-                           DESIGN,
-                           REPLICATE,
-                           PLATE,
-                           FEATURECLASS,
-                           "filename") + \
-               "VALUES (" + \
-               "'{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');" \
-                   .format(study,
-                           bacteria,
-                           library,
-                           design,
-                           replicate,
-                           plate,
-                           featureclass,
-                           file)
-
-    def _insert_meta(self, file, meta):
-        self._insert_elements(file, meta[ELEMENTS])
-        self._insert_features(file, meta[FEATURES])
-
-    def _insert_elements(self, file, meta):
-        self.__connection.insert_elements(
-          file,
-          meta,
-          self._insert_into_statement)
-
-    def _insert_features(self, file, meta):
-        tab = self.feature_table_name(file)
-        if not self._exists(tab):
-            self._create_file_feature_table(tab)
-            self.__connection.insert_many(meta, tab)
 
     def _create_dbs(self):
         self.__connection.execute(self._create_meta_table())
@@ -153,6 +97,94 @@ class DatabaseInserter:
         logger.info(s)
         return s
 
+    def _insert(self, path, file):
+        filename = os.path.join(path, file)
+        try:
+            # parse file name meta information
+            ma = FILE_FEATURES_REGEX.match(file.replace("_meta.tsv", ""))
+            stu, pat, lib, des, _, rep, pl, feature = ma.groups()
+            # put the file classifier suffixes into the meta database
+            # this really only regards the NAME of the file, the FEATURE it
+            # is containing and the meta that describes the plate
+            self._insert_file_suffixes_to_meta(
+              filename, stu, pat, lib, des, rep, pl, feature)
+
+            # read the meta file
+            # and put the meta plate information (genes, sirnas) into the
+            # database for the plate
+            with open(filename, "r") as fh:
+                meta = yaml.load(fh)
+            self._insert_meta(filename, meta)
+
+        except ValueError:
+            logger.error("Could not match meta file {}".format(file))
+
+    def _insert_file_suffixes_to_meta(self, file, study, bacteria, library,
+                                      design, replicate, plate, featureclass):
+        ins = self._create_into_meta_statement(
+          file, study, bacteria, library, design,
+          replicate, plate, featureclass
+        )
+        self.__connection.execute(ins)
+
+    @staticmethod
+    def _create_into_meta_statement(file, study, bacteria, library,
+                                    design, replicate, plate, featureclass):
+        return "INSERT INTO meta " \
+               "({}, {}, {}, {}, {}, {}, {}, {}) " \
+                   .format(STUDY,
+                           PATHOGEN,
+                           LIBRARY,
+                           DESIGN,
+                           REPLICATE,
+                           PLATE,
+                           FEATURECLASS,
+                           "filename") + \
+               "VALUES (" + \
+               "'{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');" \
+                   .format(study,
+                           bacteria,
+                           library,
+                           design,
+                           replicate,
+                           plate,
+                           featureclass,
+                           file)
+
+    def _insert_meta(self, file, meta):
+        self._insert_elements(file, meta[ELEMENTS])
+        self._insert_features(file, meta[FEATURES])
+
+    def _insert_elements(self, file, meta):
+        self.__connection.insert_elements(
+          file, meta, self._insert_into_statement)
+
+    @staticmethod
+    def _insert_into_statement(k, v, file):
+        s = "INSERT INTO {} ({}, filename) VALUES('{}', '{}')" \
+            .format(k, k, v, file)
+        return s
+
+    def _insert_features(self, file, meta):
+        tab = self.feature_table_name(file)
+        if not self._exists(tab):
+            self._create_file_feature_table(tab)
+            self.__connection.insert_many(meta, tab)
+
+    @staticmethod
+    def feature_table_name(file):
+        return file.replace("_meta.tsv", "").split("/")[-1].replace("-", "_")
+
+    def _exists(self, tab):
+        ex = self.__connection.exists(tab)
+        return ex
+
+    def _create_file_feature_table(self, tab):
+        s = "CREATE TABLE IF NOT EXISTS {}".format(tab) + \
+            " (feature varchar(1000) NOT NULL, " + \
+            "PRIMARY KEY(feature));"
+        self.__connection.execute(s)
+
     def _create_indexes(self):
         self.__connection.execute(self._create_meta_index())
         for col in [GENE, SIRNA, WELL]:
@@ -171,23 +203,3 @@ class DatabaseInserter:
         s = "CREATE INDEX {}_index ON {} ({});".format(t, t, t)
         logger.info(s)
         return s
-
-    def _create_file_feature_table(self, tab):
-        s = "CREATE TABLE IF NOT EXISTS {}".format(tab) + \
-            " (feature varchar(1000) NOT NULL, " + \
-            "PRIMARY KEY(feature));"
-        self.__connection.execute(s)
-
-    def _exists(self, tab):
-        ex = self.__connection.exists(tab)
-        return ex
-
-    @staticmethod
-    def _insert_into_statement(k, v, file):
-        s = "INSERT INTO {} ({}, filename) VALUES('{}', '{}')" \
-            .format(k, k, v, file)
-        return s
-
-    @staticmethod
-    def feature_table_name(file):
-        return file.replace("_meta.tsv", "").split("/")[-1].replace("-", "_")
