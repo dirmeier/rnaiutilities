@@ -104,20 +104,7 @@ class Query:
                            well=well,
                            featureclass=featureclass)
 
-    def _query(self, **kwargs):
-        """
-        Get a lazy file result set from some filtering criteria and a fixed
-        sample size.
-
-        :param kwargs: the filtering criteria.
-        :return: returns a lazy ResultSet
-        :rtype: ResultSet
-        """
-        fls = self._table.filter(**kwargs)
-        return ResultSet(fls, **kwargs)
-
-    @staticmethod
-    def insert(path, db):
+    def insert(self, path):
         """
         Insert meta information of an platewise RNAi screen to a database.
         For insertion the path leading to the meta files has to be provided.
@@ -133,7 +120,7 @@ class Query:
         :return:
         """
 
-        with DBMS(db) as d:
+        with DBMS(self._db) as d:
             d.insert(path)
 
     def select(self, select):
@@ -158,12 +145,23 @@ class Query:
         :rtype: list(str)
         """
 
-        fts = ["study", "pathogen", "library",
-               "design", "gene", "sirna", "well",
-               "featureclass"]
+        fts = ["study", "pathogen", "library",  "design",
+               "gene", "sirna", "well", "featureclass"]
         if select not in fts:
             raise ValueError(
               "Please provide one of: ({})".format(",".join(fts)))
         with DBMS(self._db) as d:
             res = d.select(select)
         return res
+
+    def _query(self, **kwargs):
+        """
+        Get a lazy file result set from some filtering criteria and a fixed
+        sample size.
+
+        :param kwargs: the filtering criteria.
+        :return: returns a lazy ResultSet
+        :rtype: ResultSet
+        """
+        fls = self._table.filter(**kwargs)
+        return ResultSet(fls, **kwargs)

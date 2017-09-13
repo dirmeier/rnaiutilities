@@ -86,10 +86,11 @@ class DatabaseQuery:
         fls = [
             TableFileSet(
               # the key, i.e. file prefix for all the data files
+              # (so the name of the plate without feature suffix)
               k,
               # the X table files
               x,
-              # appended list of features
+              # chain lists of features to one list total
               list(chain.from_iterable(
                 [self._feature_query(e[-1]) for e in x])),
               # filtering information
@@ -108,7 +109,7 @@ class DatabaseQuery:
                 desc = mat.group(1)
                 if desc not in result_set_map:
                     result_set_map[desc] = []
-            result_set_map[desc].append(result)
+                result_set_map[desc].append(result)
         return result_set_map
 
     @staticmethod
