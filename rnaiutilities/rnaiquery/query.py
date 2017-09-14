@@ -30,6 +30,7 @@ logger.setLevel(logging.WARNING)
 
 
 class Query:
+    # TODO: put this to another place
     __selectable_features__ = ["cells", "perinuclei", "nuclei"]
 
     def __init__(self, db=None):
@@ -82,6 +83,7 @@ class Query:
         :rtype: ResultSet
         """
 
+        # TODO put this to another place
         if featureclass is not None:
             features = featureclass.split(",")
             for feature in features:
@@ -89,7 +91,7 @@ class Query:
                     raise ValueError(
                       "Currently only featureclasses {} are supported.".format(
                           "/".join(Query.__selectable_features__)))
-        if featureclass is None:
+        else:
             featureclass = ",".join(Query.__selectable_features__)
 
         return self._query(sample=sample,

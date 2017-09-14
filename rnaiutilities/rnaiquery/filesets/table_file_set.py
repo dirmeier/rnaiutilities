@@ -23,7 +23,7 @@ class TableFileSet:
     def __init__(self, key, query_result, features, **kwargs):
         self._table_file_set_classifier = key
         f = [x[-1].replace("_meta.tsv", "") for x in query_result]
-        self.file_name = [el + "_data.tsv" for el in f]
+        self.file_names = [el + "_data.tsv" for el in f]
         self._feature_classes = [x[7] for x in query_result]
         self._filesuffixes = [x.split("/")[-1] for x in f]
         self._feature_list_table = [suf.replace("-", "_") for suf in self._filesuffixes]
@@ -42,26 +42,30 @@ class TableFileSet:
     def __eq__(self, other):
         if not isinstance(other, TableFileSet):
             return False
-        return self.file_name == other.file_name
+        return self.file_names == other.file_name
 
     def __hash__(self):
-        return hash(self.file_name)
+        return hash(self.file_names)
+
+    @property
+    def classifier(self):
+        return self._table_file_set_classifier
 
     @property
     def features(self):
         return self._features
 
     @property
-    def filename(self):
-        return self.file_name
+    def filenames(self):
+        return self.file_names
 
     @property
-    def feature_class(self):
-        return self._feature_class
+    def feature_classes(self):
+        return self._feature_classes
 
     @property
-    def filesuffix(self):
-        return self._filesuffix
+    def filesuffixes(self):
+        return self._filesuffixes
 
     @property
     def study(self):

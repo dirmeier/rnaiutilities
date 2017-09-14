@@ -33,7 +33,7 @@ class SQLiteConnection(DatabaseConnection):
 
     def __init__(self, path):
         super().__init__()
-        logger.info("Connecting to sqlitr db")
+        logger.info("Connecting to sqlite db")
         self._db_path = path
         self._connection = sqlite3.connect(self._db_path)
 
