@@ -135,27 +135,13 @@ class ResultSet:
             for f in tablefileset.filenames
         ]
         # check if the dimensions of the tables are the same
-        for i in range(len(tables) - 1):
-            for j in range(i + 1, len(tables)):
-                if tables[i].shape != tables[j].shape:
-                    logger.error("TableFileSet's {} data files do not "
-                                 "have matching dimensions."
-                                 .format(tablefileset.classifier))
-                    return None
-        # get meta column names
-        meta_cols = self._get_meta_column_names(
-          tables[0], tablefileset.feature_classes)
-        for i in range(1, len(tables)):
-            meta_cols_curr = self._get_meta_column_names(
-              tables[i], tablefileset.feature_classes)
-            if (meta_cols != meta_cols_curr).any():
-                logger.error("Meta column names are not equal: {}"
-                             .format(tablefileset))
-                return None
-            feat_col_names = self._get_meta_column_names(
-              tables[i], tablefileset.feature_classes)
-            tables[i] = tables[i][feat_col_names]
-
+        if not self._tables_have_correct_shapes(tables, tablefileset):
+            return None
+        # iterate over the tables and drop the redundant meta information
+        tables = self._drop_meta_columns(tables, tablefileset)
+        if tables is None:
+            return None
+        # merge the three tables together column-wise
         data_merged = pandas.concat(tables, axis=1)
         return data_merged
 
@@ -268,3 +254,32 @@ class ResultSet:
           filter(lambda x: not any(x.startswith(f) for f in feature_classes),
                  data.columns))
         return meta_cols
+
+    @staticmethod
+    def _tables_have_correct_shapes(tables, tablefileset):
+        for i in range(len(tables) - 1):
+            for j in range(i + 1, len(tables)):
+                if tables[i].shape[0] != tables[j].shape[0]:
+                    logger.error("TableFileSet's {} data files do not "
+                                 "have matching dimensions."
+                                 .format(tablefileset.classifier))
+                    return False
+        return True
+
+    def _drop_meta_columns(self, tables, tablefileset):
+        # get meta column names
+        meta_cols = self._get_meta_column_names(
+          tables[0], tablefileset.feature_classes)
+        # iterate over the plate meta columns and drop them from the tables
+        for i in range(1, len(tables)):
+            meta_cols_curr = self._get_meta_column_names(
+              tables[i], tablefileset.feature_classes)
+            if meta_cols != meta_cols_curr:
+                logger.error("Meta column names are not equal: {}"
+                             .format(tablefileset))
+                return None
+            feat_col_names = self._get_feature_column_names(
+              tables[i], tablefileset.feature_classes)
+            tables[i] = tables[i][feat_col_names]
+
+        return tables
