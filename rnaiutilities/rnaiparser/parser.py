@@ -51,7 +51,7 @@ class Parser:
 
     def __init__(self, config):
         """
-        Constructor for PlateParser.
+        Constructor for Parser.
 
         :param config: a configuration for file parsing
         :type config: Config

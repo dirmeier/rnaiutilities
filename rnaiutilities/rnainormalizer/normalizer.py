@@ -21,9 +21,8 @@
 
 import logging
 
-import pathlib
+import numpy
 import re
-
 import pandas
 
 logger = logging.getLogger(__name__)
@@ -31,45 +30,50 @@ logger.setLevel(logging.WARNING)
 
 
 class Normalizer:
-    _nf_ = ["zscore", "bscore", "log"]
+    _nf_ = ["zscore"]
 
     def __init__(self, *args):
         """
-        Create an instance to normalize data
+        Constructor for Normalizer.
+
+        :param *args: a tuple of normalisation functions
+        :type *args: tuple(str)
         """
 
         if any(arg not in Normalizer._nf_ for arg in args):
             raise ValueError("Please select only functions: {}"
                              .format("/".join(Normalizer._nf_)))
-        self._normalize = args
+        self._normalize = list(args)
 
     def normalize(self, file_name):
         """
         Normalize on plates from a file generated from `rnai-parse parse`.
 
-        :param file: file to be parsed
-        :type file: str
+        :param file_name: file to be parsed
+        :type file_name: str
         """
 
         outfile = self._outfile(file_name)
         lines, prefix = [None] * 100000, None
-        header = []
+        header, dat = [], []
         run = 0
         # iterate over file and normalize data.
         # write normalized data to new file
         with open(file_name, "r") as fr, open(outfile, "w") as fw:
+            logger.info("Normalizing file {}".format(file_name))
             for line in fr.readlines():
                 st = line.rstrip().split("\t")
                 # first line
                 if line.startswith("study"):
                     header = st
-                    self._write(fw, st)
+                    self._write(fw, st, True)
+                    continue
                 # this starts a new plate
                 elif lines[0] is None or not line.startswith(prefix):
                     # first batch of data (a plate) is ready to be normalized
                     if lines[0] is not None and not line.startswith(prefix):
                         dat = self._normalize_plate(lines[:run], header)
-                        self._write(fw, dat)
+                        self._write(fw, dat, False)
                         # continue with next batch by setting all to zero, None
                         lines, prefix, run = [None] * 100000, None, 0
                     prefix = "\t".join(st[:6])
@@ -83,31 +87,46 @@ class Normalizer:
                     lines.append(st)
             # do normalization of last batch of data that has not been handled
             dat = self._normalize_plate(lines[:run], header)
-            self._write(fw, dat)
+            self._write(fw, dat, False)
+            logger.info("Finished normalizing.")
 
     @staticmethod
-    def _write(file_handle, data):
-        for el in data:
-            file_handle.write("\t".join(el) + "\n")
+    def _write(filehandle, arr, is_header):
+        if is_header:
+            filehandle.write("\t".join(arr) + "\n")
+        else:
+            for el in arr:
+                filehandle.write("\t".join(map(lambda x: str(x), el)) + "\n")
 
     def _normalize_plate(self, lines, header):
-        # cast to pandas
         df, feature_columns = self._to_pandas(lines, header)
         # summarize the featurecolumns by the median per WELL
-        well_df = df.groupby(
-          ['study', 'pathogen', 'library', 'design', 'replicate', 'plate',
-           'well'])[feature_columns].median()
-
+        #well_df = df.groupby(
+        #  ['study', 'pathogen', 'library', 'design', 'replicate', 'plate',
+        #   'well'])[feature_columns].median()
+        well_df = None
+        # do normalisations
         for normal in self._normalize:
-            f = self.__getattribute__(normal)
-            # TODO
-            df, well_df = f(df, well_df)
+            f = self.__getattribute__("_" + normal)
+            df, well_df = f(df, well_df, feature_columns)
+
+        return df.values.tolist()
+
+    def _zscore(self, df, well_df, feature_columns):
+        for col in feature_columns:
+            df[col] = (df[col] - numpy.nanmean(df[col], )) / \
+                      (numpy.nanstd(df[col]) + 0.00000001)
+            # TODO: ot needed so far: comment in later
+            # well_df[col] = (well_df[col] - numpy.nanmean(well_df[col], )) / \
+            #                (numpy.nanstd(well_df[col]) + 0.00000001)
+        return df, well_df
 
 
     @staticmethod
     def _outfile(file_name):
         out_reg = re.match("(.+)\.(\w+)", file_name)
         return out_reg.group(1) + "_normalize." + out_reg.group(2)
+
 
     @staticmethod
     def _to_pandas(lines, header):
