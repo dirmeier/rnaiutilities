@@ -100,27 +100,19 @@ class Normalizer:
 
     def _normalize_plate(self, lines, header):
         df, feature_columns = self._to_pandas(lines, header)
-        # summarize the featurecolumns by the median per WELL
-        #well_df = df.groupby(
-        #  ['study', 'pathogen', 'library', 'design', 'replicate', 'plate',
-        #   'well'])[feature_columns].median()
-        well_df = None
-        # do normalisations
+        # do normalisations on the fly
         for normal in self._normalize:
             f = self.__getattribute__("_" + normal)
-            df, well_df = f(df, well_df, feature_columns)
+            df, well_df = f(df, None, feature_columns)
 
         return df.values.tolist()
 
-    def _zscore(self, df, well_df, feature_columns):
+    @staticmethod
+    def _zscore(df, well_df, feature_columns):
         for col in feature_columns:
             df[col] = (df[col] - numpy.nanmean(df[col], )) / \
                       (numpy.nanstd(df[col]) + 0.00000001)
-            # TODO: ot needed so far: comment in later
-            # well_df[col] = (well_df[col] - numpy.nanmean(well_df[col], )) / \
-            #                (numpy.nanstd(well_df[col]) + 0.00000001)
         return df, well_df
-
 
     @staticmethod
     def _outfile(file_name):
