@@ -26,7 +26,7 @@ import re
 import pandas
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.WARNING)
+logger.setLevel(logging.INFO)
 
 
 class Normalizer:
@@ -118,7 +118,6 @@ class Normalizer:
     def _outfile(file_name):
         out_reg = re.match("(.+)\.(\w+)", file_name)
         return out_reg.group(1) + "_normalized." + out_reg.group(2)
-
 
     @staticmethod
     def _to_pandas(lines, header):
