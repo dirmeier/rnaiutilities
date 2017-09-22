@@ -117,7 +117,7 @@ class Normalizer:
     @staticmethod
     def _outfile(file_name):
         out_reg = re.match("(.+)\.(\w+)", file_name)
-        return out_reg.group(1) + "_normalize." + out_reg.group(2)
+        return out_reg.group(1) + "_normalized." + out_reg.group(2)
 
 
     @staticmethod

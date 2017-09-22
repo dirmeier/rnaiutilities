@@ -22,7 +22,9 @@ setup(
   license='GPLv3',
   keywords='rnai utilities microscopy cellprofiler perturbation',
   packages=find_packages(),
-  scripts=['scripts/rnai-query', 'scripts/rnai-parse', 'scripts/rnai-parse'],
+  scripts=['scripts/rnai-query',
+           'scripts/rnai-parse',
+           'scripts/rnai-normalize'],
   python_requires='>=3',
   install_requires=[
       'h5py>=2.7.0',
