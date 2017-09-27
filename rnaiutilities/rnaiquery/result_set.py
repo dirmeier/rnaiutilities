@@ -230,7 +230,7 @@ class ResultSet:
         # for optimal overlap)
         feat_cols = sorted(feat_cols)
         # reindex the data set
-        data = data[meta_cols + feat_cols]
+        data = data.reindex_axis(meta_cols + feat_cols, axis=1, copy=False)
         return [data, feat_cols]
 
     @staticmethod

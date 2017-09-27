@@ -69,7 +69,7 @@ class DatabaseQuery:
         elif sq:
             su = "JOIN ({}) a2".format(sq)
         if su:
-            q = "\nSELECT * \n" \
+            q = "\nSELECT distinct * \n" \
                 "\tFROM ({}) a1 \n".format(mq) + \
                 "\t" + su + " \n" \
                             "\tON (a1.filename = a2.filename);"

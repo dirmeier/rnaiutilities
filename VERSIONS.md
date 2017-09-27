@@ -1,6 +1,10 @@
 ## Versions
 
+### 0.1.2
 
+* Adds normalization scripts and modules to the package.
+* Minor fixes
+* Fixed bug where multiple identical lines are returned from query
 
 ### 0.1.1
 
