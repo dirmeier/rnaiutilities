@@ -115,9 +115,9 @@ def select(select, db):
                    "such as 'a01,l05'.")
 @click.option("--featureclass", default=None,
               help="The featureclass to query for, e.g. like 'cells'.")
-@click.option("--sample", default=100, type=int,
+@click.option("--sample", default=None, type=int,
               help="The amount of single cells that are sampled per well, "
-                   "like '100'. If unset defaults to all cells in the well.")
+                   "like '100'. If unset defaults to all cells.")
 def query(outfile, db,
           study, pathogen, library, design, replicate, plate,
           gene, sirna, well,
