@@ -100,6 +100,7 @@ class Normalizer:
 
     def _normalize_plate(self, lines, header):
         df, feature_columns = self._to_pandas(lines, header)
+        df = self._replace_inf_with_nan(df, feature_columns)
         # do normalisations on the fly
         for normal in self._normalize:
             f = self.__getattribute__("_" + normal)
@@ -107,11 +108,22 @@ class Normalizer:
 
         return df.values.tolist()
 
+
+    @staticmethod
+    def _replace_inf_with_nan(df, feature_columns):
+        for col in feature_columns:
+            idx = numpy.isinf(df[col])
+            df.loc[idx, col] = numpy.nan
+        return df
+
     @staticmethod
     def _zscore(df, well_df, feature_columns):
         for col in feature_columns:
-            df[col] = (df[col] - numpy.nanmean(df[col], )) / \
-                      (numpy.nanstd(df[col]) + 0.00000001)
+            mea = numpy.nanmean(df[col])
+            sd = numpy.nanstd(df[col])
+            new_col_vals = (df[col] - mea) / (sd + 0.00000001)
+            new_col_vals[numpy.isinf(new_col_vals)] = numpy.nan
+            df[col] = new_col_vals
         return df, well_df
 
     @staticmethod
