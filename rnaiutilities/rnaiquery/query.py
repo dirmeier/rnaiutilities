@@ -32,6 +32,8 @@ logger.setLevel(logging.WARNING)
 class Query:
     # TODO: put this to another place
     __selectable_features__ = ["cells", "perinuclei", "nuclei"]
+    __filterable_features__ = ["study", "pathogen", "library", "design",
+                               "gene", "sirna", "well", "featureclass"]
 
     def __init__(self, db=None):
         """
@@ -90,7 +92,7 @@ class Query:
                 if feature.lower() not in Query.__selectable_features__:
                     raise ValueError(
                       "Currently only featureclasses {} are supported.".format(
-                          "/".join(Query.__selectable_features__)))
+                        "/".join(Query.__selectable_features__)))
         else:
             featureclass = ",".join(Query.__selectable_features__)
 
@@ -125,7 +127,17 @@ class Query:
         with DBMS(self._db) as d:
             d.insert(path)
 
-    def select(self, select):
+    def select(self, select,
+               study=None,
+               pathogen=None,
+               library=None,
+               design=None,
+               replicate=None,
+               plate=None,
+               gene=None,
+               sirna=None,
+               well=None,
+               featureclass=None):
         """
         Submits a select query to a database of image-based RNAi screening meta
         features to get an overview over meta information. The query returns
@@ -143,27 +155,62 @@ class Query:
 
         :param select: the meta feature to select
         :type select: str
+        :param study: filters by study, e.g.
+         'infectx'/'group_cossart'/'infectx_published'
+        :type study: str
+        :param pathogen: filters by pathogen, e.g.
+         'salmonella'/'adeno'/'bartonella'/'brucella'/'listeria'
+         :type pathogen: str
+        :param library: filters by library, e.g. 'a'/'d'/'q'
+        :type library: str
+        :param design: filters by design, e.g.: 'p'/'u'
+        :type design: str
+        :param replicate: filters by replicate, i.e. a number
+        :type replicate: str
+        :param plate: filters by plate, i.e.: 'dz44-1l'
+        :type plate: str
+        :param gene: filters by gene, i.e.: 'star'
+        :type gene: str
+        :param sirna: filters by gene, i.e.: 'l-019369-00'
+        :type select: str
+        :param sirna: filters by gene, i.e.: 'a01'
+        :type well: str
+        :param featureclass: filters by featureclass,
+         e.g. 'nuclei'/'cells'/'bacteria'
+        :type featureclass: str
         :return: returns a list of strings from the query
         :rtype: list(str)
         """
 
-        fts = ["study", "pathogen", "library",  "design",
-               "gene", "sirna", "well", "featureclass"]
-        if select not in fts:
-            raise ValueError(
-              "Please provide one of: ({})".format(",".join(fts)))
-        with DBMS(self._db) as d:
-            res = d.select(select)
-        return res
+        return self._select(select,
+                            study=study,
+                            pathogen=pathogen,
+                            library=library,
+                            design=design,
+                            replicate=replicate,
+                            plate=plate,
+                            gene=gene,
+                            sirna=sirna,
+                            well=well,
+                            featureclass=featureclass)
 
     def _query(self, **kwargs):
-        """
-        Get a lazy file result set from some filtering criteria and a fixed
-        sample size.
-
-        :param kwargs: the filtering criteria.
-        :return: returns a lazy ResultSet
-        :rtype: ResultSet
-        """
         fls = self._table.filter(**kwargs)
         return ResultSet(fls, **kwargs)
+
+    def _select(self, select, **kwargs):
+        # check if the value to select for is correct
+        if select not in Query.__filterable_features__:
+            raise ValueError(
+              "Please provide one of: ({})"
+                  .format(",".join(Query.__filterable_features__)))
+        # check if user provided a filter for X that also is selected for
+        for k, v in kwargs.items():
+            if k == select and v is not None:
+                raise ValueError(
+                  "You are selecting and filtering on '{}' "
+                  "at the same time. Drop the filter.".format(select))
+
+        with DBMS(self._db) as d:
+            res = d.select(select, **kwargs)
+        return res

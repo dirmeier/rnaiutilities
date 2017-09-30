@@ -108,7 +108,6 @@ class Normalizer:
 
         return df.values.tolist()
 
-
     @staticmethod
     def _replace_inf_with_nan(df, feature_columns):
         for col in feature_columns:
