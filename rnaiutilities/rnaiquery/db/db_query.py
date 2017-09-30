@@ -25,7 +25,7 @@ from itertools import chain
 
 from rnaiutilities.rnaiquery.db.db_setup import DatabaseInserter
 from rnaiutilities.rnaiquery.filesets.table_file_set import TableFileSet
-from rnaiutilities.rnaiquery.globals import FEATURECLASS
+from rnaiutilities.rnaiquery.globals import FEATURECLASS, WELL
 from rnaiutilities.rnaiquery.globals import GENE, SIRNA, LIBRARY, DESIGN
 from rnaiutilities.rnaiquery.globals import REPLICATE, PLATE, STUDY, PATHOGEN
 
@@ -36,7 +36,8 @@ logger.setLevel(logging.INFO)
 class DatabaseQuery:
     _sirna_ = SIRNA
     _gene_ = GENE
-    _gsw_ = [GENE, SIRNA]
+    _well_ = WELL
+    _gsw_ = [_gene_, _sirna_, _well_]
     _descr_ = [STUDY, PATHOGEN, LIBRARY, DESIGN, REPLICATE, PLATE, FEATURECLASS]
 
     def __init__(self, connection):
@@ -137,7 +138,7 @@ class DatabaseQuery:
 
     @staticmethod
     def _build_meta_query(what, **kwargs):
-        s = "SELECT distinct {} FROM meta".format(what)
+        s = "SELECT {} FROM meta".format(what)
         ar = []
         for k, v in kwargs.items():
             if v is not None:
@@ -174,6 +175,12 @@ class DatabaseQuery:
         return res
 
     def _build_select_query(self, select, **kwargs):
+        if not self._query_has_filters(**kwargs):
+            if select in [DatabaseQuery._gene_, DatabaseQuery._sirna_, DatabaseQuery._well_]:
+                return "SELECT distinct {} from {};".format(select, select)
+            else:
+                return "SELECT distinct {} from meta;".format(select)
+
         # get the three table queries
         mq, gq, sq = self._build_subqueries("*", **kwargs)
         # in case we want to select genes or sirnas, we need to enforce
@@ -187,7 +194,7 @@ class DatabaseQuery:
 
         su = None
         if gq is not None and sq is not None:
-            su = "JOIN (SELECT distinct * \n" + \
+            su = "JOIN (SELECT * \n" + \
                  "\t\tFROM ({}) a1 \n".format(gq) + \
                  "\t\tJOIN ({}) a2 \n".format(sq) + \
                  "\t\tON (a1.filename = a2.filename) \n" + \
@@ -206,3 +213,9 @@ class DatabaseQuery:
             mq = self._build_meta_query(select, **kwargs)
             q = mq + ";"
         return q
+
+    @staticmethod
+    def _query_has_filters(**kwargs):
+        if any(v is not None for _, v in kwargs.items()):
+            return True
+        return False
