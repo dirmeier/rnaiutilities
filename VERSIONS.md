@@ -1,5 +1,10 @@
 ## Versions
 
+
+### 0.1.3
+
+* Adds filtering to `rnai-query select`
+
 ### 0.1.2
 
 * Adds normalization scripts and modules to the package.
