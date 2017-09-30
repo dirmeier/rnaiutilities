@@ -26,6 +26,8 @@ import click
 
 from rnaiutilities import Query
 
+logger = logging.getLogger(__name__)
+
 
 @click.group()
 def cli():
@@ -166,13 +168,21 @@ def select(select, db,
 @click.option("--sample", default=None, type=int,
               help="The amount of single cells that are sampled per well, "
                    "like '100'. If unset defaults to all cells.")
+@click.option("--debug",
+              is_flag=True,
+              help="Print some debug info and skip writing to file.")
 def query(outfile, db,
           study, pathogen, library, design, replicate, plate,
           gene, sirna, well,
-          featureclass, sample):
+          featureclass, sample,
+          debug):
     """
     Query and sample single cells or bacteria and write to an OUTFILE.
     """
+
+    if debug:
+        logger.setLevel(logging.DEBUG)
+        logger.debug("Debug mode.")
 
     q = Query(db)
     res = q.query(study=study,
@@ -186,7 +196,11 @@ def query(outfile, db,
                   well=well,
                   featureclass=featureclass,
                   sample=sample)
-    res.dump(outfile)
+    if debug:
+        for r in res:
+            logger.debug(r.detail())
+    else:
+        res.dump(outfile)
 
 
 if __name__ == "__main__":

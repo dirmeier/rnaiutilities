@@ -59,6 +59,10 @@ class ResultSet:
     def __str__(self):
         return str(self._tablefile_sets)
 
+    def __iter__(self):
+        for tablefileset in self._tablefile_sets:
+            yield tablefileset
+
     def dump(self, fh=None):
         """
         Print the result set of the database query to tsv or stdout. If a string

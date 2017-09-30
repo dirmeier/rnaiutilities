@@ -39,6 +39,13 @@ class TableFileSet:
     def __str__(self):
         return "Tablefile: " + self._table_file_set_classifier
 
+    def detail(self):
+        s = "\n" + self.__str__() + "\n"
+        s += "\tFiles:\t" + "\n\t\t".join(self.file_names) + "\n"
+        s += "\tFeature-classes:\t" + ",".join(self._feature_classes) + "\n"
+        s += "\tFeaturelist table:\t" + ",".join(self._feature_list_table) + "\n"
+        return s
+
     def __eq__(self, other):
         if not isinstance(other, TableFileSet):
             return False

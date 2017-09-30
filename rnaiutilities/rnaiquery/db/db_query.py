@@ -107,7 +107,7 @@ class DatabaseQuery:
               # the key, i.e. file prefix for all the data files
               # (so the name of the plate without feature suffix)
               k,
-              # the X table files
+              # the table files
               x,
               # chain lists of features to one list total
               list(chain.from_iterable(
