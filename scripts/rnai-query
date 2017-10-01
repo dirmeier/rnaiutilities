@@ -54,7 +54,7 @@ def insert(path, db):
 
 @cli.command()
 @click.argument("select",
-                type=click.Choice(["study", "pathogen", "library",
+                type=click.Choice(["study", "pathogen", "library", "plate",
                                    "design", "gene", "sirna", "well",
                                    "featureclass"]))
 @click.option("--db", default=None,

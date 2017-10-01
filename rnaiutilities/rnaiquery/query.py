@@ -32,8 +32,9 @@ logger.setLevel(logging.WARNING)
 class Query:
     # TODO: put this to another place
     __selectable_features__ = ["cells", "perinuclei", "nuclei"]
-    __filterable_features__ = ["study", "pathogen", "library", "design",
-                               "gene", "sirna", "well", "featureclass"]
+    __filterable_features__ = ["study", "pathogen", "library",
+                               "design", "gene", "sirna", "well",
+                               "featureclass", "plate"]
 
     def __init__(self, db=None):
         """
