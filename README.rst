@@ -2,6 +2,10 @@
 rnaiutilities
 *************
 
+.. image:: https://rawgit.com/cbg-ethz/rnaiutilities/master/_fig/fig_single_cells_150.jpg
+   :align: center
+   :target: https://rawgit.com/cbg-ethz/rnaiutilities/master/_fig/fig_single_cells.jpg
+
 .. image:: http://www.repostatus.org/badges/latest/active.svg
    :target: http://www.repostatus.org/#active
 .. image:: https://travis-ci.org/cbg-ethz/rnaiutilities.svg?branch=master
@@ -15,10 +19,6 @@ rnaiutilities
    :alt: doc
 
 A collection of python modules and command line tools for processing image-based RNAi screens.
-
-.. image:: https://rawgit.com/cbg-ethz/rnaiutilities/master/_fig/fig_single_cells.png
-   :height: 300px
-   :align: right
 
 Introduction
 ============

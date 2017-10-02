@@ -21,14 +21,16 @@
 
 import os
 import sys
+import sphinx_fontawesome
+
 sys.path.insert(0, os.path.abspath('../../'))
 
 
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
               'sphinx.ext.viewcode',
-              'sphinxcontrib.fulltoc']
-
+              'sphinxcontrib.fulltoc',
+              'sphinx_fontawesome']
 templates_path = ['_templates']
 
 
@@ -55,13 +57,13 @@ html_theme = 'alabaster'
 html_theme_options = {
     'show_powered_by': False,
     'github_user': 'dirmeier',
-    'note_bg': '#FFF59C'
+    'note_bg': '#FFF59C',
+    'sidebarwidth': 5
 }
 html_sidebars = {
-    'index':    ['sidebarintro.html'],
-    '**':       ['sidebar.html', 'localtoc.html']
+    'index':    ['logo.html', 'sidebarintro.html'],
+    '**':       ['logo.html', 'localtoc.html']
 }
-
 html_title = ""
 html_static_path = ['_static']
 htmlhelp_basename = 'rnaiutilitiesdoc'

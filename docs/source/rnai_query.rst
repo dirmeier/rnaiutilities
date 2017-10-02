@@ -19,8 +19,8 @@ are used. So far the following subcommands are available:
 **The steps have to be taken in succession (or at least insert has to be the first command to be executed), so make sure to read it all**.
 
 
-Writing meta information to a database
-......................................
+Inserting meta information
+..........................
 
 Before being able query the database, we need to insert the parsed meta files.
 We can to that by calling:

@@ -11,8 +11,8 @@ effects that have to be corrected for.
 The following sections explain the tool's usage.
 
 
-Normalizing data
-................
+Normalizing data by standardization
+...................................
 
 In order to normalize your data-set, just call:
 
