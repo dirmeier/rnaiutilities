@@ -8,13 +8,17 @@ rnaiutilities
    :target: https://travis-ci.org/cbg-ethz/rnaiutilities/
 .. image:: https://codecov.io/gh/cbg-ethz/rnaiutilities/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/cbg-ethz/rnaiutilities
-.. image:: https://api.codacy.com/project/badge/Grade/1822ba83768d4d7389ba667a9c839638    
+.. image:: https://api.codacy.com/project/badge/Grade/1822ba83768d4d7389ba667a9c839638
    :target: https://www.codacy.com/app/simon-dirmeier/rnaiutilities_2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=cbg-ethz/rnaiutilities&amp;utm_campaign=Badge_Grade
 .. image:: https://readthedocs.org/projects/rnaiutilities/badge/?version=latest
    :target: http://rnaiutilities.readthedocs.io/en/latest/?badge=latest
    :alt: doc
 
 A collection of python modules and command line tools for processing image-based RNAi screens.
+
+.. image:: https://rawgit.com/cbg-ethz/rnaiutilities/master/_fig/fig_single_cells.png
+   :height: 300px
+   :align: right
 
 Introduction
 ============
