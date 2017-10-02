@@ -16,7 +16,7 @@ setup(
   description='A collection of commandline tools and python modules '
               'for working with image-based RNAi screens.',
   long_description=readme(),
-  url='https://github.com/dirmeier/rnaiutilities',
+  url='https://github.com/cbg-ethz/rnaiutilities',
   author='Simon Dirmeier',
   author_email='simon.dirmeier@bsse.ethz.ch',
   license='GPLv3',
