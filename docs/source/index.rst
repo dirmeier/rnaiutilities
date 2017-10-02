@@ -6,8 +6,8 @@ with image-based RNAi perturbation data. If offers the following
 functionalities:
 
 * ``rnai-parse`` for parsing and checking CellProfiler matlab files,
-* ``rnai-query`` for inserting meta information to a database, building datasets and selecting meta information from the DB.
-
+* ``rnai-query`` for inserting meta information to a database, building datasets and selecting meta information from the DB,
+* ``rnai-normalize`` for normalizing the datasets.
 
 
 Command line scripts
@@ -18,7 +18,7 @@ Command line scripts
 
    rnai_parse
    rnai_query
-
+   rnai_normalize
 
 API
 ---
