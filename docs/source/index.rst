@@ -1,9 +1,15 @@
 rnaiutilities
 =============
 
+Welcome to ``rnaiutilities``.
+
 ``rnaiutilities`` is a collection of python scripts and modules for working
 with image-based RNAi perturbation data. If offers the following
 functionalities:
+
+The package is still under development, so if you'd like to contribute,
+`fork us on GitHub <https://github.com/cbg-ethz/rnaiutilities>`_.
+
 
 * ``rnai-parse`` for parsing and checking CellProfiler matlab files,
 * ``rnai-query`` for inserting meta information to a database, building datasets and selecting meta information from the DB,
