@@ -34,8 +34,8 @@ with the following content:
 
 
 .. literalinclude:: ../../data/config.yml
-    :caption: Contents of ``config.yml`` file
-    :name: config.yml
+  :caption: Contents of ``config.yml`` file
+  :name: config.yml
 
 You can have a look at an example yaml file `here <https://github.com/cbg-ethz/rnaiutilities/blob/master/data/config.yml>`_.
 

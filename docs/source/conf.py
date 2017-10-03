@@ -32,7 +32,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinxcontrib.fulltoc',
               'sphinx_fontawesome']
 templates_path = ['_templates']
-
+suppress_warnings = ['image.nonlocal_uri']
 
 source_suffix = '.rst'
 master_doc = 'index'
