@@ -72,10 +72,6 @@ class ResultSet:
         to stdout.
 
         :param fh: either str or None(default)
-        :param normalize: the normalisation methods to use, e.g. like 'zscore'
-         or a list of normalisations. Options so far are 'bscore', 'loess' and
-         'zscore'.
-        :type normalize: list(str)
         """
 
         self._set_normalization(normalize)
@@ -116,8 +112,7 @@ class ResultSet:
                       .format(tablefileset.filenames))
                 return
             # normalize the feature columns
-            data = self._normalizer.normalize(
-              self._normalization_methods, feat_cols)
+            data = self._normalizer.normalize_plate(data, feat_cols)
             # filter on well/sirna/gene
             data = self._filter_data(data)
             if len(data) == 0:
