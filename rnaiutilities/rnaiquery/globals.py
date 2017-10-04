@@ -37,6 +37,11 @@ FEATURES = "features"
 ELEMENTS = "elements"
 SAMPLE = "sample"
 
+BSCORE = "bscore"
+LOESS = "loess"
+ZSCORE = "zscore"
+
+
 FILE_FEATURES_REGEX = re.compile(
   "(\w+)-(\w+)-(\w+)-(\w+)-(\w+)-(\d+)-(.*)_(\w+)")
 

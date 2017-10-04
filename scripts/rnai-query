@@ -25,6 +25,7 @@ import logging
 import click
 
 from rnaiutilities import Query
+from rnaiutilities.rnaiquery.globals import ZSCORE, BSCORE, LOESS
 
 logger = logging.getLogger(__name__)
 
@@ -127,12 +128,16 @@ def select(select, db,
 @click.option("--db", default=None,
               help="Sqlite database file."
                    " If unset uses a postgres database listening on port 5432."
-                   " Otherwise, if set, uses the database file and opens a "
-                   "connection to sqlite.")
+                   " Otherwise, if set, uses the database file and opens a"
+                   " connection to sqlite.")
+@click.option("--normalize", default="zscore",
+              help="The normalization methods to use, e.g. like '{}',"
+                   " or a comma-separated strong of normalisations"
+                   " such as '{},{},{}'.".format(ZSCORE, BSCORE, LOESS, ZSCORE))
 @click.option("--study", default=None,
-              help="The study to query for, e.g. like 'infectx', "
-                   "or a comma-separated string of libraries, "
-                   "such as 'infectx,infectx_published'.")
+              help="The study to query for, e.g. like 'infectx' "
+                   " or a comma-separated string of libraries,"
+                   " such as 'infectx,infectx_published'.")
 @click.option("--pathogen", default=None,
               help="The pathogen to query for, e.g. like 'adeno', "
                    "or a comma-separated string of pathogens, "
@@ -168,10 +173,9 @@ def select(select, db,
 @click.option("--sample", default=None, type=int,
               help="The amount of single cells that are sampled per well, "
                    "like '100'. If unset defaults to all cells.")
-@click.option("--debug",
-              is_flag=True,
+@click.option("--debug", is_flag=True,
               help="Print some debug info and skip writing to file.")
-def query(outfile, db,
+def query(outfile, db, normalize,
           study, pathogen, library, design, replicate, plate,
           gene, sirna, well,
           featureclass, sample,
@@ -200,7 +204,7 @@ def query(outfile, db,
         for r in res:
             logger.debug(r.detail())
     else:
-        res.dump(outfile)
+        res.dump(outfile, normalize=normalize.split(","))
 
 
 if __name__ == "__main__":

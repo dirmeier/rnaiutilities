@@ -25,12 +25,15 @@ import numpy
 import re
 import pandas
 
+from rnaiutilities.rnaiquery.globals import BSCORE, ZSCORE, LOESS
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
 class Normalizer:
-    _nf_ = ["zscore"]
+    _nf_ = [ZSCORE]
+    _normalisations_ = [BSCORE, ZSCORE, LOESS]
 
     def __init__(self, *args):
         """
@@ -40,12 +43,19 @@ class Normalizer:
         :type *args: tuple(str)
         """
 
+        self._check_methods(*args)
+        self._normalize = list(args)
+
+    def set_normalization(self, normalize):
+
+
+    def _check_methods(self, *args):
         if any(arg not in Normalizer._nf_ for arg in args):
             raise ValueError("Please select only functions: {}"
                              .format("/".join(Normalizer._nf_)))
-        self._normalize = list(args)
 
-    def normalize(self, file_name):
+
+    def normalize(self, data, normaliz):
         """
         Normalize on plates from a file generated from `rnai-parse parse`.
 

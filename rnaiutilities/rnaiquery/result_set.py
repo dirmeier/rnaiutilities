@@ -25,6 +25,7 @@ import os
 import numpy as np
 import pandas
 
+from rnaiutilities import Normalizer
 from rnaiutilities.rnaiquery.filesets.table_file_set import TableFileSet
 from rnaiutilities.rnaiquery.globals import WELL, GENE, SIRNA, \
     SAMPLE, ADDED_COLUMNS_FOR_PRINTING
@@ -52,6 +53,7 @@ class ResultSet:
           x.index, self._sample, False), :] if len(x) >= self._sample else x
         # TODO: this is solved so badly
         self._shared_features = self._get_shared_features()
+        self._normalizer = Normalizer()
 
     def __repr__(self):
         return self.__str__()
@@ -63,18 +65,28 @@ class ResultSet:
         for tablefileset in self._tablefile_sets:
             yield tablefileset
 
-    def dump(self, fh=None):
+    def dump(self, fh=None, normalize="score"):
         """
         Print the result set of the database query to tsv or stdout. If a string
         is given as param *fh* prints to file, otherwise if None is given prints
         to stdout.
 
         :param fh: either str or None(default)
+        :param normalize: the normalisation methods to use, e.g. like 'zscore'
+         or a list of normalisations. Options so far are 'bscore', 'loess' and
+         'zscore'.
+        :type normalize: list(str)
         """
+
+        self._set_normalization(normalize)
+
         with IO(fh) as io:
             for tablefileset in self._tablefile_sets:
                 self._dump(tablefileset, io)
         logger.info("Successfully wrote table files!")
+
+    def _set_normalization(self, normalize):
+        self._normalizer.set_normalisation(normalize)
 
     def _dump(self, tablefileset, io):
         """
@@ -103,6 +115,9 @@ class ResultSet:
                   "{} does not have the correct number of features. Skipping."
                       .format(tablefileset.filenames))
                 return
+            # normalize the feature columns
+            data = self._normalizer.normalize(
+              self._normalization_methods, feat_cols)
             # filter on well/sirna/gene
             data = self._filter_data(data)
             if len(data) == 0:
