@@ -45,8 +45,10 @@ example consider these two scripts:
 
 .. code-block:: bash
 
-  rnai-query query --db /i/am/a/file/called/tix.db --sample 10 OUTFILE
-  rnai-query query --db /i/am/a/file/called/tix.db --plate dz05-1e --gene pik3ca OUTFILE
+  rnai-query query --db /i/am/a/file/called/tix.db
+                   --sample 10 OUTFILE
+  rnai-query query --db /i/am/a/file/called/tix.db
+                   --plate dz05-1e --gene pik3ca OUTFILE
 
 The first query would return 10 single cells randomly sampled from each well
 from all plates and write it to the file `OUTFILE`. The second query would
@@ -67,15 +69,10 @@ can choose which plates/gene/sirnas/etc. to choose from, by setting the
 respective command line arguments:
 
 --normalize
-    The normalization methods to use, e.g. like 'zscore' or a comma-separated
-     strong of normalisations" such as 'bscore,loess,zscore'.
-     **Defaults to
-     'zscore'**. If you do **not** want to normalize you need to explicitely set
-      'none'.
+    The normalization methods to use, e.g. like 'zscore' or a comma-separated string of normalisations such as 'bscore,loess,zscore'. **Defaults to 'zscore'**. If you do **not** want to normalize you need to explicitely set to 'none'.
 
 --study
-    The study to query for, e.g. like 'infectx', or a comma-separated string
-    of libraries, such as 'infectx,infectx_published'.
+    The study to query for, e.g. like 'infectx', or a comma-separated string of libraries, such as 'infectx,infectx_published'.
 
 --pathogen
     The pathogen to query for, e.g. like 'adeno', or a comma-separated string of pathogens, such as 'adeno, bartonella'.
@@ -108,7 +105,7 @@ respective command line arguments:
      The amount of single cells that are sampled per well,like '100'. If unset defaults to all cells.
 
 --debug
-    Dont write the files, put only print debug information.
+    Dont write the files, but only print debug information.
 
 --help
     Print a help message.
@@ -125,7 +122,7 @@ Here, we show some examples how you can query. In these examples we use a
 
 
 Sample 100 cells from every well for every plate and write **standardized** data
- to *OUTFILE*.
+to *OUTFILE*.
 
 .. code-block:: bash
 
@@ -135,7 +132,7 @@ Sample 100 cells from every well for every plate and write **standardized** data
 
 
 Filter by pathogens *shigella* and *bartonella* and write **standardized** data
- to *OUTFILE*. If no aw
+to *OUTFILE*.
 
 .. code-block:: bash
 
@@ -145,7 +142,7 @@ Filter by pathogens *shigella* and *bartonella* and write **standardized** data
 
 
 Filter by pathogens *Shigella* and *Bartonella* and gene *pik3ca* and write
- standardized data to *OUTFILE*.
+standardized data to *OUTFILE*.
 
 .. code-block:: bash
 
@@ -169,7 +166,7 @@ write debug info.
 
 
 Filter by gene *nfkb1*, pathogen *Shigella*, study *infectx*, *pooled*
-designs, sample 1000 cells per well and write un-normalized data to output
+designs, sample 1000 cells per well and write *un-normalized* data to *OUTFILE*.
 
 .. code-block:: bash
 
@@ -186,8 +183,7 @@ designs, sample 1000 cells per well and write un-normalized data to output
 Filter by gene *pik3ca* and *mock*, feature classes *cells* and *perinuclei*,
 pathogens *Shigella* and *Bartonella*, library *Dharmacon* with a *pooled*
 siRNA design, sample 100 cells from each well and write **standardized** data
- to
-*OUTFILE*.
+to *OUTFILE*.
 
 .. code-block:: bash
 
@@ -221,7 +217,7 @@ would call
    rnai-query select --plate dz05-1e gene
 
 ``rnai-query select`` takes the same filters as ``rnai-query query``, except
-*sample*, and *debug*, so check section :ref:`cmdlineargs-label`.
+*sample*, *normalize* and *debug*, so check section :ref:`cmdlineargs-label`.
 
 
 Examples

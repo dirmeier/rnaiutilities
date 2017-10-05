@@ -136,7 +136,7 @@ def select(select, db,
   help="The normalization methods to use, e.g. like '{}',"
        " or a comma-separated string of normalisations"
        " such as '{},{},{}'. Defaults to 'zscore'."
-       " If you do NOT want to normalize you need to explicitely set 'NONE'."
+       " If you do NOT want to normalize you need to explicitely set to 'none'."
       .format(ZSCORE, BSCORE, LOESS, ZSCORE, NONE))
 @click.option("--study", default=None,
               help="The study to query for, e.g. like 'infectx' "
