@@ -18,5 +18,4 @@
 # @author = 'Simon Dirmeier'
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
-
-from rnaiutilities.rnainormalizer.normalizer import Normalizer
+from rnaiutilities.rnaiquery.normalization.normalizer import Normalizer

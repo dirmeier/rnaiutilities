@@ -19,7 +19,6 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
-from rnaiutilities.rnainormalizer import Normalizer
 from rnaiutilities.rnaiparser import Config
 from rnaiutilities.rnaiparser import Parser
 from rnaiutilities.rnaiquery import Query

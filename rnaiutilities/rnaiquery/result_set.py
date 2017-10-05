@@ -25,11 +25,11 @@ import os
 import numpy as np
 import pandas
 
-from rnaiutilities import Normalizer
 from rnaiutilities.rnaiquery.filesets.table_file_set import TableFileSet
 from rnaiutilities.rnaiquery.globals import WELL, GENE, SIRNA, \
     SAMPLE, ADDED_COLUMNS_FOR_PRINTING
 from rnaiutilities.rnaiquery.io.io import IO
+from rnaiutilities.rnaiquery.normalization.normalizer import Normalizer
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -75,29 +75,22 @@ class ResultSet:
         :type fh: str
         :param normalize: a list of normalisation methods to use, e.g. like
          'zscore'. Options so far are 'bscore', 'loess' and 'zscore'.
-        :type normalize: tuple(str)
+        :type normalize: list(str)
         """
 
-        self._set_normalization(normalize)
+        self._set_normalization(*normalize)
 
         with IO(fh) as io:
             for tablefileset in self._tablefile_sets:
                 self._dump(tablefileset, io)
         logger.info("Successfully wrote table files!")
 
-    def _set_normalization(self, normalize):
-        self._normalizer.set_normalization(normalize)
+    def _set_normalization(self, *normalize):
+        self._normalizer.set_normalization(*normalize)
 
     def _dump(self, tablefileset, io):
         """
-        Dumbs a table file to tsv/h5/stdout
-
-        This is arguably not very efficient, since it first reads a tsv, then
-        does filtering, grouping and sampling and then prints to tsv again.
-        For the time being this suffices.
-
-        Ideally at some point Nicolas' DB is used.
-
+        Dumbs a table file to tsv/h5/stdout.
         """
 
         # test if the data files can be found
@@ -168,7 +161,7 @@ class ResultSet:
             data.well.str.contains(self.__getattribute__("_" + WELL)) &
             data.gene.str.contains(self.__getattribute__("_" + GENE)) &
             data.sirna.str.contains(self.__getattribute__("_" + SIRNA))
-            ]
+        ]
         return data
 
     def _sample_data(self, data):

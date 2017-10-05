@@ -43,7 +43,9 @@ class Normalizer:
         :type *args: tuple(str)
         """
 
-        self._normalize = self.set_normalization(*args)
+        self._normalize = None
+        if args:
+            self.set_normalization(*args)
 
     def set_normalization(self, *args):
         """
@@ -55,10 +57,11 @@ class Normalizer:
         """
 
         self._check_methods(*args)
-        return list(args)
+        self._normalize = list(args)
 
     @staticmethod
     def _check_methods(*args):
+
         if any(arg not in Normalizer._nf_ for arg in args):
             raise ValueError(
               "Please select only functions: {}"
