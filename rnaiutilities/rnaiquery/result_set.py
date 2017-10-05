@@ -71,7 +71,11 @@ class ResultSet:
         is given as param *fh* prints to file, otherwise if None is given prints
         to stdout.
 
-        :param fh: either str or None(default)
+        :param fh: name of the file or None
+        :type fh: str
+        :param normalize: a list of normalisation methods to use, e.g. like
+         'zscore'. Options so far are 'bscore', 'loess' and 'zscore'.
+        :type normalize: tuple(str)
         """
 
         self._set_normalization(normalize)
@@ -82,7 +86,7 @@ class ResultSet:
         logger.info("Successfully wrote table files!")
 
     def _set_normalization(self, normalize):
-        self._normalizer.set_normalisation(normalize)
+        self._normalizer.set_normalization(normalize)
 
     def _dump(self, tablefileset, io):
         """

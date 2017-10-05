@@ -22,7 +22,6 @@
 import logging
 
 import numpy
-import re
 import pandas
 
 from rnaiutilities.rnaiquery.globals import BSCORE, ZSCORE, LOESS
@@ -46,7 +45,7 @@ class Normalizer:
 
         self._normalize = self.set_normalization(*args)
 
-    def set_normalisation(self, *args):
+    def set_normalization(self, *args):
         """
         Set the normalisation methods.
 
@@ -58,21 +57,25 @@ class Normalizer:
         self._check_methods(*args)
         return list(args)
 
-    def normalize_plate(self, data, cols):
+    @staticmethod
+    def _check_methods(*args):
+        if any(arg not in Normalizer._nf_ for arg in args):
+            raise ValueError(
+              "Please select only functions: {}"
+                .format("/".join(Normalizer._nf_)))
+
+    def normalize_plate(self, data, feature_cols):
         """
         Normalize a plate.
 
         :param data: the data to normalize
         :type data: pandas.DataFrame
+        :param feature_cols: the columns representing features
+        :type feature_cols: list(str)
         """
 
-        return self._normalize_plate(data, cols)
-
-    @staticmethod
-    def _check_methods(*args):
-        if any(arg not in Normalizer._nf_ for arg in args):
-            raise ValueError("Please select only functions: {}"
-                             .format("/".join(Normalizer._nf_)))
+        logger.info("Normalizing plate.")
+        return self._normalize_plate(data, feature_cols)
 
     def _normalize_plate(self, df, feature_columns):
         df = self._replace_inf_with_nan(df, feature_columns)
@@ -92,6 +95,7 @@ class Normalizer:
 
     @staticmethod
     def _zscore(df, well_df, feature_columns):
+        logger.info("\tstandardizing feature columns.")
         for col in feature_columns:
             mea = numpy.nanmean(df[col])
             sd = numpy.nanstd(df[col])
