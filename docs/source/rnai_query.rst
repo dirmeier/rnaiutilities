@@ -66,6 +66,13 @@ single-cell features that fit these conditions. Using ``rnai-query query`` you
 can choose which plates/gene/sirnas/etc. to choose from, by setting the
 respective command line arguments:
 
+--normalize
+    The normalization methods to use, e.g. like 'zscore' or a comma-separated
+     strong of normalisations" such as 'bscore,loess,zscore'.
+     **Defaults to
+     'zscore'**. If you do **not** want to normalize you need to explicitely set
+      'none'.
+
 --study
     The study to query for, e.g. like 'infectx', or a comma-separated string
     of libraries, such as 'infectx,infectx_published'.
@@ -117,7 +124,8 @@ Here, we show some examples how you can query. In these examples we use a
 *SQLite* database called ``database.db``.
 
 
-Sample 100 cells from every well for every plate and write to *OUTFILE*.
+Sample 100 cells from every well for every plate and write **standardized** data
+ to *OUTFILE*.
 
 .. code-block:: bash
 
@@ -126,7 +134,8 @@ Sample 100 cells from every well for every plate and write to *OUTFILE*.
                    OUTFILE
 
 
-Filter by pathogens *shigella* and *bartonella* and write to *OUTFILE*.
+Filter by pathogens *shigella* and *bartonella* and write **standardized** data
+ to *OUTFILE*. If no aw
 
 .. code-block:: bash
 
@@ -136,13 +145,14 @@ Filter by pathogens *shigella* and *bartonella* and write to *OUTFILE*.
 
 
 Filter by pathogens *Shigella* and *Bartonella* and gene *pik3ca* and write
-to *OUTFILE*.
+ standardized data to *OUTFILE*.
 
 .. code-block:: bash
 
   rnai-query query --db database.db
                    --pathogen shigella,bartonella
                    --gene pik3ca
+                   --normalize zscore
                    OUTFILE
 
 
@@ -159,7 +169,7 @@ write debug info.
 
 
 Filter by gene *nfkb1*, pathogen *Shigella*, study *infectx*, *pooled*
-designs, sample 1000 cells per well and write to output
+designs, sample 1000 cells per well and write un-normalized data to output
 
 .. code-block:: bash
 
@@ -169,12 +179,15 @@ designs, sample 1000 cells per well and write to output
                    --study infectx
                    --design p
                    --sample 1000
+                   --normalize none
                    OUTFILE
 
 
 Filter by gene *pik3ca* and *mock*, feature classes *cells* and *perinuclei*,
 pathogens *Shigella* and *Bartonella*, library *Dharmacon* with a *pooled*
-siRNA design, sample 100 cells from each well and write to *OUTFILE*.
+siRNA design, sample 100 cells from each well and write **standardized** data
+ to
+*OUTFILE*.
 
 .. code-block:: bash
 
@@ -244,9 +257,9 @@ available.
 
 .. code-block:: bash
 
-  rnai-query query --db /i/am/a/file/called/tix.db
-                   --featureclass cells,perinuclei
-                   --gene pik3ca,mock
-                   --library d
-                   --design p
-                   pathogen
+  rnai-query select --db /i/am/a/file/called/tix.db
+                    --featureclass cells,perinuclei
+                    --gene pik3ca,mock
+                    --library d
+                    --design p
+                    pathogen

@@ -21,11 +21,6 @@ TODO
 
 
 
-Normalizer
-----------
-
-TODO
-
 Analyser
 --------
 

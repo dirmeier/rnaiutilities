@@ -21,6 +21,8 @@
 
 import re
 
+NONE = "none"
+
 GENE = "gene"
 SIRNA = "sirna"
 WELL = "well"

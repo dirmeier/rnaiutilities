@@ -25,7 +25,7 @@ import logging
 import click
 
 from rnaiutilities import Query
-from rnaiutilities.rnaiquery.globals import ZSCORE, BSCORE, LOESS
+from rnaiutilities.rnaiquery.globals import ZSCORE, BSCORE, LOESS, NONE
 
 logger = logging.getLogger(__name__)
 
@@ -125,15 +125,19 @@ def select(select, db,
 
 @cli.command()
 @click.argument("outfile", type=str)
-@click.option("--db", default=None,
-              help="Sqlite database file."
-                   " If unset uses a postgres database listening on port 5432."
-                   " Otherwise, if set, uses the database file and opens a"
-                   " connection to sqlite.")
-@click.option("--normalize", default="zscore",
-              help="The normalization methods to use, e.g. like '{}',"
-                   " or a comma-separated strong of normalisations"
-                   " such as '{},{},{}'.".format(ZSCORE, BSCORE, LOESS, ZSCORE))
+@click.option(
+  "--db", default=None,
+  help="Sqlite database file."
+       " If unset uses a postgres database listening on port 5432."
+       " Otherwise, if set, uses the database file and opens a"
+       " connection to sqlite.")
+@click.option(
+  "--normalize", default="zscore",
+  help="The normalization methods to use, e.g. like '{}',"
+       " or a comma-separated string of normalisations"
+       " such as '{},{},{}'. Defaults to 'zscore'."
+       " If you do NOT want to normalize you need to explicitely set 'NONE'."
+      .format(ZSCORE, BSCORE, LOESS, ZSCORE, NONE))
 @click.option("--study", default=None,
               help="The study to query for, e.g. like 'infectx' "
                    " or a comma-separated string of libraries,"

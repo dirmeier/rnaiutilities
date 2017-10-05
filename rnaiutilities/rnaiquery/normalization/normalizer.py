@@ -24,15 +24,15 @@ import logging
 import numpy
 import pandas
 
-from rnaiutilities.rnaiquery.globals import BSCORE, ZSCORE, LOESS
+from rnaiutilities.rnaiquery.globals import BSCORE, ZSCORE, LOESS, NONE
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
 class Normalizer:
-    _nf_ = [ZSCORE]
-    _normalisations_ = [BSCORE, ZSCORE, LOESS]
+    _nf_ = [ZSCORE, NONE]
+    _normalisations_ = [BSCORE, ZSCORE, LOESS, NONE]
 
     def __init__(self, *args):
         """
@@ -43,7 +43,7 @@ class Normalizer:
         :type *args: tuple(str)
         """
 
-        self._normalize = None
+        self._normalize = []
         if args:
             self.set_normalization(*args)
 
@@ -57,7 +57,15 @@ class Normalizer:
         """
 
         self._check_methods(*args)
-        self._normalize = list(args)
+        if not args:
+            return
+        args = list(args)
+        if NONE in args and len(args) > 1:
+            raise ValueError(
+              "You cannot use {} in combination with other normalisations ()"
+              .format(NONE, "/".join(args)))
+        if NONE not in list(args):
+            self._normalize = list(args)
 
     @staticmethod
     def _check_methods(*args):
@@ -65,7 +73,7 @@ class Normalizer:
         if any(arg not in Normalizer._nf_ for arg in args):
             raise ValueError(
               "Please select only functions: {}"
-                .format("/".join(Normalizer._nf_)))
+                  .format("/".join(Normalizer._nf_)))
 
     def normalize_plate(self, data, feature_cols):
         """
@@ -84,6 +92,7 @@ class Normalizer:
         df = self._replace_inf_with_nan(df, feature_columns)
         # do normalisations on the fly
         for normal in self._normalize:
+
             f = self.__getattribute__("_" + normal)
             df, well_df = f(df, None, feature_columns)
 
