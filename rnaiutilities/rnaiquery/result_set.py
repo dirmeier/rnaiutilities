@@ -157,15 +157,22 @@ class ResultSet:
         return data_merged
 
     def _filter_data(self, data):
+        well = self.__getattribute__("_" + WELL)
+        gene = self.__getattribute__("_" + GENE)
+        sirna = self.__getattribute__("_" + SIRNA)
+        logger.info("\tfiltering data on well '{}', gene '{}' and sirna '{}'."
+                    .format(well, gene, sirna))
         data = data[
-            data.well.str.contains(self.__getattribute__("_" + WELL)) &
-            data.gene.str.contains(self.__getattribute__("_" + GENE)) &
-            data.sirna.str.contains(self.__getattribute__("_" + SIRNA))
+            data.well.str.contains(well) &
+            data.gene.str.contains(gene) &
+            data.sirna.str.contains(sirna)
         ]
         return data
 
     def _sample_data(self, data):
         if self.__getattribute__("_" + SAMPLE) != ResultSet._sar_:
+            logger.info("\tsampling {} cells per well."
+                        .format(str(self._sample)))
             data = data.groupby([WELL, GENE, SIRNA]).apply(self._filter_fn)
         return data
 

@@ -5,6 +5,11 @@
 
 * Adds filtering to `rnai-query select`
 
+#### 0.1.3.post1
+
+* Moves normalisation to `rnai-query query`
+* Adds landing page
+
 ### 0.1.2
 
 * Adds normalization scripts and modules to the package.
