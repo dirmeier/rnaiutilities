@@ -35,6 +35,11 @@ class TableFileSets:
     def __str__(self):
         return "TODO"
 
+    def print(self, **kwargs):
+        with DBMS(self._db) as d:
+            res = d.print(**kwargs)
+        return res
+
     def filter(self, **kwargs):
         """
         Get a set of files that meets some criteria. Kwargs is a names list,

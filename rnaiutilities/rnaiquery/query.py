@@ -48,6 +48,49 @@ class Query:
         # filesets of meta files
         self._table = table_file_sets.TableFileSets(db)
 
+    def print(self,
+              study=None,
+              pathogen=None,
+              library=None,
+              design=None,
+              replicate=None,
+              plate=None,
+              featureclass=None):
+        """
+        Query a database of image-based RNAi screening features for cells/bacteria/nuclei.
+         The result will be printed to stdout.
+
+        :param study: filters by study, e.g.
+         'infectx'/'group_cossart'/'infectx_published'
+        :param pathogen: filters by pathogen, e.g.
+         'salmonella'/'adeno'/'bartonella'/'brucella'/'listeria'
+        :param library: filters by library, e.g. 'a'/'d'/'q'
+        :param design: filters by design, e.g.: 'p'/'u'
+        :param replicate: filters by replicate, i.e. a number
+        :param plate: filters by plate, i.e.: 'dz44-1l'
+        :param featureclass: filters by featureclass,
+         e.g. 'nuclei'/'cells'/'bacteria'
+        """
+
+        # TODO put this to another place
+        if featureclass is not None:
+            features = featureclass.split(",")
+            for feature in features:
+                if feature.lower() not in Query.__selectable_features__:
+                    raise ValueError(
+                      "Currently only featureclasses {} are supported.".format(
+                        "/".join(Query.__selectable_features__)))
+        else:
+            featureclass = ",".join(Query.__selectable_features__)
+
+        return self._print(study=study,
+                           pathogen=pathogen,
+                           library=library,
+                           design=design,
+                           replicate=replicate,
+                           plate=plate,
+                           featureclass=featureclass)
+
     def query(self,
               study=None,
               pathogen=None,
@@ -194,6 +237,10 @@ class Query:
                             sirna=sirna,
                             well=well,
                             featureclass=featureclass)
+
+    def _print(self, **kwargs):
+        fls = self._table.print(**kwargs)
+        return fls
 
     def _query(self, **kwargs):
         fls = self._table.filter(**kwargs)

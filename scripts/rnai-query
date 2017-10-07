@@ -211,5 +211,58 @@ def query(outfile, db, normalize,
         res.dump(outfile, normalize=normalize.split(","))
 
 
+@cli.command()
+@click.argument("outfile", type=str)
+@click.option(
+  "--db", default=None,
+  help="Sqlite database file."
+       " If unset uses a postgres database listening on port 5432."
+       " Otherwise, if set, uses the database file and opens a"
+       " connection to sqlite.")
+@click.option("--study", default=None,
+              help="The study to query for, e.g. like 'infectx' "
+                   " or a comma-separated string of libraries,"
+                   " such as 'infectx,infectx_published'.")
+@click.option("--pathogen", default=None,
+              help="The pathogen to query for, e.g. like 'adeno', "
+                   "or a comma-separated string of pathogens, "
+                   "such as 'adeno,bartonella'.")
+@click.option("--library", default=None,
+              help="The library to query for, e.g. like 'd', "
+                   "or a comma-separated string of libraries, "
+                   "such as 'd,q'.")
+@click.option("--plate", default=None,
+              help="The plate to query for, e.g. like 'dz03-1k', "
+                   "or a comma-separated string of plates, "
+                   "such as 'dz03-1k,dz04-1k'.")
+@click.option("--design", default=None,
+              help="The design to query for, e.g. like 'p'.")
+@click.option("--replicate", default=None, type=int,
+              help="The replicate to query for, e.g. like '1', "
+                   "or a comma-separated string of replicates, "
+                   "such as '1,4'.")
+@click.option("--featureclass", default=None,
+              help="The featureclass to query for, e.g. like 'cells'.")
+def print(outfile, db,
+          study, pathogen, library, design, replicate, plate,
+          featureclass):
+    """
+    Query and sample single cells or bacteria and write the resultset
+    to OUTFILE.
+    """
+
+    q = Query(db)
+    fls = q.print(study=study,
+                  pathogen=pathogen,
+                  library=library,
+                  design=design,
+                  replicate=replicate,
+                  plate=plate,
+                  featureclass=featureclass)
+    with open(outfile, "a") as fh:
+        for f in fls:
+            fh.write('\t'.join(map(str, f)) + "\n")
+
+
 if __name__ == "__main__":
     cli()

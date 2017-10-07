@@ -50,6 +50,12 @@ class DatabaseQuery:
         res = map(lambda x: x[0], res)
         return res
 
+    def print(self, **kwargs):
+        q = self._build_file_name_query(**kwargs)
+        logger.info(q)
+        res = self._print(q, **kwargs)
+        return res
+
     def query(self, **kwargs):
         q = self._build_file_name_query(**kwargs)
         logger.info(q)
@@ -96,6 +102,9 @@ class DatabaseQuery:
         sq = self._build_plate_query(SIRNA, **kwargs)
 
         return mq, gq, sq
+
+    def _print(self, q, **kwargs):
+        return self.__connection.query(q)
 
     def _query(self, q, **kwargs):
         # get for relevant files

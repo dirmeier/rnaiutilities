@@ -61,6 +61,10 @@ class DBMS:
         q = DatabaseQuery(self.__connection)
         return q.query(**kwargs)
 
+    def print(self, **kwargs):
+        q = DatabaseQuery(self.__connection)
+        return q.print(**kwargs)
+
     def insert(self, path):
         d = DatabaseInserter(self.__connection)
         d.insert(path)
