@@ -40,7 +40,7 @@ class TableFileSets:
             res = d.print(**kwargs)
         return res
 
-    def filter(self, **kwargs):
+    def filter(self, file_name,**kwargs):
         """
         Get a set of files that meets some criteria. Kwargs is a names list,
         that can have the following form:
@@ -60,7 +60,7 @@ class TableFileSets:
         """
 
         with DBMS(self._db) as d:
-            res = d.query(**kwargs)
+            res = d.query(file_name, **kwargs)
         return res
 
 

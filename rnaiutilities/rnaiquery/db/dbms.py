@@ -57,9 +57,9 @@ class DBMS:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.__connection.close()
 
-    def query(self, **kwargs):
+    def query(self, file_name, **kwargs):
         q = DatabaseQuery(self.__connection)
-        return q.query(**kwargs)
+        return q.query(file_name, **kwargs)
 
     def print(self, **kwargs):
         q = DatabaseQuery(self.__connection)

@@ -92,6 +92,7 @@ class Query:
                            featureclass=featureclass)
 
     def query(self,
+              file_name=None,
               study=None,
               pathogen=None,
               library=None,
@@ -140,7 +141,8 @@ class Query:
         else:
             featureclass = ",".join(Query.__selectable_features__)
 
-        return self._query(sample=sample,
+        return self._query(file_name,
+          sample=sample,
                            study=study,
                            pathogen=pathogen,
                            library=library,
@@ -242,8 +244,8 @@ class Query:
         fls = self._table.print(**kwargs)
         return fls
 
-    def _query(self, **kwargs):
-        fls = self._table.filter(**kwargs)
+    def _query(self, file_name, **kwargs):
+        fls = self._table.filter(file_name, **kwargs)
         return ResultSet(fls, **kwargs)
 
     def _select(self, select, **kwargs):

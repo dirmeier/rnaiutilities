@@ -56,10 +56,11 @@ class DatabaseQuery:
         res = self._print(q, **kwargs)
         return res
 
-    def query(self, **kwargs):
+    def query(self, file_name, **kwargs):
         q = self._build_file_name_query(**kwargs)
-        logger.info(q)
-        res = self._query(q, **kwargs)
+        if file_name is None:
+            logger.info(q)
+        res = self._query(q, file_name, **kwargs)
         return res
 
     def _build_file_name_query(self, **kwargs):
@@ -106,9 +107,12 @@ class DatabaseQuery:
     def _print(self, q, **kwargs):
         return self.__connection.query(q)
 
-    def _query(self, q, **kwargs):
+    def _query(self, q, file_name, **kwargs):
         # get for relevant files
-        results = self.__connection.query(q)
+        if file_name is None:
+           results = self.__connection.query(q)
+        else:
+           results = self.__read_query_file(file_name)
         # merge files of the same plate together
         result_set_map = self._build_result_set(results)
         # setup table file list
@@ -127,6 +131,14 @@ class DatabaseQuery:
             for k, x in result_set_map.items()
         ]
         return fls
+
+    def __read_query_file(self, file_name):
+        res = []
+        with open(file_name, "r") as fh:
+            for line in fh.readlines():
+                tokens = line.strip().split("\t")
+                res.append( (*tokens,) )
+        return res
 
     @staticmethod
     def _build_result_set(results):
