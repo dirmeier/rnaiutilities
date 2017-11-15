@@ -10,6 +10,10 @@
 * Moves normalisation to `rnai-query query`
 * Adds landing page
 
+#### 0.1.3.post2
+
+* Replaces screen-wise feature set computation with plate-wise computation
+
 ### 0.1.2
 
 * Adds normalization scripts and modules to the package.

@@ -12,7 +12,7 @@ def readme():
 
 setup(
   name='rnaiutilities',
-  version='0.1.3.post1',
+  version='0.1.3.post2',
   description='A collection of commandline tools and python modules '
               'for working with image-based RNAi screens.',
   long_description=readme(),
