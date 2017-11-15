@@ -36,15 +36,16 @@ def cli():
 
 @cli.command()
 @click.argument("config", type=str)
-def featuresets(config):
+@click.argument("file", type=str)
+def featuresets(config, file):
     """
-    Computes pairwise Jaccard indexes between all possible screens in CONFIG.
-    The overlaps can be taken to decide which screens to include in the analysis.
-
+    Computes pairwise Jaccard indexes between all possible screens in CONFIG and
+    write the results to FILE.
+    The overlaps can be taken to decide which screens to include in the analysis
     """
 
     c = Config(config)
-    Parser(c).feature_sets()
+    Parser(c).feature_sets(file)
 
 
 @cli.command()

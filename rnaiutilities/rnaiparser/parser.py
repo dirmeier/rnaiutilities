@@ -221,26 +221,41 @@ class Parser:
                 return False
         return True
 
-    def feature_sets(self):
+    def feature_sets(self, file_name):
         """
         Checks between all possible screens for pairwise feature overlaps.
         The overlaps can be taken to decide which screens to include in the analysis.
 
         """
 
+        jaccard_file, feature_file = self._get_feature_set_files(file_name)
         plate_map = self._plate_map()
-        file_map = self._file_map(plate_map)
-        keys = sorted(list(file_map.keys()))
+        f_map = self._file_map(plate_map)
+        keys = sorted(list(f_map.keys()))
         tab = []
-        for i, _ in enumerate(keys):
-            row = [keys[i]]
-            print("#" + keys[i] + "\t" + ",".join(file_map[keys[i]]))
-            for j, _ in enumerate(keys):
-                row.append(
-                  "{:2.5f}".format(
-                    jaccard(file_map[keys[i]], file_map[keys[j]])))
-            tab.append(row)
-        print(tabulate(tab, headers=[""] + keys))
+        with open(jaccard_file, "w") as jf, open(feature_file, "w") as ff:
+            for i, _ in enumerate(keys):
+                row = [keys[i]]
+                ff.write("#" + keys[i] + "\t" + ",".join(f_map[keys[i]]) + "\n")
+                for j, _ in enumerate(keys):
+                    row.append(
+                      "{:2.5f}".format(
+                        jaccard(f_map[keys[i]], f_map[keys[j]])))
+                tab.append(row)
+            jf.write(tabulate(tab, headers=[""] + keys) + "\n")
+
+    @staticmethod
+    def _get_feature_set_files(file_name):
+        reg = re.compile("(.*)(\..*)$").match(file_name)
+        if reg is None:
+            raise ValueError("Could not match filename")
+        file_prefix, file_suffix = reg.group(1), reg.group(2)
+        jaccard_file = file_prefix + "_jaccard" + file_suffix
+        feature_file = file_prefix + "_feature_files" + file_suffix
+
+        return jaccard_file, feature_file
+
+
 
     def _plate_map(self):
         """
