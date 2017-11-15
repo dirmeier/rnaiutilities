@@ -228,8 +228,8 @@ class Parser:
 
         """
 
-        screen_map = self._screen_map()
-        file_map = self._file_map(screen_map)
+        plate_map = self._plate_map()
+        file_map = self._file_map(plate_map)
         keys = sorted(list(file_map.keys()))
         tab = []
         for i, _ in enumerate(keys):
@@ -237,72 +237,30 @@ class Parser:
             print("#" + keys[i] + "\t" + ",".join(file_map[keys[i]]))
             for j, _ in enumerate(keys):
                 row.append(
-                  "{:2.5f}".format(jaccard(file_map[keys[i]],
-                                           file_map[keys[j]])))
+                  "{:2.5f}".format(
+                    jaccard(file_map[keys[i]], file_map[keys[j]])))
             tab.append(row)
         print(tabulate(tab, headers=[""] + keys))
 
-    def _screen_map(self):
+    def _plate_map(self):
         """
-        Computes a mapping screen -> plate, i.e. sth like:
-        BRUCELLA-DP-K2 -> {plate1, plate2, plate }
+        Computes a mapping plate identifier -> plate file name
 
         :return: returns a mapping
         :rtype: dict(str, str)
         """
-        screen_map = {}
+        plate_map = {}
         for plate in self._plate_list:
-            platefile_path = self._config.plate_folder + "/" + plate
-            screen = self._to_screen(plate)
-            if screen not in screen_map:
-                screen_map[screen] = set()
-            screen_map[screen].add(platefile_path)
-        return screen_map
+            plate_file_path = self._config.plate_folder + "/" + plate
+            plate_map[plate] = plate_file_path
+        return plate_map
 
-    @staticmethod
-    def _to_screen(plate):
-        """
-        Parses sth like this: "/(GROUP_COSSART)/LISTERIA_TEAM/(LISTERIA-DP-G)1/DZ44-1K"
-
-        """
-        ma = re.match("^/(.+)/.+/(\w+-\w+-\w+)\d+.*/.+$", plate)
-        return ma.group(1) + "-" + ma.group(2)
-
-    def _file_map(self, screen_map):
+    def _file_map(self, plate_map):
         file_map = {}
-        for screen, platesets in screen_map.items():
-            # number of plate sets.
-            # so every feature file should be found size times
-            size = len(platesets)
-            # maps a feat
-            file_count_map = self._get_screen_file_map(platesets)
-            self._check_file_counts(file_count_map, size, screen)
-            file_map[screen] = list(file_count_map.keys())
+        for plate, plate_file in plate_map.items():
+            file_map[plate] = self._get_features(plate_file)
         return file_map
 
     @staticmethod
-    def _get_suffixes(fileset):
-        return get_base_filesnames(fileset, ".mat")
-
-    def _get_screen_file_map(self, platesets):
-        file_map = {}
-        for plateset in platesets:
-            # list of files ending in *mat
-            feature_list = self._get_suffixes(plateset)
-            for fl_suffix in feature_list:
-                if fl_suffix not in file_map:
-                    file_map[fl_suffix] = 0
-                # increment the number of times a feature has been found
-                file_map[fl_suffix] += 1
-        return file_map
-
-    @staticmethod
-    def _check_file_counts(file_map, size, screen):
-        for fl_suffix in file_map:
-            if file_map[fl_suffix] != size:
-                logger.warning(
-                  "Screen {} has only {}/{} files for feature {}."
-                      .format(screen,
-                              file_map[fl_suffix],
-                              size,
-                              fl_suffix))
+    def _get_features(plate):
+        return get_base_filesnames(plate, ".mat")

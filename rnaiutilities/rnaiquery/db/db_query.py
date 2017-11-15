@@ -110,9 +110,9 @@ class DatabaseQuery:
     def _query(self, q, file_name, **kwargs):
         # get for relevant files
         if file_name is None:
-           results = self.__connection.query(q)
+            results = self.__connection.query(q)
         else:
-           results = self.__read_query_file(file_name)
+            results = self.__read_query_file(file_name)
         # merge files of the same plate together
         result_set_map = self._build_result_set(results)
         # setup table file list
@@ -137,7 +137,7 @@ class DatabaseQuery:
         with open(file_name, "r") as fh:
             for line in fh.readlines():
                 tokens = line.strip().split("\t")
-                res.append( (*tokens,) )
+                res.append((*tokens,))
         return res
 
     @staticmethod
@@ -197,7 +197,8 @@ class DatabaseQuery:
 
     def _build_select_query(self, select, **kwargs):
         if not self._query_has_filters(**kwargs):
-            if select in [DatabaseQuery._gene_, DatabaseQuery._sirna_, DatabaseQuery._well_]:
+            if select in [DatabaseQuery._gene_, DatabaseQuery._sirna_,
+                          DatabaseQuery._well_]:
                 return "SELECT distinct {} from {};".format(select, select)
             else:
                 return "SELECT distinct {} from meta;".format(select)
