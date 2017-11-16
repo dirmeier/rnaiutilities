@@ -25,9 +25,9 @@ import re
 from pathlib import Path
 import numpy as np
 import multiprocessing as mp
-from tabulate import tabulate
 
 from rnaiutilities.rnaiparser.globals import USABLE_FEATURES
+from rnaiutilities.rnaiparser.parse_featuresets import FeatureSetParser
 from rnaiutilities.rnaiparser.plate_list import PlateList
 from rnaiutilities.rnaiparser.config import Config
 from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_sets import \
@@ -35,8 +35,7 @@ from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_sets import \
 from rnaiutilities.rnaiparser.plate_layout import MetaLayout
 from rnaiutilities.rnaiparser.plate_parser import PlateParser
 from rnaiutilities.rnaiparser.plate_writer import PlateWriter
-from rnaiutilities.rnaiparser.utility.io import get_base_filesnames
-from rnaiutilities.rnaiparser.utility.math import jaccard
+
 
 logger = mp.log_to_stderr()
 logger.setLevel(logging.INFO)
@@ -63,9 +62,8 @@ class Parser:
         self._output_path = config.output_path
         self._multi_processing = config.multi_processing
         # read the plate list files
-        # oly take files with regex pooled/unpooled genome/kinome
+        # only take files with regex pooled/unpooled genome/kinome
         # TODO: this also needs to go to the config file
-        # why is this again: (-\w+)* ?
         self._plate_list = PlateList(
           config.plate_id_file,
           ".*\/\w+\-\w[P|U]\-[G|K]\d+(-\w+)*\/.*"
@@ -221,61 +219,13 @@ class Parser:
                 return False
         return True
 
-    def feature_sets(self, file_name):
+    def feature_sets(self, outfile):
         """
         Checks between all possible screens for pairwise feature overlaps.
-        The overlaps can be taken to decide which screens to include in the analysis.
+        The overlaps can be taken to decide which screens to
+         include in the analysis.
 
         """
 
-        jaccard_file, feature_file = self._get_feature_set_files(file_name)
-        plate_map = self._plate_map()
-        f_map = self._file_map(plate_map)
-        keys = sorted(list(f_map.keys()))
-        tab = []
-        with open(jaccard_file, "w") as jf, open(feature_file, "w") as ff:
-            for i, _ in enumerate(keys):
-                row = [keys[i]]
-                ff.write("#" + keys[i] + "\t" + ",".join(f_map[keys[i]]) + "\n")
-                for j, _ in enumerate(keys):
-                    row.append(
-                      "{:2.5f}".format(
-                        jaccard(f_map[keys[i]], f_map[keys[j]])))
-                tab.append(row)
-            jf.write(tabulate(tab, headers=[""] + keys) + "\n")
+        FeatureSetParser(self._plate_list, self._plate_folder, outfile).parse()
 
-    @staticmethod
-    def _get_feature_set_files(file_name):
-        reg = re.compile("(.*)(\..*)$").match(file_name)
-        if reg is None:
-            raise ValueError("Could not match filename")
-        file_prefix, file_suffix = reg.group(1), reg.group(2)
-        jaccard_file = file_prefix + "_jaccard" + file_suffix
-        feature_file = file_prefix + "_feature_files" + file_suffix
-
-        return jaccard_file, feature_file
-
-
-
-    def _plate_map(self):
-        """
-        Computes a mapping plate identifier -> plate file name
-
-        :return: returns a mapping
-        :rtype: dict(str, str)
-        """
-        plate_map = {}
-        for plate in self._plate_list:
-            plate_file_path = self._config.plate_folder + "/" + plate
-            plate_map[plate] = plate_file_path
-        return plate_map
-
-    def _file_map(self, plate_map):
-        file_map = {}
-        for plate, plate_file in plate_map.items():
-            file_map[plate] = self._get_features(plate_file)
-        return file_map
-
-    @staticmethod
-    def _get_features(plate):
-        return get_base_filesnames(plate, ".mat")
