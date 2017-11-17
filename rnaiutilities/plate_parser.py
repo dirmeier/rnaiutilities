@@ -22,21 +22,20 @@
 import logging
 
 import numpy
-from rnaiutilities.rnaiparser.plate_cell_features import PlateCellFeature
-from rnaiutilities.rnaiparser.plate_file_set_generator import PlateFileSet
 
-from rnaiutilities.plate.plate_sirna_gene_mapping import \
-    PlateSirnaGeneMapping
-from rnaiutilities.utility import load_matlab
+from rnaiutilities.plate.plate_cell_features import FeatureMatrix
+from rnaiutilities.plate.plate_file_set import PlateFileSet
+from rnaiutilities.plate.plate_sirna_gene_mapping import PlateSirnaGeneMapping
+from rnaiutilities.utility.files import load_matlab
 
 logger = logging.getLogger(__name__)
 
 __NA__ = "NA"
 
 
-class PlateParser:
+class PlateFilesParser:
     """
-    Plate Parser class.
+    Class for parsing single features files as numpy arrays.
     """
 
     def parse(self, pfs):
@@ -48,23 +47,28 @@ class PlateParser:
         """
 
         if not isinstance(pfs, PlateFileSet):
-            logger.error("Please provide a PlateFileSets object.")
+            logger.error("Please provide a PlateFileSet object.")
             return None, None, None
+
         features = self._parse_plate_file_set(pfs)
         if len(features) == 0:
+            logger.error("No files found for platefileset: {}"
+                         .format(pfs.classifier))
             return None, None, None
+
         mapping = self._parse_plate_mapping(pfs)
         if len(mapping) == 0:
-            logger.warning("Mapping is none for plate-fileset: " +
-                           pfs.classifier + ". Continuing to next set!")
+            logger.warning("Found no mapping for platefileset: " +
+                           pfs.classifier + "!")
             return None, None, None
+
         return pfs, features, mapping
 
-    def _parse_plate_file_set(self, plate_file_set):
-        features = {}
+    def _parse_plate_file_set(self, pfs):
         logger.info("Parsing plate file set to memory: " +
-                    str(plate_file_set.classifier))
-        for plate_file in plate_file_set:
+                    str(pfs.classifier))
+        features = {}
+        for plate_file in pfs:
             cf = self._parse_file(plate_file)
             if cf is None:
                 continue
@@ -78,6 +82,7 @@ class PlateParser:
         :param plate_file: the matlab file
         :return: returns a 2D np.array
         """
+
         featurename = plate_file.featurename
         file = plate_file.filename
         if file is None:
@@ -102,14 +107,14 @@ class PlateParser:
             mat = numpy.full(shape=(n_row, max_n_col),
                              fill_value=numpy.Infinity,
                              dtype="float64")
-            for i,_ in enumerate(arr):
+            for i, _ in enumerate(arr):
                 try:
                     row = arr[i]
                     mat[i][:len(row)] = row.flatten()
                 except ValueError:
                     mat[i][0] = numpy.Infinity
-            return PlateCellFeature(mat, n_row, max_n_col,
-                                    file, row_lens, f_name)
+            return FeatureMatrix(mat, n_row, max_n_col,
+                                 file, row_lens, f_name)
         except AssertionError:
             logger.warning("Could not alloc feature %s of %s",
                            f_name, file)
@@ -117,7 +122,6 @@ class PlateParser:
 
     @staticmethod
     def _add(features, cf, feature_group):
-        # TODO: is this really enough?
         if feature_group not in features:
             features[feature_group] = []
         features[feature_group].append(cf)

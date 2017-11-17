@@ -18,4 +18,7 @@
 # @author = 'Simon Dirmeier'
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
-
+"""
+Package contains all modules that are related to
+ plate layout, features, mappings, etc.
+"""

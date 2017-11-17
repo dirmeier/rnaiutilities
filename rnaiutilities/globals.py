@@ -27,6 +27,7 @@ GENE = "gene"
 SIRNA = "sirna"
 WELL = "well"
 
+IMAGE = "image."
 STUDY = "study"
 PATHOGEN = "pathogen"
 LIBRARY = "library"
@@ -43,7 +44,6 @@ BSCORE = "bscore"
 LOESS = "loess"
 ZSCORE = "zscore"
 
-
 FILE_FEATURES_REGEX = re.compile(
   "(\w+)-(\w+)-(\w+)-(\w+)-(\w+)-(\d+)-(.*)_(\w+)")
 
@@ -55,9 +55,36 @@ ADDED_COLUMNS_FOR_PRINTING = {
     ]
 }
 
-USABLE_FEATURES = ["bacteria",
-                   "cells",
-                   "nuclei",
-                   "perinuclei",
-                   "expandednuclei",
-                   "invasomes"]
+# file that stores the inforation which well is at which position.
+# great stuff :)
+IMAGE_MAPPING_FILE = "Image.FileName_OrigDNA".lower()
+
+# shouldnt that be sufficient???
+USABLE_FEATURES = [
+    "bacteria",
+    "cells",
+    "nuclei",
+    "perinuclei",
+    "expandednuclei",
+    "invasomes"]
+
+## the later two can probably be combined
+UNUSED_PLATE_FEATURE_REGEX = re.compile(
+  ".*((BACKUP)|(INVASIN)|(OLIGOPROFILE)|(TITRATION)|"
+  "(RHINO-TEST)|(1PMOL)).*".upper())
+
+# features to be skipped during parsing file names
+SKIPPABLE_FEATURE_NAMES = list(
+  map(lambda x: x.lower(), [
+      "Batch_handles.",
+      "Neighbors.",
+      "ERGIC53.",
+      "TGN46.",
+      "Bacteria.SubObjectFlag.",
+      "CometTails.",
+      "DAPIFG.",
+      "BlobBacteria."]))
+
+# features to be skipped based on regex during parsing file names
+SKIPPABLE_FEATURE_REGEX = [
+    re.compile(".*_subcell.*"), re.compile(".*subobjectflag.*")]

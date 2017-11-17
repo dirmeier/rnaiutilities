@@ -21,13 +21,13 @@
 
 import logging
 
-from rnaiutilities.plate import PlateLayout
+from rnaiutilities.plate.plate_layout import PlateLayout
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class MetaLayout:
+class LibraryPlateLayout:
     """
     Class that loads the layout meta files for the plates, i.e. which siRNAs
     map to which well, etc.

@@ -28,6 +28,8 @@ from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file import \
 from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_set import \
     PlateFileSet
 
+from rnaiutilities.globals import SKIPPABLE_FEATURE_NAMES, IMAGE_MAPPING_FILE, \
+    IMAGE, SKIPPABLE_FEATURE_REGEX
 from rnaiutilities.utility import parse_plate_info, regex
 from rnaiutilities.utility import parse_screen_details
 
@@ -37,97 +39,70 @@ logger.setLevel(logging.INFO)
 
 class PlateFileSets:
     """
-    Class for keeping all the filenames of plates stored as a map.
-
+    Class for keeping all the filenames of a plate with possible different
+     timestamps or IDs stored as a map.
     """
 
-    # feature names of features to skip
-    _skippable_feature_names_ = ["Batch_handles.",
-                                 "Neighbors.",
-                                 "ERGIC53.",
-                                 "TGN46.",
-                                 "Bacteria.SubObjectFlag.",
-                                 "CometTails.",
-                                 "DAPIFG.",
-                                 "BlobBacteria."]
-    # these are feature file names we dont use
-    _skippable_features_starts = [x.lower() for x in _skippable_feature_names_]
-    _image_ = "Image.".lower()
-    _skippable_feature_regex_ = [re.compile(".*_subcell.*"),
-                                 re.compile(".*subobjectflag.*")]
-    # name of the well index mappings
-    _mapping_file_ = "Image.FileName_OrigDNA".lower()
-    # the pattern for screen, replicate
-    _setting_pattern_ = "(\w+)(\d+)"
-
     def __init__(self, folder, outfolder):
-        self._setting_regex = re.compile(PlateFileSets._setting_pattern_)
+        self._setting_regex = re.compile("(\w+)(\d+)")
         self._folder = folder
-        self._plates = {}
+        self._plate_file_sets = {}
         self._files = []
         self._outfolder = outfolder
-        self._parse_file_names(folder)
+
+        self._parse_plate_file_sets(folder)
 
     def __iter__(self):
         """
-        Iterate over all the single plates.
-
+        Iterate over all the single plate filesets.
         """
-        for _, v in self._plates.items():
+
+        for _, v in self._plate_file_sets.items():
             yield v
 
     def __len__(self):
-        return len(self._plates)
+        return len(self._plate_file_sets)
 
-    def remove(self):
-        """
-        Remove the plate file set from the disc.
-
-        """
-        logger.info("Removing plate-file sets")
-        from subprocess import call
-        for f in self._files:
-            if f.endswith(".mat"):
-                call(["rm", f])
-
-    def _parse_file_names(self, folder):
+    def _parse_plate_file_sets(self, folder):
         """
         Traverse the given folder structure and save every
         (classifier-folder) pair in a plate map.
 
         :param folder: the folder for which all the plates should get parsed
         """
+
         # iterate over the array of files
         for basename, filename in self._find_files(folder):
             self._files.append(filename)
             if self._skip(basename):
                 continue
-            # decompose the file name
             self._parse_file_name(filename)
 
     def _parse_file_name(self, filename):
         clss, st, pa, lib, des, scr, rep, suf, plate, feature \
             = self._parse_plate_name(filename)
-        self._add_platefileset(clss, st, pa, lib, des, scr,
-                               rep, suf, plate, self._outfolder)
+
+        self._add_platefileset(
+          clss, st, pa, lib, des, scr, rep, suf, plate, self._outfolder)
         self._add_platefile(filename, feature, clss)
 
     def _skip(self, basename):
         b = basename.lower()
         if self._skip_feature(b):
             return True
-        if b.startswith(PlateFileSets._image_) and \
-          not b.startswith(PlateFileSets._mapping_file_):
+        if b.startswith(IMAGE) and \
+           not b.startswith(IMAGE_MAPPING_FILE):
             return True
         return False
 
     def _add_platefile(self, f, feature, classifier):
         # matlab file is the well mapping
-        if feature.lower() == PlateFileSets._mapping_file_:
-            self._plates[classifier].mapping = PlateFile(f, feature)
+        if feature.lower() == IMAGE_MAPPING_FILE:
+            self._plate_file_sets[classifier].mapping = PlateFile(f, feature)
         # add the current matlab file do the respective platefile
         else:
-            self._plates[classifier].files.append(PlateFile(f, feature))
+            self._plate_file_sets[classifier].files.append(
+                PlateFile(f, feature))
 
     @staticmethod
     def _find_files(folder):
@@ -145,10 +120,10 @@ class PlateFileSets:
     @staticmethod
     def _skip_feature(basename):
         b = basename.lower()
-        for skip in PlateFileSets._skippable_features_starts:
+        for skip in SKIPPABLE_FEATURE_NAMES:
             if b.startswith(skip):
                 return True
-        for skip in PlateFileSets._skippable_feature_regex_:
+        for skip in SKIPPABLE_FEATURE_REGEX:
             if skip.match(b):
                 return True
         return False
@@ -172,8 +147,8 @@ class PlateFileSets:
 
     def _add_platefileset(self, classifier, study, pathogen, library, design,
                           screen, replicate, suffix, plate, outfolder):
-        if classifier not in self._plates:
-            self._plates[classifier] = \
+        if classifier not in self._plate_file_sets:
+            self._plate_file_sets[classifier] = \
                 PlateFileSet(classifier, outfolder + '/' + classifier,
                              study, pathogen, library, design,
                              screen, replicate, suffix, plate)

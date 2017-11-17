@@ -21,15 +21,15 @@
 
 import logging
 import re
+import yaml
 from pathlib import Path
 
-from rnaiutilities.utility import check_feature_group
+from rnaiutilities.library_plate_layout import LibraryPlateLayout
+from rnaiutilities.utility.check import check_feature_group
 from rnaiutilities.utility.files import data_filename, meta_filename
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
-__NA__ = "NA"
 
 
 class PlateWriter:
@@ -37,90 +37,98 @@ class PlateWriter:
     Write a plate to tsv or any other format.
     """
 
+    __NA__ = "NA"
     _meta_ = ["well", "gene", "sirna", "well_type", "image_idx", "object_idx"]
     _well_regex = re.compile("(\w)(\d+)")
 
-    def __init__(self, layout):
-        self._layout = layout
+    def __init__(self, layout_file):
+        self._layout = LibraryPlateLayout(layout_file)
 
     def write(self, pfs, feature_groups, mapping):
-        logger.info("Integrating the different feature sets to matrices for "
-                    "plate file set: " + str(pfs.classifier))
+        logger.info(
+          "Integrating plate file set: {}".format(str(pfs.classifier)))
         for k, v in feature_groups.items():
             self._write(pfs, k, v, mapping)
         return 0
 
     def _write(self, pfs, feature_group, features, mapping):
-        features = sorted(features, key=lambda x: x.short_name)
-        pathogen = pfs.pathogen
-        library = pfs.library
-        replicate = pfs.replicate
-        screen = pfs.screen
-        design = pfs.design
-        plate = pfs.plate
-        suffix = pfs.suffix
-        layout = self._layout.get(pathogen, library, design,
-                                  screen, replicate, plate, suffix)
+        layout = self._get_layout(pfs)
         if layout is None and pfs.pathogen.lower() != "mock":
             logger.warning("Could not load layout for: " + pfs.classifier)
             return
+        self._write_file(pfs, sorted(features, key=lambda x: x.short_name),
+                         feature_group, mapping, layout)
+
+    def _get_layout(self, pfs):
+        return self._layout.get(
+          pfs.pathogen, pfs.library, pfs.design, pfs.screen,
+          pfs.replicate, pfs.plate, pfs.suffix)
+
+    def _write_file(self, pfs, features, feature_group, mapping, layout):
         filename = pfs.outfile + "_" + feature_group
         try:
-            if not Path(self.data_filename(filename)).exists():
+            if not Path(data_filename(filename)).exists():
                 logger.info("Writing to: {}".format(filename))
-                self._write_file(filename, features, mapping, layout)
-                logger.info("Success: {}".format(filename))
+                self._dump(filename, features, mapping, layout)
+                logger.info("Success!")
             else:
-                logger.info(filename + " already exists. Skipping")
+                logger.info("{} already exists. Skipping.".format(filename))
         except Exception as e:
-            logger.error("Could not integrate: {}".format(filename))
-            logger.error(str(e))
+            logger.error(
+              "Could not integrate {} with error {}".format(filename, str(e)))
 
-    def _write_file(self, filename, features, mapping, layout):
+    def _dump(self, filename, features, mapping, layout):
         check_feature_group(features)
-        meat_hash = {}
         feature_names = [feat.featurename.lower() for feat in features]
         header = PlateWriter._meta_ + feature_names
         dat_file = data_filename(filename)
 
-        meta = [__NA__] * len(PlateWriter._meta_)
         with open(dat_file, "w") as f:
             f.write("\t".join(header) + "\n")
             nimg = features[0].values.shape[0]
             assert nimg == len(mapping)
-            for iimg in range(nimg):
-                well = mapping[iimg]
-                meta[0] = well
-                if layout is not None:
-                    meta[1] = layout.gene(well)
-                    meta[2] = layout.sirna(well)
-                    meta[3] = layout.welltype(well)
-                meta[4] = iimg + 1
-                meat_hash[";".join(map(str, meta[:4]))] = 1
-                for cell in range(features[0].ncells[iimg]):
-                    vals = [__NA__] * len(features)
-                    for p, _ in enumerate(features):
-                        try:
-                            vals[p] = features[p].values[iimg, cell]
-                        except IndexError:
-                            vals[p] = __NA__
-                    meta[5] = cell + 1
-                    try:
-                        f.write("\t".join(list(map(str, meta)) +
-                                          list(map(str, vals))).lower() + "\n")
-                    except Exception:
-                        f.write("\t".join([__NA__] * len(header)) + "\n")
+            self._dump_images(nimg, layout, mapping, features, f, header)
 
-        self._write_meta(filename, meat_hash, feature_names)
+        self._write_meta(filename, feature_names)
         return 0
 
-    def _write_meta(self, filename, meat_hash, features):
+    def _dump_images(self, nimg, layout, mapping, features, f, header):
+        meat_hash = {}
+        meta = [PlateWriter.__NA__] * len(PlateWriter._meta_)
+        for iimg in range(nimg):
+            well = mapping[iimg]
+            meta[0] = well
+            if layout is not None:
+                meta[1] = layout.gene(well)
+                meta[2] = layout.sirna(well)
+                meta[3] = layout.welltype(well)
+            meta[4] = iimg + 1
+            meat_hash[";".join(map(str, meta[:4]))] = 1
+            self._dump_cells(features, iimg, meta, f, header)
+
+    @staticmethod
+    def _dump_cells(features, iimg, meta, f, header):
+        for cell in range(features[0].ncells[iimg]):
+            vals = [PlateWriter.__NA__] * len(features)
+            for p, _ in enumerate(features):
+                try:
+                    vals[p] = features[p].values[iimg, cell]
+                except IndexError:
+                    vals[p] = PlateWriter.__NA__
+            meta[5] = cell + 1
+            try:
+                f.write("\t".join(list(map(str, meta)) +
+                                  list(map(str, vals))).lower() + "\n")
+            except Exception:
+                f.write("\t".join([PlateWriter.__NA__] * len(header)) + "\n")
+
+    @staticmethod
+    def _write_meta(filename, meat_hash, features):
         h = {'elements': list(meat_hash.keys()),
              'features': features}
 
         meat_file = meta_filename(filename)
         try:
-            import yaml
             with open(meat_file, "w") as m:
                 yaml.dump(h, m, default_flow_style=False)
         except Exception as e:

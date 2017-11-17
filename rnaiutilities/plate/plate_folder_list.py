@@ -22,14 +22,16 @@
 import logging
 import re
 
+from rnaiutilities.globals import UNUSED_PLATE_FEATURE_REGEX
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class PlateList:
+class PlateFolderList:
     """
-    Class that stores plate file names as array and removes lines that
-    should not be used.
+    Class that stores plate folder names in an array and filters plates that
+    are not needed or wanted.
 
     """
 
@@ -42,21 +44,16 @@ class PlateList:
         """
         self._meta_file = file
         self._pattern = pattern
-        # regex that automatically excludes files
-        # maybe i should remove this and remove these plates beforehand
-        self._regex = re.compile(
-          ".*((BACKUP)|(INVASIN)|(OLIGOPROFILE)|(TITRATION)|"
-          "(RHINO-TEST)|(1PMOL)).*".upper())
         logger.info("Loading experiments...")
-        self._plate_files = self._load()
+        self._plate_folders = self._load()
 
     def __iter__(self):
-        for f in self._plate_files:
+        for f in self._plate_folders:
             yield f
 
     @property
-    def plate_files(self):
-        return self._plate_files
+    def folders(self):
+        return self._plate_folders
 
     def _load(self):
         fls = []
@@ -71,10 +68,11 @@ class PlateList:
                     continue
                 filename, platetype = toks[0], toks[1]
                 if not (platetype.lower().startswith("screeningplate") or
-                        platetype.lower().startswith("checkerboard") or
-                        platetype.lower().startswith("mockplate")):
+                            platetype.lower().startswith("checkerboard") or
+                            platetype.lower().startswith("mockplate")):
                     continue
-                if self._regex.match(filename) or not pat.match(filename):
+                if UNUSED_PLATE_FEATURE_REGEX.match(filename) \
+                   or not pat.match(filename):
                     continue
                 fls.append(filename)
         return fls

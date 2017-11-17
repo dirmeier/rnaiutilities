@@ -22,7 +22,7 @@
 from numpy import shape
 
 
-class PlateCellFeature:
+class FeatureMatrix:
     """
     Class that stores the features for a single matlab files
 

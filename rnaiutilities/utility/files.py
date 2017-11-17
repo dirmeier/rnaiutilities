@@ -26,6 +26,7 @@ import os
 import logging
 import numpy
 from pathlib import Path
+import scipy.io as spio
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -53,11 +54,10 @@ def get_base_filesnames(folder, suffix):
 
 
 def usable_feature_files(platefileset, usable_features):
-    available_feature_files = self._available_files(platefileset)
+    available_feature_files = _available_files(platefileset)
     fls = [
         data_filename(platefileset.outfile + "_" + x) for x in
-        usable_features
-    ]
+        usable_features]
     uff = []
     for fl in fls:
         if any(fl.endswith("_" + av + "_data.tsv") for av in
@@ -67,9 +67,9 @@ def usable_feature_files(platefileset, usable_features):
 
 
 def _available_files(platefileset):
-    return numpy.unique(list(map(lambda x: x.split(".")[0],
-                                 [x.featurename.lower() for x in
-                                  platefileset.files])))
+    return numpy.unique(
+      list(map(lambda x: x.split(".")[0],
+               [x.featurename.lower() for x in platefileset.files])))
 
 
 def data_filename(filename):
@@ -78,3 +78,14 @@ def data_filename(filename):
 
 def meta_filename(filename):
     return filename + "_meta.tsv"
+
+
+def load_matlab(file):
+    """
+    Load a matlab file as np array
+
+    :param file: matlab file name
+    :return: returns an numpy.array
+    """
+    matlab_matrix = spio.loadmat(file)
+    return matlab_matrix["handles"][0][0][0][0][0][0][0][0][0][0]

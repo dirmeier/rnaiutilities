@@ -58,17 +58,21 @@ class ParseStatistics:
 
         for plate in self._plate_list:
             platefilesets = PlateFileSets(
-              self._output_path + "/" + plate,
-              self._output_path)
+              self._plate_folder + "/" + plate, self._output_path)
             if len(platefilesets) == 0:
                 logger.warning("{} is missing entirely".format(plate))
-            for platefileset in platefilesets:
-                uff = usable_feature_files(platefileset, USABLE_FEATURES)
-                cnt_all_files = len(uff)
-                cnt_avail_files = sum(
-                  [Path(x).exists() for x in uff])
-                if cnt_all_files != cnt_avail_files:
-                    logger.warning("{} has not been parsed completely -> only "
-                                   "{}/{} files there.".format(
-                      plate, cnt_avail_files, cnt_all_files))
+            else:
+                self._statistics(platefilesets, plate)
         logger.info("All's well that ends well")
+
+    @staticmethod
+    def _statistics(platefilesets, plate):
+        for platefileset in platefilesets:
+            uff = usable_feature_files(platefileset, USABLE_FEATURES)
+            cnt_all_files = len(uff)
+            cnt_avail_files = sum([Path(x).exists() for x in uff])
+            if cnt_all_files != cnt_avail_files:
+                logger.warning(
+                  "{} has not been parsed completely -> only "
+                  "{}/{} files there.".format(
+                    plate, cnt_avail_files, cnt_all_files))
