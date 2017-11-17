@@ -24,6 +24,7 @@ import re
 from pathlib import Path
 
 from rnaiutilities.utility import check_feature_group
+from rnaiutilities.utility.files import data_filename, meta_filename
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -80,7 +81,7 @@ class PlateWriter:
         meat_hash = {}
         feature_names = [feat.featurename.lower() for feat in features]
         header = PlateWriter._meta_ + feature_names
-        dat_file = self.data_filename(filename)
+        dat_file = data_filename(filename)
 
         meta = [__NA__] * len(PlateWriter._meta_)
         with open(dat_file, "w") as f:
@@ -117,7 +118,7 @@ class PlateWriter:
         h = {'elements': list(meat_hash.keys()),
              'features': features}
 
-        meat_file = self._meta_filename(filename)
+        meat_file = meta_filename(filename)
         try:
             import yaml
             with open(meat_file, "w") as m:
@@ -126,11 +127,3 @@ class PlateWriter:
             logger.error("Some IO-error writing to meta file: {}"
                          .format(meat_file))
             logger.error(str(e))
-
-    @staticmethod
-    def data_filename(filename):
-        return filename + "_data.tsv"
-
-    @staticmethod
-    def _meta_filename(filename):
-        return filename + "_meta.tsv"

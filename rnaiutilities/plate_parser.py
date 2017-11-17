@@ -87,7 +87,7 @@ class PlateParser:
         try:
             matrix = self._alloc(load_matlab(file), file, featurename)
         except (ValueError,  TypeError, AssertionError) as e:
-            logger.error("Could not parse: {} -> {}".format(file, str(e)))
+            logger.error("Could not statistics: {} -> {}".format(file, str(e)))
         return matrix
 
     @staticmethod

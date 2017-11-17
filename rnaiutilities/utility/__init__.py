@@ -18,8 +18,6 @@
 # @author = 'Simon Dirmeier'
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
-
-from .regex import parse_plate_info
-from .regex import parse_screen_details
-from .utility import load_matlab
-from .check import check_feature_group
+"""
+Subpackage for various utility tasks that do not fit in another package.
+"""

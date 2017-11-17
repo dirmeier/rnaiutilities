@@ -101,7 +101,7 @@ class DatabaseInserter:
     def _insert(self, path, file):
         filename = os.path.join(path, file)
         try:
-            # parse file name meta information
+            # statistics file name meta information
             ma = FILE_FEATURES_REGEX.match(file.replace("_meta.tsv", ""))
             stu, pat, lib, des, _, rep, pl, feature = ma.groups()
             # put the file classifier suffixes into the meta database

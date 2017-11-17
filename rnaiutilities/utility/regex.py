@@ -50,7 +50,7 @@ def parse_screen_details(screen):
                pat.group(5), pat.group(6), \
                pat.group(8) if pat.group(8) is not None else __NA__
     except AttributeError:
-        logger.warning("Could not parse: " + str(screen))
+        logger.warning("Could not statistics: " + str(screen))
         return None
 
 

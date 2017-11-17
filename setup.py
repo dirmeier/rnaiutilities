@@ -23,7 +23,7 @@ setup(
   keywords='rnai utilities microscopy cellprofiler perturbation',
   packages=find_packages(),
   scripts=['scripts/rnai-query',
-           'scripts/rnai-parse'],
+           'scripts/rnai-statistics'],
   python_requires='>=3',
   install_requires=[
       'h5py>=2.7.0',

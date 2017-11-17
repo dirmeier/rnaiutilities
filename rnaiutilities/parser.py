@@ -18,24 +18,28 @@
 # @author = 'Simon Dirmeier'
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
+"""
+Main module (entry point) for parsing feature files.
+"""
 
 import logging
 import multiprocessing as mp
-import os
-import re
 from pathlib import Path
 
 import numpy as np
-from rnaiutilities.rnaiparser.globals import USABLE_FEATURES
-from rnaiutilities.rnaiparser.parse_featuresets import FeatureSetParser
-from rnaiutilities.rnaiparser.plate_layout import MetaLayout
-from rnaiutilities.rnaiparser.plate_list import PlateList
-from rnaiutilities.rnaiparser.plate_parser import PlateParser
-from rnaiutilities.rnaiparser.plate_writer import PlateWriter
 
 from rnaiutilities.config import Config
+from rnaiutilities.globals import USABLE_FEATURES
+from rnaiutilities.statistics.download_statistics import DownloadStatistics
+from rnaiutilities.statistics.featureset_statistics import FeatureSetStatistics
 from rnaiutilities.plate_file_set_generator.plate_file_sets import \
     PlateFileSets
+from rnaiutilities.plate_layout.layout import MetaLayout
+from rnaiutilities.plate_list import PlateList
+from rnaiutilities.plate_parser import PlateParser
+from rnaiutilities.plate_writer import PlateWriter
+from rnaiutilities.statistics.parse_statistics import ParseStatistics
+from rnaiutilities.utility.files import usable_feature_files
 
 logger = mp.log_to_stderr()
 logger.setLevel(logging.INFO)
@@ -45,7 +49,6 @@ class Parser:
     """
     Class for parsing a folder of plates containing matlab files for the
     features.
-
     """
 
     def __init__(self, config):
@@ -66,9 +69,8 @@ class Parser:
         # TODO: this also needs to go to the config file
         self._plate_list = PlateList(
           config.plate_id_file,
-          ".*\/\w+\-\w[P|U]\-[G|K]\d+(-\w+)*\/.*"
-        )
-        # parse the folder into a map of (classifier-plate) pairs
+          ".*\/\w+\-\w[P|U]\-[G|K]\d+(-\w+)*\/.*")
+        # statistics the folder into a map of (classifier-plate) pairs
         self._layout = MetaLayout(config.layout_file)
         self._parser = PlateParser()
         self._writer = PlateWriter(self._layout)
@@ -96,10 +98,8 @@ class Parser:
 
     def _parse(self, plate):
         try:
-            platefilesets = self._filesets(
-              self._plate_folder + "/" + plate,
-              self._output_path
-            )
+            platefilesets = PlateFileSets(self._output_path + "/" + plate,
+                                          self._output_path)
             if len(platefilesets) > 1:
                 logger.warning("Found multiple plate identifiers for: " + plate)
             ret = self._parse_plate_file_sets(platefilesets)
@@ -109,123 +109,48 @@ class Parser:
             ret = -1
         return ret
 
-    @staticmethod
-    def _filesets(folder, output_path):
-        """
-        Create a list of platefile sets contained in a folder. Recursively go
-        through all the folders and add the found matlab files into the
-        respective platefile set.
-
-        :param folder: the folder that is recursively went through
-        :param output_path: the output path where the platefile set is stored to
-        :return: returns a platefilesets object
-        """
-        return PlateFileSets(folder, output_path)
-
     def _parse_plate_file_sets(self, platefilesets):
         if not isinstance(platefilesets, PlateFileSets):
             raise TypeError("no PlateFileSets object given")
         try:
             for platefileset in platefilesets:
-                # create a list of relevant files for the plateset
-                fls = self._usable_feature_files(platefileset)
-                # if all the files exist, we just skip the creation of the files
-                if any(not Path(x).exists() for x in fls):
-                    logger.info("Doing: " + " ".join(platefileset.meta))
-                    pfs, features, mapping = self._parser.parse(platefileset)
-                    if pfs is not None:
-                        self._writer.write(pfs, features, mapping)
-                else:
-                    logger.info(" ".join(map(str, platefileset.meta)) +
-                                " already exists. Skipping.")
+                self._parse_plate_file_set(platefileset)
         except Exception as ex:
             logger.error("Some error idk anything can happen here: " + str(ex))
         return 0
+
+    def _parse_plate_file_set(self, platefileset):
+        # create a list of relevant files for the plateset
+        fls = usable_feature_files(platefileset, USABLE_FEATURES)
+        # if all the files exist, we just skip the creation of the files
+        if any(not Path(x).exists() for x in fls):
+            logger.info("Doing: " + " ".join(platefileset.meta))
+            pfs, features, mapping = self._parser.parse(platefileset)
+            if pfs is not None:
+                self._writer.write(pfs, features, mapping)
+        else:
+            logger.info(" ".join(map(str, platefileset.meta)) +
+                        " already exists. Skipping.")
 
     def report(self):
         """
         Checks if all files have been parsed correctly.
 
         """
-
-        for plate in self._plate_list:
-            platefilesets = self._filesets(
-              self._output_path + "/" + plate,
-              self._output_path
-            )
-            if len(platefilesets) == 0:
-                logger.warning("{} is missing entirely".format(plate))
-            for platefileset in platefilesets:
-                usable_feature_files = self._usable_feature_files(platefileset)
-                cnt_all_files = len(usable_feature_files)
-                cnt_avail_files = sum(
-                  [Path(x).exists() for x in usable_feature_files])
-                if cnt_all_files != cnt_avail_files:
-                    logger.warning("{} has not been parsed completely -> only "
-                                   "{}/{} files there.".format(
-                      plate, cnt_avail_files, cnt_all_files))
-        logger.info("All's well that ends well")
-
-    @staticmethod
-    def _available_files(platefileset):
-        return np.unique(list(map(lambda x: x.split(".")[0],
-                                  [x.featurename.lower() for x in
-                                   platefileset.files])))
-
-    def _usable_feature_files(self, platefileset):
-        available_feature_files = self._available_files(platefileset)
-        fls = [
-            self._writer.data_filename(platefileset.outfile + "_" + x) for x in
-            USABLE_FEATURES
-        ]
-        usable_feature_files = []
-        for fl in fls:
-            if any(fl.endswith("_" + av + "_data.tsv") for av in
-                   available_feature_files):
-                usable_feature_files.append(fl)
-        return usable_feature_files
+        ParseStatistics(
+          self._plate_list, self._plate_folder, self._output_path).statistics()
 
     def check_download(self):
         """
         Checks if all files given in config have been downloaded correctly.
-
         """
-
-        logger.setLevel(logging.WARNING)
-        for plate in self._plate_list:
-            platefile_path = self._config.plate_folder + "/" + plate
-            if not Path(platefile_path).exists():
-                logger.warning("{} is missing".format(platefile_path))
-            else:
-                if self._has_correct_file_count(platefile_path):
-                    logger.info(
-                      "{} is available".format(platefile_path))
-        logger.setLevel(logging.INFO)
-
-    @staticmethod
-    def _has_correct_file_count(platefile_path):
-        for _, s, f in os.walk(platefile_path):
-            if any(re.match("20\d+-\d+", el) for el in s):
-                if len(s) > 1:
-                    logger.warning(
-                      "{} has multiple downloaded platefilesets".format(
-                        platefile_path))
-                    return False
-            if len(s):
-                continue
-            files = list(filter(lambda x: x.endswith(".mat"), f))
-            if len(files) == 0:
-                logger.warning("{} has no files".format(platefile_path))
-                return False
-        return True
+        DownloadStatistics(self._plate_list, self._plate_folder).statistics()
 
     def feature_sets(self, outfile):
         """
         Checks between all possible screens for pairwise feature overlaps.
-        The overlaps can be taken to decide which screens to
-         include in the analysis.
-
+        The overlaps can be taken to decide which screens to include.
         """
 
-        FeatureSetParser(self._plate_list, self._plate_folder, outfile).parse()
-
+        FeatureSetStatistics(
+          self._plate_list, self._plate_folder, outfile).statistics()

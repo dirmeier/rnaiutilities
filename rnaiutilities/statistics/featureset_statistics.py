@@ -23,24 +23,41 @@ import logging
 import re
 
 from tabulate import tabulate
-
-from rnaiutilities.utility import get_base_filesnames
-from rnaiutilities.utility import jaccard
+from rnaiutilities.utility.math import jaccard
+from rnaiutilities.utility.files import get_base_filesnames
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class FeatureSetParser:
+class FeatureSetStatistics:
+    """
+    Class for parsing and computing of various sets of features per screen.
+    """
+
     def __init__(self, plate_list, plate_folder, outfile):
+        """
+        Constructor
+
+        :param plate_list: the list of plates
+        :type plate_list: list(str)
+        :param plate_folder: the folder where all plates lie
+        :type plate_folder: str
+        :param outfile: the file name where everything is written to
+        :type outfile: str
+        """
+
         self._plate_list = plate_list
         self._plate_folder = plate_folder
         self._outfile = outfile
 
-    def parse(self):
-        self._parse()
+    def statistics(self):
+        """
+        Parse the counts of the feature sets and compute some statistics.
+        """
+        self._statistics()
 
-    def _parse(self):
+    def _statistics(self):
         jaccard_file, feature_file = self._get_feature_set_files(self._outfile)
         f_map = self._file_map(self._screen_map())
         self._write(jaccard_file, feature_file,
