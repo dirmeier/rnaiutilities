@@ -23,15 +23,12 @@ import logging
 import os
 import re
 
-from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file import \
-    PlateFile
-from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_set import \
-    PlateFileSet
-
 from rnaiutilities.globals import SKIPPABLE_FEATURE_NAMES, IMAGE_MAPPING_FILE, \
     IMAGE, SKIPPABLE_FEATURE_REGEX
-from rnaiutilities.utility import parse_plate_info, regex
-from rnaiutilities.utility import parse_screen_details
+from rnaiutilities.plate.plate_file import PlateFile
+from rnaiutilities.plate.plate_file_set import PlateFileSet
+from rnaiutilities.utility import regex
+from rnaiutilities.utility.regex import parse_plate_info, parse_screen_details
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

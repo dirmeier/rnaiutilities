@@ -23,7 +23,7 @@ import logging
 
 import numpy
 
-from rnaiutilities.plate.plate_cell_features import FeatureMatrix
+from rnaiutilities.plate.plate_feature_matrix import FeatureMatrix
 from rnaiutilities.plate.plate_file_set import PlateFileSet
 from rnaiutilities.plate.plate_sirna_gene_mapping import PlateSirnaGeneMapping
 from rnaiutilities.utility.files import load_matlab

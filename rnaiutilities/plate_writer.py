@@ -88,8 +88,8 @@ class PlateWriter:
             nimg = features[0].values.shape[0]
             assert nimg == len(mapping)
             self._dump_images(nimg, layout, mapping, features, f, header)
-
         self._write_meta(filename, feature_names)
+
         return 0
 
     def _dump_images(self, nimg, layout, mapping, features, f, header):
@@ -132,6 +132,6 @@ class PlateWriter:
             with open(meat_file, "w") as m:
                 yaml.dump(h, m, default_flow_style=False)
         except Exception as e:
-            logger.error("Some IO-error writing to meta file: {}"
-                         .format(meat_file))
+            logger.error(
+              "Some IO-error writing to meta file: {}".format(meat_file))
             logger.error(str(e))

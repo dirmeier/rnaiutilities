@@ -22,7 +22,7 @@
 import logging
 import re
 
-from rnaiutilities.utility import load_matlab
+from rnaiutilities.utility.files import load_matlab
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

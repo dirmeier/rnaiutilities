@@ -28,7 +28,19 @@ logger.setLevel(logging.INFO)
 
 
 class PlateLayout(object):
+    """
+    Class for the sirna/gene layout for wells, i.e., the mapping of wells
+     to sirnas/genes.
+    """
+
     def __init__(self, classifier, geneset, library):
+        """
+        Constructor.
+
+        :param classifier: the plate classifier
+        :param geneset: ?
+        :param library: ?
+        """
         self._classifier = classifier
         self._geneset = geneset
         self._library = library
