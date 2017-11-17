@@ -59,7 +59,7 @@ class LibraryPlateLayout:
 
     def _add(self, tokens):
         bar, expr, _, geneset, _, library, _, _, well, \
-        well_type, gene, sirna = tokens
+         well_type, gene, sirna = tokens
         classifier = (expr + "-" + bar)
         if classifier not in self._meta:
             self._meta[classifier] = PlateLayout(classifier, geneset, library)

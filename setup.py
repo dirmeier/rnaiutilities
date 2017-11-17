@@ -3,7 +3,7 @@ from sys import version_info, exit
 
 
 if version_info[0] == 2:
-    exit("Sorry, Python 2 is not supported")
+    exit("Sorry, Python 2 is not supported. Move to Python 3 already.")
 
 
 def readme():
@@ -12,7 +12,7 @@ def readme():
 
 setup(
   name='rnaiutilities',
-  version='0.1.3.post2',
+  version='0.2',
   description='A collection of commandline tools and python modules '
               'for working with image-based RNAi screens.',
   long_description=readme(),
@@ -23,7 +23,7 @@ setup(
   keywords='rnai utilities microscopy cellprofiler perturbation',
   packages=find_packages(),
   scripts=['scripts/rnai-query',
-           'scripts/rnai-statistics'],
+           'scripts/rnai-parse'],
   python_requires='>=3',
   install_requires=[
       'h5py>=2.7.0',

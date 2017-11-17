@@ -45,31 +45,30 @@ def featuresets(config, outfile):
     """
 
     c = Config(config)
-    Parser(c).feature_sets(outfile)
+    Parser(c).featureset_statistics(outfile)
 
 
 @cli.command()
 @click.argument("config", type=str)
 def checkdownload(config):
     """
-    Checks if all files from CONFIG have been downloaded correctly.
-
+    Checks if all files from CONFIG have been downloaded correctly and
+    computes some statistics
     """
 
     c = Config(config)
-    Parser(c).check_download()
+    Parser(c).download_statistics()
 
 
 @cli.command()
 @click.argument("config", type=str)
-def report(config):
+def statistics(config):
     """
-    Creates a report if all files from CONFIG have been parsed correctly.
-
+    Computes statistics if all files from CONFIG have been parsed correctly.
     """
 
     c = Config(config)
-    Parser(c).report()
+    Parser(c).parse_statistics()
 
 
 @cli.command()
@@ -77,7 +76,6 @@ def report(config):
 def parse(config):
     """
     Parses image-based RNAi screening files to flat tsvs from a CONFIG file.
-
     """
 
     c = Config(config)

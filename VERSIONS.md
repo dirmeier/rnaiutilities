@@ -1,5 +1,9 @@
 ## Versions
 
+### 0.2
+
+* Overhaul to complete package and modularization
+* Update of documentation
 
 ### 0.1.3
 

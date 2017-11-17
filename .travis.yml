@@ -16,7 +16,7 @@ install:
 
 script:
   - rnai-query query --help
-  - rnai-statistics report --help
+  - rnai-parse report --help
   - py.test --cov=./
 
 after_success:
