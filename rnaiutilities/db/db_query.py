@@ -23,11 +23,11 @@ import logging
 import re
 from itertools import chain
 
-from rnaiutilities.rnaiquery.db.db_setup import DatabaseInserter
-from rnaiutilities.rnaiquery.filesets.table_file_set import TableFileSet
-from rnaiutilities.rnaiquery.globals import FEATURECLASS, WELL
-from rnaiutilities.rnaiquery.globals import GENE, SIRNA, LIBRARY, DESIGN
-from rnaiutilities.rnaiquery.globals import REPLICATE, PLATE, STUDY, PATHOGEN
+from rnaiutilities.db import DatabaseInserter
+from rnaiutilities.filesets.table_file_set import TableFileSet
+from rnaiutilities.globals import FEATURECLASS, WELL
+from rnaiutilities.globals import GENE, SIRNA, LIBRARY, DESIGN
+from rnaiutilities.globals import REPLICATE, PLATE, STUDY, PATHOGEN
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

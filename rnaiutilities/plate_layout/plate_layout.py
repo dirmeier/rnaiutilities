@@ -21,8 +21,7 @@
 
 import logging
 
-from rnaiutilities.rnaiparser.plate_layout.plate_well import PlateWell
-
+from rnaiutilities.plate_layout.plate_well import PlateWell
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

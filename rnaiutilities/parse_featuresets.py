@@ -19,13 +19,13 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
-import re
 import logging
+import re
+
 from tabulate import tabulate
 
-from rnaiutilities.rnaiparser.utility.math import jaccard
-
-from rnaiutilities.rnaiparser.utility.io import get_base_filesnames
+from rnaiutilities.utility import get_base_filesnames
+from rnaiutilities.utility import jaccard
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

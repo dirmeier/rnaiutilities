@@ -22,7 +22,8 @@
 import logging
 import re
 from pathlib import Path
-from rnaiutilities.rnaiparser.utility import check_feature_group
+
+from rnaiutilities.utility import check_feature_group
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

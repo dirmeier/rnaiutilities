@@ -20,13 +20,14 @@
 
 
 import logging
-import numpy
 
-from rnaiutilities.rnaiparser.plate_file_set_generator import PlateFileSet
-from rnaiutilities.rnaiparser.utility import load_matlab
-from rnaiutilities.rnaiparser.plate_sirna_gene_mapping import \
-    PlateSirnaGeneMapping
+import numpy
 from rnaiutilities.rnaiparser.plate_cell_features import PlateCellFeature
+from rnaiutilities.rnaiparser.plate_file_set_generator import PlateFileSet
+
+from rnaiutilities.plate_sirna_gene_mapping import \
+    PlateSirnaGeneMapping
+from rnaiutilities.utility import load_matlab
 
 logger = logging.getLogger(__name__)
 

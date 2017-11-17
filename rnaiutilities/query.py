@@ -21,9 +21,9 @@
 
 import logging
 
-from rnaiutilities.rnaiquery.db.dbms import DBMS
-from rnaiutilities.rnaiquery.filesets import table_file_sets
-from rnaiutilities.rnaiquery.result_set import ResultSet
+from rnaiutilities.db.dbms import DBMS
+from rnaiutilities.filesets import table_file_sets
+from rnaiutilities.result_set import ResultSet
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)

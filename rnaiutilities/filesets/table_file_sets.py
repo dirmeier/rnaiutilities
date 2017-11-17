@@ -19,7 +19,7 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
-from rnaiutilities.rnaiquery.db import DBMS
+from rnaiutilities.db import DBMS
 
 
 class TableFileSets:

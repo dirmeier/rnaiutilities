@@ -19,7 +19,45 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
-from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_sets import \
-    PlateFileSets
-from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_set import \
-    PlateFileSet
+import re
+
+NONE = "none"
+
+GENE = "gene"
+SIRNA = "sirna"
+WELL = "well"
+
+STUDY = "study"
+PATHOGEN = "pathogen"
+LIBRARY = "library"
+DESIGN = "design"
+REPLICATE = "replicate"
+PLATE = "plate"
+FEATURECLASS = "featureclass"
+
+FEATURES = "features"
+ELEMENTS = "elements"
+SAMPLE = "sample"
+
+BSCORE = "bscore"
+LOESS = "loess"
+ZSCORE = "zscore"
+
+
+FILE_FEATURES_REGEX = re.compile(
+  "(\w+)-(\w+)-(\w+)-(\w+)-(\w+)-(\d+)-(.*)_(\w+)")
+
+ADDED_COLUMNS_FOR_PRINTING = {
+    'cells': [
+        'parent_nuclei',
+        'children_invasomes_count',
+        'children_bacteria_count'
+    ]
+}
+
+USABLE_FEATURES = ["bacteria",
+                   "cells",
+                   "nuclei",
+                   "perinuclei",
+                   "expandednuclei",
+                   "invasomes"]

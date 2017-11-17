@@ -22,8 +22,8 @@
 import logging
 import sqlite3
 
-from rnaiutilities.rnaiquery.db.database_connection import DatabaseConnection
-from rnaiutilities.rnaiquery.globals import GENE, SIRNA, WELL
+from rnaiutilities.db import DatabaseConnection
+from rnaiutilities.globals import GENE, SIRNA, WELL
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

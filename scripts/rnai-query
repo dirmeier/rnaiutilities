@@ -22,10 +22,11 @@
 
 
 import logging
+
 import click
 
 from rnaiutilities import Query
-from rnaiutilities.rnaiquery.globals import ZSCORE, BSCORE, LOESS, NONE
+from rnaiutilities.globals import ZSCORE, BSCORE, LOESS, NONE
 
 logger = logging.getLogger(__name__)
 

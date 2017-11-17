@@ -21,11 +21,10 @@
 
 import logging
 
-from rnaiutilities.rnaiquery.db.db_query import DatabaseQuery
-from rnaiutilities.rnaiquery.db.db_setup import DatabaseInserter
-from rnaiutilities.rnaiquery.db.postgres_connection import PostgresConnection
-from rnaiutilities.rnaiquery.db.sqlite_connection import SQLiteConnection
-
+from rnaiutilities.db import DatabaseInserter
+from rnaiutilities.db import DatabaseQuery
+from rnaiutilities.db import PostgresConnection
+from rnaiutilities.db import SQLiteConnection
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

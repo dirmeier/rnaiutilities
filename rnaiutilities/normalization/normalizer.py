@@ -24,7 +24,7 @@ import logging
 import numpy
 import pandas
 
-from rnaiutilities.rnaiquery.globals import BSCORE, ZSCORE, LOESS, NONE
+from rnaiutilities.globals import BSCORE, ZSCORE, LOESS, NONE
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

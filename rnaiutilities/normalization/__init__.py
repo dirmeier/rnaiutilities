@@ -18,5 +18,3 @@
 # @author = 'Simon Dirmeier'
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
-from .config import Config
-from .parser import Parser

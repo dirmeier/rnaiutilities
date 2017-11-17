@@ -18,4 +18,6 @@
 # @author = 'Simon Dirmeier'
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
-from rnaiutilities.rnaiquery.normalization.normalizer import Normalizer
+
+from rnaiutilities.plate_file_set_generator.plate_file_sets import \
+    PlateFileSets

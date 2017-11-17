@@ -20,22 +20,22 @@
 
 
 import logging
+import multiprocessing as mp
 import os
 import re
 from pathlib import Path
-import numpy as np
-import multiprocessing as mp
 
+import numpy as np
 from rnaiutilities.rnaiparser.globals import USABLE_FEATURES
 from rnaiutilities.rnaiparser.parse_featuresets import FeatureSetParser
-from rnaiutilities.rnaiparser.plate_list import PlateList
-from rnaiutilities.rnaiparser.config import Config
-from rnaiutilities.rnaiparser.plate_file_set_generator.plate_file_sets import \
-    PlateFileSets
 from rnaiutilities.rnaiparser.plate_layout import MetaLayout
+from rnaiutilities.rnaiparser.plate_list import PlateList
 from rnaiutilities.rnaiparser.plate_parser import PlateParser
 from rnaiutilities.rnaiparser.plate_writer import PlateWriter
 
+from rnaiutilities.config import Config
+from rnaiutilities.plate_file_set_generator.plate_file_sets import \
+    PlateFileSets
 
 logger = mp.log_to_stderr()
 logger.setLevel(logging.INFO)

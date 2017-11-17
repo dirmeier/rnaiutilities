@@ -24,12 +24,12 @@ import os
 
 import numpy as np
 import pandas
-
 from rnaiutilities.rnaiquery.filesets.table_file_set import TableFileSet
-from rnaiutilities.rnaiquery.globals import WELL, GENE, SIRNA, \
-    SAMPLE, ADDED_COLUMNS_FOR_PRINTING
-from rnaiutilities.rnaiquery.io.io import IO
 from rnaiutilities.rnaiquery.normalization.normalizer import Normalizer
+
+from rnaiutilities.globals import WELL, GENE, SIRNA, \
+    SAMPLE, ADDED_COLUMNS_FOR_PRINTING
+from rnaiutilities.io.io import IO
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

@@ -21,12 +21,13 @@
 
 import logging
 import os
+
 import yaml
 
-from rnaiutilities.rnaiquery.globals import FEATURECLASS, FEATURES, ELEMENTS
-from rnaiutilities.rnaiquery.globals import FILE_FEATURES_REGEX
-from rnaiutilities.rnaiquery.globals import GENE, SIRNA, WELL, LIBRARY, DESIGN
-from rnaiutilities.rnaiquery.globals import REPLICATE, PLATE, STUDY, PATHOGEN
+from rnaiutilities.globals import FEATURECLASS, FEATURES, ELEMENTS
+from rnaiutilities.globals import FILE_FEATURES_REGEX
+from rnaiutilities.globals import GENE, SIRNA, WELL, LIBRARY, DESIGN
+from rnaiutilities.globals import REPLICATE, PLATE, STUDY, PATHOGEN
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
