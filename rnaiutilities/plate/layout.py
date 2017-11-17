@@ -21,7 +21,7 @@
 
 import logging
 
-from rnaiutilities.plate_layout import PlateLayout
+from rnaiutilities.plate import PlateLayout
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

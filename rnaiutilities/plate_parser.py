@@ -25,7 +25,7 @@ import numpy
 from rnaiutilities.rnaiparser.plate_cell_features import PlateCellFeature
 from rnaiutilities.rnaiparser.plate_file_set_generator import PlateFileSet
 
-from rnaiutilities.plate_sirna_gene_mapping import \
+from rnaiutilities.plate.plate_sirna_gene_mapping import \
     PlateSirnaGeneMapping
 from rnaiutilities.utility import load_matlab
 

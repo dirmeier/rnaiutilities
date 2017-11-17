@@ -23,7 +23,7 @@ import logging
 from pathlib import Path
 
 from rnaiutilities.globals import USABLE_FEATURES
-from rnaiutilities.plate_file_set_generator import PlateFileSets
+from rnaiutilities.plate.plate_file_set_generator import PlateFileSets
 from rnaiutilities.utility.files import usable_feature_files
 
 logger = logging.getLogger(__name__)

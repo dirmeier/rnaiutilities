@@ -18,6 +18,9 @@
 # @author = 'Simon Dirmeier'
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
+"""
+
+"""
 
 import logging
 import os
@@ -38,7 +41,6 @@ logger.setLevel(logging.INFO)
 class ResultSet:
     """
     Set of results derived from a database query.
-
     """
 
     _filter_attributes_ = [GENE, SIRNA, WELL, SAMPLE]

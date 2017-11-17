@@ -26,18 +26,16 @@ import logging
 import multiprocessing as mp
 from pathlib import Path
 
-import numpy as np
-
 from rnaiutilities.config import Config
 from rnaiutilities.globals import USABLE_FEATURES
-from rnaiutilities.statistics.download_statistics import DownloadStatistics
-from rnaiutilities.statistics.featureset_statistics import FeatureSetStatistics
-from rnaiutilities.plate_file_set_generator.plate_file_sets import \
+from rnaiutilities.plate.layout import MetaLayout
+from rnaiutilities.plate.plate_file_sets import \
     PlateFileSets
-from rnaiutilities.plate_layout.layout import MetaLayout
-from rnaiutilities.plate_list import PlateList
+from rnaiutilities.plate.plate_list import PlateList
 from rnaiutilities.plate_parser import PlateParser
 from rnaiutilities.plate_writer import PlateWriter
+from rnaiutilities.statistics.download_statistics import DownloadStatistics
+from rnaiutilities.statistics.featureset_statistics import FeatureSetStatistics
 from rnaiutilities.statistics.parse_statistics import ParseStatistics
 from rnaiutilities.utility.files import usable_feature_files
 
@@ -132,24 +130,25 @@ class Parser:
             logger.info(" ".join(map(str, platefileset.meta)) +
                         " already exists. Skipping.")
 
-    def report(self):
+    def parse_statistics(self):
         """
-        Checks if all files have been parsed correctly.
+        Computes parsing statistics.
 
         """
         ParseStatistics(
           self._plate_list, self._plate_folder, self._output_path).statistics()
 
-    def check_download(self):
+    def download_statistics(self):
         """
-        Checks if all files given in config have been downloaded correctly.
+        Computes download statistics if all files given in config have been
+        downloaded correctly.
         """
         DownloadStatistics(self._plate_list, self._plate_folder).statistics()
 
-    def feature_sets(self, outfile):
+    def featureset_statistics(self, outfile):
         """
-        Checks between all possible screens for pairwise feature overlaps.
-        The overlaps can be taken to decide which screens to include.
+        Computes statistics between all possible screens for pairwise feature
+         overlaps. The overlaps can be taken to decide which screens to include.
         """
 
         FeatureSetStatistics(

@@ -44,7 +44,8 @@ class PlateCellFeature:
         self._filename = filename
         self._n_cells_per_image = n_cells_per_image
         self._featurename = featurename.lower()
-        self._feature_group, self._short_feature_name = self._featurename.split(".")[0:2]
+        self._feature_group, self._short_feature_name =\
+            self._featurename.split(".")[0:2]
         assert (shape(self._mat)[0] == self._n_images)
         assert (shape(self._mat)[1] == self._n_max_cells_count)
 

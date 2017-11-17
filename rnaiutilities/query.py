@@ -23,7 +23,7 @@ import logging
 
 from rnaiutilities.db.dbms import DBMS
 from rnaiutilities.filesets import table_file_sets
-from rnaiutilities.result_set import ResultSet
+from rnaiutilities.query_result_set import ResultSet
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)

@@ -18,6 +18,9 @@
 # @author = 'Simon Dirmeier'
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
+"""
+
+"""
 
 class TableFileSet:
     def __init__(self, key, query_result, features, **kwargs):
