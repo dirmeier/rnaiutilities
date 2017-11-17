@@ -22,22 +22,21 @@
 import logging
 import yaml
 
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
 class Config:
+    __PLATE_REGEX__ = "plate_regex"
     __PLATE_ID_FILE__ = "plate_id_file"
     __LAYOUT_FILE__ = "layout_file"
     __PLATE_FOLDER__ = "plate_folder"
     __OUTPUT_PATH__ = "output_path"
     __MULTI_PROCESSING__ = "multiprocessing"
-    __CONFIG__ = \
-        [
-            __PLATE_FOLDER__, __PLATE_ID_FILE__, __LAYOUT_FILE__,
-            __MULTI_PROCESSING__, __OUTPUT_PATH__
-        ]
+    __CONFIG__ = [
+        __PLATE_FOLDER__, __PLATE_ID_FILE__, __LAYOUT_FILE__,
+        __MULTI_PROCESSING__, __OUTPUT_PATH__, __PLATE_REGEX__
+    ]
 
     def __init__(self, credentials):
         with open(credentials, 'r') as f:
@@ -45,7 +44,7 @@ class Config:
             for credential in Config.__CONFIG__:
                 if credential not in doc:
                     logger.error(
-                        "Could not find credential: " + str(credential))
+                      "Could not find credential: " + str(credential))
                     exit(-1)
                 setattr(self, "_" + credential, doc[credential])
 
@@ -68,3 +67,7 @@ class Config:
     @property
     def plate_folder(self):
         return getattr(self, "_" + Config.__PLATE_FOLDER__)
+
+    @property
+    def plate_regex(self):
+        return getattr(self, "_" + Config.__PLATE_REGEX__)

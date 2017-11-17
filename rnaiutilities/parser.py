@@ -51,7 +51,7 @@ class Parser:
 
     def __init__(self, config):
         """
-        Constructor for Parser.
+        Constructor for from the command line.
 
         :param config: a configuration for file parsing
         :type config: Config
@@ -66,8 +66,7 @@ class Parser:
         # only take files with regex pooled/unpooled genome/kinome
         # TODO: this also needs to go to the config file
         self._plate_list = PlateList(
-          config.plate_id_file,
-          ".*\/\w+\-\w[P|U]\-[G|K]\d+(-\w+)*\/.*")
+          config.plate_id_file, config.plate_regex)
         # statistics the folder into a map of (classifier-plate) pairs
         self._layout = MetaLayout(config.layout_file)
         self._parser = PlateParser()
