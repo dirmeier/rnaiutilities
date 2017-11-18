@@ -38,4 +38,4 @@ class TestPlain(unittest.TestCase):
 
     def test_no_featurclass_raises_error(self):
         with pytest.raises(ValueError):
-            self._q.query(featureclass="test")
+            self._q.compose(featureclass="test")
