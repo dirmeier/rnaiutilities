@@ -91,7 +91,7 @@ class Query:
                            plate=plate,
                            featureclass=featureclass)
 
-    def query(self,
+    def compose(self,
               file_name=None,
               study=None,
               pathogen=None,
@@ -173,7 +173,7 @@ class Query:
         with DBMS(self._db) as d:
             d.insert(path)
 
-    def select(self, select,
+    def query(self, select,
                study=None,
                pathogen=None,
                library=None,

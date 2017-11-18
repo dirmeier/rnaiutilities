@@ -21,8 +21,8 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
-import click
 import logging
+import click
 
 from rnaiutilities import Parser
 from rnaiutilities import Config
@@ -62,7 +62,7 @@ def checkdownload(config):
 
 @cli.command()
 @click.argument("config", type=str)
-def statistics(config):
+def parsereport(config):
     """
     Computes statistics if all files from CONFIG have been parsed correctly.
     """

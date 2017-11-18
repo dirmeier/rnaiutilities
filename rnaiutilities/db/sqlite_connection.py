@@ -22,7 +22,7 @@
 import logging
 import sqlite3
 
-from rnaiutilities.db import DatabaseConnection
+from rnaiutilities.db.database_connection import DatabaseConnection
 from rnaiutilities.globals import GENE, SIRNA, WELL
 
 logger = logging.getLogger(__name__)

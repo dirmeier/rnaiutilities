@@ -18,21 +18,18 @@
 # @author = 'Simon Dirmeier'
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
-"""
-
-"""
 
 import logging
 import os
 
 import numpy as np
 import pandas
-from rnaiutilities.rnaiquery.filesets.table_file_set import TableFileSet
-from rnaiutilities.rnaiquery.normalization.normalizer import Normalizer
 
+from rnaiutilities.filesets.table_file_set import TableFileSet
 from rnaiutilities.globals import WELL, GENE, SIRNA, \
     SAMPLE, ADDED_COLUMNS_FOR_PRINTING
 from rnaiutilities.io.io import IO
+from rnaiutilities.normalization.normalizer import Normalizer
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

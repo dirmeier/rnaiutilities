@@ -23,7 +23,7 @@ import logging
 
 import psycopg2
 
-from rnaiutilities.db import DatabaseConnection
+from rnaiutilities.db.database_connection import DatabaseConnection
 from rnaiutilities.globals import GENE, SIRNA, WELL
 
 logger = logging.getLogger(__name__)
