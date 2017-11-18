@@ -21,6 +21,4 @@
 
 from rnaiutilities.parser import Config
 from rnaiutilities.parser import Parser
-from rnaiutilities.config import Config
-from rnaiutilities.parser import Parser
 from rnaiutilities.query import Query

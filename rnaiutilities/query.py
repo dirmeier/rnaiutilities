@@ -92,18 +92,18 @@ class Query:
                            featureclass=featureclass)
 
     def compose(self,
-              file_name=None,
-              study=None,
-              pathogen=None,
-              library=None,
-              design=None,
-              replicate=None,
-              plate=None,
-              gene=None,
-              sirna=None,
-              well=None,
-              featureclass=None,
-              sample=None):
+                file_name=None,
+                study=None,
+                pathogen=None,
+                library=None,
+                design=None,
+                replicate=None,
+                plate=None,
+                gene=None,
+                sirna=None,
+                well=None,
+                featureclass=None,
+                sample=None):
         """
         Query a database of image-based RNAi screening features for
          cells/bacteria/nuclei.
@@ -142,7 +142,7 @@ class Query:
             featureclass = ",".join(Query.__selectable_features__)
 
         return self._query(file_name,
-          sample=sample,
+                           sample=sample,
                            study=study,
                            pathogen=pathogen,
                            library=library,
@@ -174,16 +174,16 @@ class Query:
             d.insert(path)
 
     def query(self, select,
-               study=None,
-               pathogen=None,
-               library=None,
-               design=None,
-               replicate=None,
-               plate=None,
-               gene=None,
-               sirna=None,
-               well=None,
-               featureclass=None):
+              study=None,
+              pathogen=None,
+              library=None,
+              design=None,
+              replicate=None,
+              plate=None,
+              gene=None,
+              sirna=None,
+              well=None,
+              featureclass=None):
         """
         Submits a select query to a database of image-based RNAi screening meta
         features to get an overview over meta information. The query returns

@@ -20,9 +20,7 @@
 
 
 import logging
-
 import numpy
-import pandas
 
 from rnaiutilities.globals import BSCORE, ZSCORE, LOESS, NONE
 
@@ -93,7 +91,7 @@ class Normalizer:
         # do normalisations on the fly
         for normal in self._normalize:
             f = self.__getattribute__("_" + normal)
-            df, well_df = f(df, None, feature_columns)
+            df, _ = f(df, None, feature_columns)
 
         return df
 

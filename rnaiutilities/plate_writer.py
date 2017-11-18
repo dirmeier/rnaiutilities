@@ -83,17 +83,18 @@ class PlateWriter:
         header = PlateWriter._meta_ + feature_names
         dat_file = data_filename(filename)
 
+        meat_hash = {}
         with open(dat_file, "w") as f:
             f.write("\t".join(header) + "\n")
             nimg = features[0].values.shape[0]
             assert nimg == len(mapping)
-            self._dump_images(nimg, layout, mapping, features, f, header)
-        self._write_meta(filename, feature_names)
+            self._dump_images(
+              nimg, layout, mapping, features, f, header, meat_hash)
+        self._write_meta(filename, meat_hash, feature_names)
 
         return 0
 
-    def _dump_images(self, nimg, layout, mapping, features, f, header):
-        meat_hash = {}
+    def _dump_images(self, nimg, layout, mapping, features, f, header, meat):
         meta = [PlateWriter.__NA__] * len(PlateWriter._meta_)
         for iimg in range(nimg):
             well = mapping[iimg]
@@ -103,7 +104,7 @@ class PlateWriter:
                 meta[2] = layout.sirna(well)
                 meta[3] = layout.welltype(well)
             meta[4] = iimg + 1
-            meat_hash[";".join(map(str, meta[:4]))] = 1
+            meat[";".join(map(str, meta[:4]))] = 1
             self._dump_cells(features, iimg, meta, f, header)
 
     @staticmethod

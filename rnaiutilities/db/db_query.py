@@ -132,7 +132,8 @@ class DatabaseQuery:
         ]
         return fls
 
-    def __read_query_file(self, file_name):
+    @staticmethod
+    def __read_query_file(file_name):
         res = []
         with open(file_name, "r") as fh:
             for line in fh.readlines():
