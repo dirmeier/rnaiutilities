@@ -23,7 +23,6 @@ import sys
 import logging
 
 from rnaiutilities.db.dbms import DBMS
-from rnaiutilities.filesets.table_file_sets import TableFileSets
 from rnaiutilities.query_result_set import ResultSet
 
 logger = logging.getLogger(__name__)
@@ -51,8 +50,6 @@ class Query:
         """
 
         self._db = db
-        # filesets of meta files
-        self._table = TableFileSets(db)
 
     def query(self,
               study=None,
@@ -87,8 +84,9 @@ class Query:
                            featureclass=self._featureclass(featureclass))
 
     def _query(self, **kwargs):
-        fls = self._table.print(**kwargs)
-        return fls
+        with DBMS(self._db) as d:
+            res = d.print(**kwargs)
+        return res
 
     @staticmethod
     def _featureclass(featureclass):
@@ -157,8 +155,9 @@ class Query:
                              featureclass=self._featureclass(featureclass))
 
     def _compose(self, file_name, **kwargs):
-        fls = self._table.filter(file_name, **kwargs)
-        return ResultSet(fls, **kwargs)
+        with DBMS(self._db) as d:
+            res = d.query(file_name, **kwargs)
+        return ResultSet(res, **kwargs)
 
     def insert(self, path):
         """
