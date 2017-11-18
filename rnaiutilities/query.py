@@ -38,7 +38,7 @@ class Query:
         "Currently only featureclasses {} are supported.".format(
           "/".join(__selectable_features__))
     __exit_wrong_filter__ = "Please provide one of: ({})".format(
-        ",".join(__filterable_features__))
+      ",".join(__filterable_features__))
 
     def __init__(self, db=None):
         """
@@ -243,6 +243,13 @@ class Query:
                             featureclass=featureclass)
 
     def _select(self, select, **kwargs):
+        self._check_select(select, **kwargs)
+        with DBMS(self._db) as d:
+            res = d.select(select, **kwargs)
+        return res
+
+    @staticmethod
+    def _check_select(select, **kwargs):
         # check if the value to select for is correct
         if select not in Query.__filterable_features__:
             sys.exit(Query.__exit_wrong_filter__)
@@ -250,10 +257,5 @@ class Query:
         # check if user provided a filter for X that also is selected for
         for k, v in kwargs.items():
             if k == select and v is not None:
-                sys.exit(
-                  "You are selecting and filtering on '{}' "
-                  "at the same time. Drop the filter.".format(select))
-
-        with DBMS(self._db) as d:
-            res = d.select(select, **kwargs)
-        return res
+                sys.exit("You are selecting and filtering on '{}' "
+                         "at the same time. Drop the filter.".format(select))

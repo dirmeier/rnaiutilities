@@ -18,7 +18,13 @@
 # @author = 'Simon Dirmeier'
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
+"""
+Module related to all data base managment function, i.e., writing/selecting or
+ opening DB connections.
+"""
 
+
+import sys
 import logging
 
 from rnaiutilities.db.db_query import DatabaseQuery
@@ -31,43 +37,58 @@ logger.setLevel(logging.INFO)
 
 
 class DBMS:
-    _postgres_ = "postgres"
-    _sqlite_ = "sqlite"
+    """
+    Class for opening and working with data bases.
+    """
+
+    _SQLITE_ = "sqlite"
 
     def __init__(self, db=None):
+        """
+        Create an instance of a DBMS which allows opening a SQLite database
+        connection and writing to it. The database parameter `db` should be
+        a filename which stores the data base tables and indexes.
+
+        :param db: the name of the data base to access or write, .e.g., 'db.db'
+        :type db: str
+        """
         self._db_path = db
         self.__connection = None
         if db is None:
-            self._db = DBMS._postgres_
+            sys.exit("Set a database path.")
         else:
-            self._db = DBMS._sqlite_
+            self._db = DBMS._SQLITE_
 
     def __enter__(self):
         try:
-            if self._db != DBMS._sqlite_:
+            if self._db != DBMS._SQLITE_:
                 self.__connection = PostgresConnection()
             else:
                 self.__connection = SQLiteConnection(self._db_path)
         except Exception as e:
-            logger.error("Could not connect" + str(e))
-            exit()
+            sys.exit("Could not connect: " + str(e))
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.__connection.close()
 
     def query(self, file_name, **kwargs):
+        # TODO: this needs changing,
+        # separate the two things
         q = DatabaseQuery(self.__connection)
         return q.query(file_name, **kwargs)
 
     def print(self, **kwargs):
+        # TODO: this needs changing
         q = DatabaseQuery(self.__connection)
         return q.print(**kwargs)
 
     def insert(self, path):
+        # TODO: this needs changing
         d = DatabaseInserter(self.__connection)
         d.insert(path)
 
     def select(self, select, **kwargs):
+        # TODO: this needs changing
         q = DatabaseQuery(self.__connection)
         return q.select(select, **kwargs)
