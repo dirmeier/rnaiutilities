@@ -122,7 +122,7 @@ def insert(path, db):
   default=None,
   help="The featureclass to query for, e.g. like 'cells'.")
 def select(select, db, study, pathogen, library, design, replicate, plate,
-  gene, sirna, well, featureclass):
+           gene, sirna, well, featureclass):
     """
     Submits a SELECT query to the database for a single attribute.
     """
@@ -164,7 +164,7 @@ def select(select, db, study, pathogen, library, design, replicate, plate,
   "--from-file",
   default=None,
   help="Input file in case you already queried the database using"
-       "rnai-query print.")
+       "`rnai-query query`.")
 @click.option(
   "--study",
   default=None,
@@ -233,10 +233,10 @@ def select(select, db, study, pathogen, library, design, replicate, plate,
   is_flag=True,
   help="Print some debug info and skip writing to file.")
 def compose(outfile, db, normalize, from_file,
-          study, pathogen, library, design, replicate, plate,
-          gene, sirna, well,
-          featureclass, sample,
-          debug):
+            study, pathogen, library, design, replicate, plate,
+            gene, sirna, well,
+            featureclass, sample,
+            debug):
     """
     Query and sample single cells or bacteria and write to an OUTFILE.
     """
@@ -245,18 +245,18 @@ def compose(outfile, db, normalize, from_file,
         logger.setLevel(logging.DEBUG)
         logger.debug("Debug mode.")
 
-    res = Query(db).compose(file_name=from_file,
-                  study=study,
-                  pathogen=pathogen,
-                  library=library,
-                  design=design,
-                  replicate=replicate,
-                  plate=plate,
-                  gene=gene,
-                  sirna=sirna,
-                  well=well,
-                  featureclass=featureclass,
-                  sample=sample)
+    res = Query(db).compose(from_file=from_file,
+                            study=study,
+                            pathogen=pathogen,
+                            library=library,
+                            design=design,
+                            replicate=replicate,
+                            plate=plate,
+                            gene=gene,
+                            sirna=sirna,
+                            well=well,
+                            featureclass=featureclass,
+                            sample=sample)
     if debug:
         for r in res:
             logger.debug(r.detail())
@@ -304,12 +304,12 @@ def query(outfile, db, study, pathogen, library, design, replicate, plate,
     """
 
     fls = Query(db).query(study=study,
-                  pathogen=pathogen,
-                  library=library,
-                  design=design,
-                  replicate=replicate,
-                  plate=plate,
-                  featureclass=featureclass)
+                          pathogen=pathogen,
+                          library=library,
+                          design=design,
+                          replicate=replicate,
+                          plate=plate,
+                          featureclass=featureclass)
 
     with open(outfile, "a") as fh:
         for f in fls:

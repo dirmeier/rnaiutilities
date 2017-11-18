@@ -19,10 +19,11 @@
 # @email = 'simon.dirmeier@bsse.ethz.ch'
 
 
+import sys
 import logging
 
 from rnaiutilities.db.dbms import DBMS
-from rnaiutilities.filesets import table_file_sets
+from rnaiutilities.filesets.table_file_sets import TableFileSets
 from rnaiutilities.query_result_set import ResultSet
 
 logger = logging.getLogger(__name__)
@@ -30,25 +31,30 @@ logger.setLevel(logging.WARNING)
 
 
 class Query:
-    # TODO: put this to another place
     __selectable_features__ = ["cells", "perinuclei", "nuclei"]
     __filterable_features__ = ["study", "pathogen", "library",
                                "design", "gene", "sirna", "well",
                                "featureclass", "plate"]
+    __exit_wrong_feat_class__ = \
+        "Currently only featureclasses {} are supported.".format(
+          "/".join(__selectable_features__))
+    __exit_wrong_filter__ = "Please provide one of: ({})".format(
+        ",".join(__filterable_features__))
 
     def __init__(self, db=None):
         """
-        Create an instance to query a data.base
+        Create an instance to query a database
 
-        :param db: if provided the filename of a sqlite database
+        :param db: if provided the filename of a sqlite database otherwise a db
+         that listens on port 5432.
         :type db: str
         """
 
         self._db = db
         # filesets of meta files
-        self._table = table_file_sets.TableFileSets(db)
+        self._table = TableFileSets(db)
 
-    def print(self,
+    def query(self,
               study=None,
               pathogen=None,
               library=None,
@@ -57,8 +63,8 @@ class Query:
               plate=None,
               featureclass=None):
         """
-        Query a database of image-based RNAi screening features for cells/bacteria/nuclei.
-         The result will be printed to stdout.
+        Query a database of image-based RNAi screening features for
+         cells/bacteria/nuclei. The result will be printed to stdout.
 
         :param study: filters by study, e.g.
          'infectx'/'group_cossart'/'infectx_published'
@@ -72,27 +78,31 @@ class Query:
          e.g. 'nuclei'/'cells'/'bacteria'
         """
 
-        # TODO put this to another place
-        if featureclass is not None:
-            features = featureclass.split(",")
-            for feature in features:
-                if feature.lower() not in Query.__selectable_features__:
-                    raise ValueError(
-                      "Currently only featureclasses {} are supported.".format(
-                        "/".join(Query.__selectable_features__)))
-        else:
-            featureclass = ",".join(Query.__selectable_features__)
-
-        return self._print(study=study,
+        return self._query(study=study,
                            pathogen=pathogen,
                            library=library,
                            design=design,
                            replicate=replicate,
                            plate=plate,
-                           featureclass=featureclass)
+                           featureclass=self._featureclass(featureclass))
+
+    def _query(self, **kwargs):
+        fls = self._table.print(**kwargs)
+        return fls
+
+    @staticmethod
+    def _featureclass(featureclass):
+        if featureclass is not None:
+            features = featureclass.split(",")
+            for feature in features:
+                if feature.lower() not in Query.__selectable_features__:
+                    sys.exit(Query.__exit_wrong_feat_class__)
+        else:
+            featureclass = ",".join(Query.__selectable_features__)
+        return featureclass
 
     def compose(self,
-                file_name=None,
+                from_file=None,
                 study=None,
                 pathogen=None,
                 library=None,
@@ -111,10 +121,13 @@ class Query:
         A lazy result set is returned, i.e. a set of plate files that meets the
         filtered criteria.
 
+        :param from_file: file argument from `Query.query` to avoid excessive
+          data base access. If not given does normal query. If given only uses
+          from_file argument
         :param study: filters by study, e.g.
-         'infectx'/'group_cossart'/'infectx_published'
+          'infectx'/'group_cossart'/'infectx_published'
         :param pathogen: filters by pathogen, e.g.
-         'salmonella'/'adeno'/'bartonella'/'brucella'/'listeria'
+          'salmonella'/'adeno'/'bartonella'/'brucella'/'listeria'
         :param library: filters by library, e.g. 'a'/'d'/'q'
         :param design: filters by design, e.g.: 'p'/'u'
         :param replicate: filters by replicate, i.e. a number
@@ -123,36 +136,29 @@ class Query:
         :param sirna: filters by gene, i.e.: 'l-019369-00'
         :param well: filters by gene, i.e.: 'a01'
         :param featureclass: filters by featureclass,
-         e.g. 'nuclei'/'cells'/'bacteria'
+          e.g. 'nuclei'/'cells'/'bacteria'
         :param sample: sample from every well x times
 
         :return: returns a lazy ResultSet
         :rtype: ResultSet
         """
 
-        # TODO put this to another place
-        if featureclass is not None:
-            features = featureclass.split(",")
-            for feature in features:
-                if feature.lower() not in Query.__selectable_features__:
-                    raise ValueError(
-                      "Currently only featureclasses {} are supported.".format(
-                        "/".join(Query.__selectable_features__)))
-        else:
-            featureclass = ",".join(Query.__selectable_features__)
+        return self._compose(from_file=from_file,
+                             sample=sample,
+                             study=study,
+                             pathogen=pathogen,
+                             library=library,
+                             design=design,
+                             replicate=replicate,
+                             plate=plate,
+                             gene=gene,
+                             sirna=sirna,
+                             well=well,
+                             featureclass=self._featureclass(featureclass))
 
-        return self._query(file_name,
-                           sample=sample,
-                           study=study,
-                           pathogen=pathogen,
-                           library=library,
-                           design=design,
-                           replicate=replicate,
-                           plate=plate,
-                           gene=gene,
-                           sirna=sirna,
-                           well=well,
-                           featureclass=featureclass)
+    def _compose(self, file_name, **kwargs):
+        fls = self._table.filter(file_name, **kwargs)
+        return ResultSet(fls, **kwargs)
 
     def insert(self, path):
         """
@@ -160,30 +166,27 @@ class Query:
         For insertion the path leading to the meta files has to be provided.
         Meta information is then written to either a sqlite database if `db`
         is set, otherwise the DB connection defaults to a postgres DB that
-        listens on port 5432/.
+        listens on port 5432.
 
         :param path: the folder to the meta files
         :type path: str
-        :param db: filename of the sqlite database. If not set defaults to
-         postgres DB.
-        :type db: str
-        :return:
         """
 
         with DBMS(self._db) as d:
             d.insert(path)
 
-    def query(self, select,
-              study=None,
-              pathogen=None,
-              library=None,
-              design=None,
-              replicate=None,
-              plate=None,
-              gene=None,
-              sirna=None,
-              well=None,
-              featureclass=None):
+    def select(self,
+               select,
+               study=None,
+               pathogen=None,
+               library=None,
+               design=None,
+               replicate=None,
+               plate=None,
+               gene=None,
+               sirna=None,
+               well=None,
+               featureclass=None):
         """
         Submits a select query to a database of image-based RNAi screening meta
         features to get an overview over meta information. The query returns
@@ -206,7 +209,7 @@ class Query:
         :type study: str
         :param pathogen: filters by pathogen, e.g.
          'salmonella'/'adeno'/'bartonella'/'brucella'/'listeria'
-         :type pathogen: str
+        :type pathogen: str
         :param library: filters by library, e.g. 'a'/'d'/'q'
         :type library: str
         :param design: filters by design, e.g.: 'p'/'u'
@@ -240,24 +243,15 @@ class Query:
                             well=well,
                             featureclass=featureclass)
 
-    def _print(self, **kwargs):
-        fls = self._table.print(**kwargs)
-        return fls
-
-    def _query(self, file_name, **kwargs):
-        fls = self._table.filter(file_name, **kwargs)
-        return ResultSet(fls, **kwargs)
-
     def _select(self, select, **kwargs):
         # check if the value to select for is correct
         if select not in Query.__filterable_features__:
-            raise ValueError(
-              "Please provide one of: ({})"
-                  .format(",".join(Query.__filterable_features__)))
+            sys.exit(Query.__exit_wrong_filter__)
+
         # check if user provided a filter for X that also is selected for
         for k, v in kwargs.items():
             if k == select and v is not None:
-                raise ValueError(
+                sys.exit(
                   "You are selecting and filtering on '{}' "
                   "at the same time. Drop the filter.".format(select))
 
