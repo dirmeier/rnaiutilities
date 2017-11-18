@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class DatabaseQuery:
+class DatabaseQueryBuilder:
     _sirna_ = SIRNA
     _gene_ = GENE
     _well_ = WELL
@@ -56,11 +56,11 @@ class DatabaseQuery:
         res = self._print(q, **kwargs)
         return res
 
-    def query(self, file_name, **kwargs):
+    def build_query(self, **kwargs):
         q = self._build_file_name_query(**kwargs)
-        if file_name is None:
-            logger.info(q)
-        res = self._query(q, file_name, **kwargs)
+        logger.info(q)
+        return q
+        res = self._build_query(q, file_name, **kwargs)
         return res
 
     def _build_file_name_query(self, **kwargs):
@@ -107,56 +107,16 @@ class DatabaseQuery:
     def _print(self, q, **kwargs):
         return self.__connection.query(q)
 
-    def _query(self, q, file_name, **kwargs):
-        # get for relevant files
-        if file_name is None:
-            results = self.__connection.query(q)
-        else:
-            results = self.__read_query_file(file_name)
-        # merge files of the same plate together
-        result_set_map = self._build_result_set(results)
-        # setup table file list
-        fls = [
-            TableFileSet(
-              # the key, i.e. file prefix for all the data files
-              # (so the name of the plate without feature suffix)
-              k,
-              # the table files
-              x,
-              # chain lists of features to one list total
-              list(chain.from_iterable(
-                [self._feature_query(e[-1]) for e in x])),
-              # filtering information
-              **kwargs)
-            for k, x in result_set_map.items()
-        ]
-        return fls
+
 
     @staticmethod
-    def __read_query_file(file_name):
+    def read_query_file(file_name):
         res = []
         with open(file_name, "r") as fh:
             for line in fh.readlines():
                 tokens = line.strip().split("\t")
                 res.append((*tokens,))
         return res
-
-    @staticmethod
-    def _build_result_set(results):
-        """
-        Set together the different files belonging to one plate.
-        """
-
-        result_set_map = {}
-        reg = re.compile("(.+)_\w+_meta.tsv")
-        for result in results:
-            mat = reg.match(result[-1])
-            if mat is not None:
-                desc = mat.group(1)
-                if desc not in result_set_map:
-                    result_set_map[desc] = []
-                result_set_map[desc].append(result)
-        return result_set_map
 
     @staticmethod
     def _build_meta_query(what, **kwargs):
@@ -189,12 +149,6 @@ class DatabaseQuery:
                 eq = "(" + " OR ".join(els) + ")"
                 s = "SELECT * FROM {} WHERE {}".format(el, eq)
         return s
-
-    def _feature_query(self, filename):
-        d = DatabaseInserter.feature_table_name(filename)
-        res = self.__connection.query("SELECT distinct * FROM {}".format(d))
-        res = list(map(lambda x: x[0], res))
-        return res
 
     def _build_select_query(self, select, **kwargs):
         if not self._query_has_filters(**kwargs):

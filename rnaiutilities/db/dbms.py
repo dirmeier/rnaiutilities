@@ -22,15 +22,17 @@
 Module related to all data base managment function, i.e., writing/selecting or
  opening DB connections.
 """
-
-
+import re
 import sys
 import logging
+from itertools import chain
 
-from rnaiutilities.db.db_query import DatabaseQuery
 from rnaiutilities.db.db_setup import DatabaseInserter
+from rnaiutilities.db.db_query import DatabaseQueryBuilder
 from rnaiutilities.db.postgres_connection import PostgresConnection
 from rnaiutilities.db.sqlite_connection import SQLiteConnection
+from rnaiutilities.db.utility import feature_table_name
+from rnaiutilities.filesets.table_file_set import TableFileSet
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -72,15 +74,65 @@ class DBMS:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.__connection.close()
 
-    def query(self, file_name, **kwargs):
-        # TODO: this needs changing,
-        # separate the two things
-        q = DatabaseQuery(self.__connection)
-        return q.query(file_name, **kwargs)
+    def tableset(self, file_name, **kwargs):
+        results = self._query(file_name, **kwargs)
+        tableset = self._compose_tableset(results, **kwargs)
+        return tableset
+
+    def _compose_tableset(self, results, **kwargs):
+        plate_file_map = self._plate_file_map(results)
+        # setup table file list
+        fls = [
+            TableFileSet(
+              # the key, i.e. file prefix for all the data files
+              # (so the name of the plate without feature suffix)
+              k,
+              # the table files that belong to one plate, i.e.
+              # the different feature group files like cell/nuclei/perinuclei
+              x,
+              # chain lists of features to one list total
+              list(chain.from_iterable(
+                [self._feature_query(e[-1]) for e in x])),
+              # filtering information
+              **kwargs)
+            for k, x in plate_file_map.items()
+        ]
+
+        return fls
+
+    @staticmethod
+    def _plate_file_map(results):
+        # Set together the different feature files belonging to one plate.
+        # I.e.: every plate has like 3 meta files, that belong together
+        # like cell/nuclei/perinuclei
+        result_set_map = {}
+        reg = re.compile("(.+)_\w+_meta.tsv")
+        for result in results:
+            mat = reg.match(result[-1])
+            if mat is not None:
+                desc = mat.group(1)
+                if desc not in result_set_map:
+                    result_set_map[desc] = []
+                result_set_map[desc].append(result)
+
+        return result_set_map
+
+    def _feature_query(self, filename):
+        d = feature_table_name(filename)
+        res = self.__connection.query("SELECT distinct * FROM {}".format(d))
+        return list(map(lambda x: x[0], res))
+
+    def _query(self, file_name, **kwargs):
+        if not file_name:
+            query = DatabaseQueryBuilder().build_query(file_name, **kwargs)
+            results = self.__connection.query(query)
+        else:
+            results = DatabaseQueryBuilder().read_query_file(file_name)
+        return results
 
     def print(self, **kwargs):
         # TODO: this needs changing
-        q = DatabaseQuery(self.__connection)
+        q = DatabaseQueryBuilder(self.__connection)
         return q.print(**kwargs)
 
     def insert(self, path):
@@ -90,5 +142,5 @@ class DBMS:
 
     def select(self, select, **kwargs):
         # TODO: this needs changing
-        q = DatabaseQuery(self.__connection)
+        q = DatabaseQueryBuilder(self.__connection)
         return q.select(select, **kwargs)

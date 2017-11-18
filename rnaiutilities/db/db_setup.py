@@ -24,6 +24,7 @@ import os
 
 import yaml
 
+from rnaiutilities.db.utility import feature_table_name
 from rnaiutilities.globals import FEATURECLASS, FEATURES, ELEMENTS
 from rnaiutilities.globals import FILE_FEATURES_REGEX
 from rnaiutilities.globals import GENE, SIRNA, WELL, LIBRARY, DESIGN
@@ -167,14 +168,10 @@ class DatabaseInserter:
         return s
 
     def _insert_features(self, file, meta):
-        tab = self.feature_table_name(file)
+        tab = feature_table_name(file)
         if not self._exists(tab):
             self._create_file_feature_table(tab)
             self.__connection.insert_many(meta, tab)
-
-    @staticmethod
-    def feature_table_name(file):
-        return file.replace("_meta.tsv", "").split("/")[-1].replace("-", "_")
 
     def _exists(self, tab):
         ex = self.__connection.exists(tab)
