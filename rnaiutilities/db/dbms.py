@@ -79,7 +79,19 @@ class DBMS:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.__connection.close()
 
-    def tableset(self, file_name, **kwargs):
+    def tableset(self, file_name=None, **kwargs):
+        """
+        Query the database and compose a dataset filtered by **kwargs.
+
+        :param file_name: a preprocessed file that has already been used vor
+         querying using `query`. If file_name is not none the file is used for
+         creating the return argument, otherwise a complete database query is
+         submitted.
+        :param kwargs: a keyword argument of filtering criteria or None.
+        :return: returns a list table file sets
+        :rtype: list(TableFileSet)
+        """
+
         results = self._query(file_name, **kwargs)
         tableset = self._compose_tableset(results, **kwargs)
         return tableset
