@@ -156,8 +156,8 @@ class Query:
 
     def _compose(self, file_name, **kwargs):
         with DBMS(self._db) as d:
-            res = d.query(file_name, **kwargs)
-
+            res = d.tableset(file_name, **kwargs)
+        # TODO: why do I do that again? it should at least be called differently
         return ResultSet(res, **kwargs)
 
     def insert(self, path):

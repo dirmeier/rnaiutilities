@@ -84,6 +84,8 @@ class DatabaseQueryBuilder:
                             "\tON (a1.filename = a2.filename);"
         else:
             q = mq + ";"
+        logger.info(q)
+
         return q
 
     def _build_subqueries(self, select, **kwargs):
@@ -107,8 +109,6 @@ class DatabaseQueryBuilder:
     def _print(self, q, **kwargs):
         return self.__connection.query(q)
 
-
-
     @staticmethod
     def read_query_file(file_name):
         res = []
@@ -129,7 +129,7 @@ class DatabaseQueryBuilder:
                 else:
                     varr = v
                 els = []
-                if k in DatabaseQuery._descr_:
+                if k in DatabaseQueryBuilder._descr_:
                     for vel in varr:
                         els.append("{}='{}'".format(k, vel))
                     ar.append("(" + " OR ".join(els) + ")")
@@ -152,8 +152,9 @@ class DatabaseQueryBuilder:
 
     def _build_select_query(self, select, **kwargs):
         if not self._query_has_filters(**kwargs):
-            if select in [DatabaseQuery._gene_, DatabaseQuery._sirna_,
-                          DatabaseQuery._well_]:
+            if select in [DatabaseQueryBuilder._gene_,
+                          DatabaseQueryBuilder._sirna_,
+                          DatabaseQueryBuilder._well_]:
                 return "SELECT distinct {} from {};".format(select, select)
             else:
                 return "SELECT distinct {} from meta;".format(select)
@@ -163,10 +164,10 @@ class DatabaseQueryBuilder:
         # in case we want to select genes or sirnas, we need to enforce
         # that the tables are still joined
         # otherwise we cannot find the selectable column later
-        if select in DatabaseQuery._gsw_:
-            if select == DatabaseQuery._sirna_ and sq is None:
+        if select in DatabaseQueryBuilder._gsw_:
+            if select == DatabaseQueryBuilder._sirna_ and sq is None:
                 sq = "SELECT * FROM sirna"
-            elif select == DatabaseQuery._gene_ and gq is None:
+            elif select == DatabaseQueryBuilder._gene_ and gq is None:
                 gq = "SELECT * FROM gene"
 
         su = None
@@ -196,3 +197,69 @@ class DatabaseQueryBuilder:
         if any(v is not None for _, v in kwargs.items()):
             return True
         return False
+
+    @staticmethod
+    def create_meta_table_statement():
+        s = "CREATE TABLE IF NOT EXISTS meta " + \
+            "(" + \
+            "id serial, "
+        for col in DatabaseQueryBuilder._descr_:
+            s += "{} varchar(100) NOT NULL, ".format(col)
+        s += "filename varchar(1000) NOT NULL, " + \
+             "PRIMARY KEY(id)" + \
+             ");"
+        logger.info(s)
+        return s
+
+    @staticmethod
+    def create_table_name(t):
+        s = "CREATE TABLE IF NOT EXISTS {} ".format(t) + \
+            "(" + \
+            "id serial, " + \
+            "{} varchar(100) NOT NULL, ".format(t) + \
+            "filename varchar(1000) NOT NULL, " + \
+            "PRIMARY KEY(id)" + \
+            ");"
+        logger.info(s)
+        return s
+
+    @staticmethod
+    def create_into_meta_statement(
+      file, study, bacteria, library, design, replicate, plate, featureclass):
+        s = "INSERT INTO meta " \
+            "({}, {}, {}, {}, {}, {}, {}, {}) " \
+                .format(STUDY, PATHOGEN, LIBRARY, DESIGN,
+                        REPLICATE, PLATE, FEATURECLASS, "filename") + \
+            "VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');" \
+                .format(study, bacteria, library, design, replicate, plate,
+                        featureclass, file)
+        logger.info(s)
+        return s
+
+        @staticmethod
+        def insert_into_statement(k, v, file):
+            s = "INSERT INTO {} ({}, filename) VALUES('{}', '{}')" \
+                .format(k, k, v, file)
+            logger.info(s)
+            return s
+
+        @staticmethod
+        def create_file_fesature_table(tab):
+            s = "CREATE TABLE IF NOT EXISTS {}".format(tab) + \
+                " (feature varchar(1000) NOT NULL, " + \
+                "PRIMARY KEY(feature));"
+            logger.info(s)
+            return s
+
+        @staticmethod
+        def create_meta_index():
+            s = "CREATE INDEX meta_index ON meta ({});" \
+                .format(", ".join(DatabaseQueryBuilder._descr_))
+            logger.info(s)
+            return s
+
+        @staticmethod
+        def create_table_index(t):
+            s = "CREATE INDEX {}_index ON {} ({});".format(t, t, t)
+            logger.info(s)
+            return s

@@ -46,8 +46,10 @@ class ResultSet:
     def __init__(self, tablefile_sets, sample, **kwargs):
         self._tablefile_sets = tablefile_sets
         self._print_header = True
+        # filters applied for qurying
         self._filters = self._set_filter(**kwargs)
         self._sample = sample if sample is not None else 2 ** 30
+        # lambda function for sampling
         self._filter_fn = lambda x: x.loc[np.random.choice(
           x.index, self._sample, False), :] if len(x) >= self._sample else x
         # TODO: this is solved so badly
@@ -64,7 +66,7 @@ class ResultSet:
         for tablefileset in self._tablefile_sets:
             yield tablefileset
 
-    def dump(self, fh=None, normalize="score"):
+    def dump(self, fh=None, normalize="zscore"):
         """
         Print the result set of the database query to tsv or stdout. If a string
         is given as param *fh* prints to file, otherwise if None is given prints

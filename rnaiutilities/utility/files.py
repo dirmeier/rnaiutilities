@@ -25,6 +25,7 @@ Module for various file related functions.
 import os
 import logging
 import numpy
+import yaml
 from pathlib import Path
 import scipy.io as spio
 
@@ -32,9 +33,37 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
+def read_yaml(filename):
+    """
+    Read a yaml file into a variable
+
+    :param filename: the yaml file
+    :return: returns the yaml as dictionary
+    """
+
+    with open(filename, "r") as fh:
+        meta = yaml.load(fh)
+    return meta
+
+
+def filter_files(path, suffix):
+    """
+    Find all files in path and filter them by a suffix. Does NOT recurse in the
+     folders.
+
+    :param path: the path to find files in
+    :param suffix: the suffix files need to end with
+    :return: the list of files with appropriate filer
+    """
+
+    fil_files = filter(lambda x: x.endswith(suffix), os.listdir(path))
+    return list(fil_files)
+
+
 def get_base_filesnames(folder, suffix):
     """
-    Get the basenames of all files fiven in `folder` that end with `suffix`.
+    Get the basenames of all files given in `folder` that end with `suffix`.
+     DOES recurse through files.
 
     :param folder: the folder to look into
     :type folder: str

@@ -22,17 +22,22 @@
 Module related to all data base managment function, i.e., writing/selecting or
  opening DB connections.
 """
+
+import os
 import re
 import sys
 import logging
 from itertools import chain
 
 from rnaiutilities.db.db_setup import DatabaseInserter
-from rnaiutilities.db.db_query import DatabaseQueryBuilder
+from rnaiutilities.db.db_query_builder import DatabaseQueryBuilder
 from rnaiutilities.db.postgres_connection import PostgresConnection
 from rnaiutilities.db.sqlite_connection import SQLiteConnection
 from rnaiutilities.db.utility import feature_table_name
 from rnaiutilities.filesets.table_file_set import TableFileSet
+from rnaiutilities.globals import GENE, SIRNA, WELL
+from rnaiutilities.globals import FILE_FEATURES_REGEX
+from rnaiutilities.utility.files import filter_files, read_yaml
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -106,6 +111,7 @@ class DBMS:
         # I.e.: every plate has like 3 meta files, that belong together
         # like cell/nuclei/perinuclei
         result_set_map = {}
+        # parses sth like: '(i_am_a_plate)_someText_meta.tsv'
         reg = re.compile("(.+)_\w+_meta.tsv")
         for result in results:
             mat = reg.match(result[-1])
@@ -136,9 +142,67 @@ class DBMS:
         return q.print(**kwargs)
 
     def insert(self, path):
-        # TODO: this needs changing
-        d = DatabaseInserter(self.__connection)
-        d.insert(path)
+        """
+        Insert meta information from parsed imaging data into a database.
+        Creates a couple of different databases for all created meta files
+        containing information about plates, filenames, siRNAs, genes, etc.
+
+        :param path: the path where the parsed files are placed
+        :return: str
+        """
+
+        self._insert(path)
+
+    def _insert(self, path):
+        d = DatabaseInserter()
+        self._create_tables(d)
+        self._insert_files(path, d)
+        self._create_indexes(d)
+
+    def _create_tables(self, d):
+        # creates meta file database
+        # also creates one table for every plate and feature type
+        self.__connection.execute(d.create_meta_table_statement())
+        for col in [GENE, SIRNA, WELL]:
+            tb = d.create_table_name(col)
+            self.__connection.execute(tb)
+
+    def _insert_files(self, path, d):
+        fls = filter_files(path, "_meta.tsv")
+        for i, file in enumerate(fls):
+            if i % 100 == 0:
+                logger.info("Doing file {} of {}".format(i, len(fls)))
+            self._insert_file(d, path, file)
+
+    def _insert_file(self, d, path, file):
+        filename = os.path.join(path, file)
+        try:
+            ma = FILE_FEATURES_REGEX.match(file.replace("_meta.tsv", ""))
+            stu, pat, lib, des, _, rep, pl, feature = ma.groups()
+            # put the file classifier suffixes into the meta database
+            # this really only regards the NAME of the file, the FEATURE it
+            # is containing and the meta that describes the plate
+            ins = d.create_into_meta_statement(
+              filename, stu, pat, lib, des, rep, pl, feature)
+            self.__connection.execute(ins)
+            # read the meta file and put the meta plate information
+            # (genes, sirnas) into the database for the plate
+            meta = read_yaml(filename)
+            self.__connection.insert_elements(
+              file, meta, d.insert_into_statement)
+            tab = feature_table_name(file)
+            if not self.__connection.exists(tab):
+                s = d.create_file_feature_table(tab)
+                self.__connection.execute(s)
+                self.__connection.insert_many(meta, tab)
+        except ValueError:
+            logger.error("Could not match meta file {}".format(file))
+
+    def _create_indexes(self, d):
+        self.__connection.execute(d.create_meta_index())
+        for col in [GENE, SIRNA, WELL]:
+            tb = d.create_table_index(col)
+            self.__connection.execute(tb)
 
     def select(self, select, **kwargs):
         # TODO: this needs changing
