@@ -44,9 +44,6 @@ BSCORE = "bscore"
 LOESS = "loess"
 ZSCORE = "zscore"
 
-FILE_FEATURES_REGEX = re.compile(
-  "(\w+)-(\w+)-(\w+)-(\w+)-(\w+)-(\d+)-(.*)_(\w+)")
-
 ADDED_COLUMNS_FOR_PRINTING = {
     'cells': [
         'parent_nuclei',

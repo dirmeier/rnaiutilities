@@ -40,15 +40,10 @@ class DatabaseQueryBuilder:
     _gsw_ = [_gene_, _sirna_, _well_]
     _descr_ = [STUDY, PATHOGEN, LIBRARY, DESIGN, REPLICATE, PLATE, FEATURECLASS]
 
-    def __init__(self, connection):
-        self.__connection = connection
-
-    def select(self, select, **kwargs):
+    def build_select_query(self, select, **kwargs):
         q = self._build_select_query(select, **kwargs)
         logger.info(q)
-        res = self.__connection.query(q)
-        res = map(lambda x: x[0], res)
-        return res
+        return q
 
     def print(self, **kwargs):
         q = self._build_file_name_query(**kwargs)
@@ -190,6 +185,8 @@ class DatabaseQueryBuilder:
         else:
             mq = self._build_meta_query(select, **kwargs)
             q = mq + ";"
+
+        logger.info(q)
         return q
 
     @staticmethod
@@ -236,30 +233,30 @@ class DatabaseQueryBuilder:
         logger.info(s)
         return s
 
-        @staticmethod
-        def insert_into_statement(k, v, file):
-            s = "INSERT INTO {} ({}, filename) VALUES('{}', '{}')" \
-                .format(k, k, v, file)
-            logger.info(s)
-            return s
+    @staticmethod
+    def insert_into_statement(k, v, file):
+        s = "INSERT INTO {} ({}, filename) VALUES('{}', '{}')" \
+            .format(k, k, v, file)
+        logger.info(s)
+        return s
 
-        @staticmethod
-        def create_file_fesature_table(tab):
-            s = "CREATE TABLE IF NOT EXISTS {}".format(tab) + \
-                " (feature varchar(1000) NOT NULL, " + \
-                "PRIMARY KEY(feature));"
-            logger.info(s)
-            return s
+    @staticmethod
+    def create_file_fesature_table(tab):
+        s = "CREATE TABLE IF NOT EXISTS {}".format(tab) + \
+            " (feature varchar(1000) NOT NULL, " + \
+            "PRIMARY KEY(feature));"
+        logger.info(s)
+        return s
 
-        @staticmethod
-        def create_meta_index():
-            s = "CREATE INDEX meta_index ON meta ({});" \
-                .format(", ".join(DatabaseQueryBuilder._descr_))
-            logger.info(s)
-            return s
+    @staticmethod
+    def create_meta_index():
+        s = "CREATE INDEX meta_index ON meta ({});" \
+            .format(", ".join(DatabaseQueryBuilder._descr_))
+        logger.info(s)
+        return s
 
-        @staticmethod
-        def create_table_index(t):
-            s = "CREATE INDEX {}_index ON {} ({});".format(t, t, t)
-            logger.info(s)
-            return s
+    @staticmethod
+    def create_table_index(t):
+        s = "CREATE INDEX {}_index ON {} ({});".format(t, t, t)
+        logger.info(s)
+        return s

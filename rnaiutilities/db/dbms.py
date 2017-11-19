@@ -23,20 +23,18 @@ Module related to all data base managment function, i.e., writing/selecting or
  opening DB connections.
 """
 
+import logging
 import os
 import re
 import sys
-import logging
 from itertools import chain
 
-from rnaiutilities.db.db_setup import DatabaseInserter
 from rnaiutilities.db.db_query_builder import DatabaseQueryBuilder
 from rnaiutilities.db.postgres_connection import PostgresConnection
 from rnaiutilities.db.sqlite_connection import SQLiteConnection
 from rnaiutilities.db.utility import feature_table_name
 from rnaiutilities.filesets.table_file_set import TableFileSet
 from rnaiutilities.globals import GENE, SIRNA, WELL
-from rnaiutilities.globals import FILE_FEATURES_REGEX
 from rnaiutilities.utility.files import filter_files, read_yaml
 
 logger = logging.getLogger(__name__)
@@ -49,6 +47,8 @@ class DBMS:
     """
 
     _SQLITE_ = "sqlite"
+    _FILE_FEATURES_REGEX_ = re.compile(
+      "(\w+)-(\w+)-(\w+)-(\w+)-(\w+)-(\d+)-(.*)_(\w+)")
 
     def __init__(self, db=None):
         """
@@ -154,7 +154,7 @@ class DBMS:
         self._insert(path)
 
     def _insert(self, path):
-        d = DatabaseInserter()
+        d = DatabaseQueryBuilder()
         self._create_tables(d)
         self._insert_files(path, d)
         self._create_indexes(d)
@@ -177,7 +177,7 @@ class DBMS:
     def _insert_file(self, d, path, file):
         filename = os.path.join(path, file)
         try:
-            ma = FILE_FEATURES_REGEX.match(file.replace("_meta.tsv", ""))
+            ma = DBMS._FILE_FEATURES_REGEX_.match(file.replace("_meta.tsv", ""))
             stu, pat, lib, des, _, rep, pl, feature = ma.groups()
             # put the file classifier suffixes into the meta database
             # this really only regards the NAME of the file, the FEATURE it
@@ -205,6 +205,5 @@ class DBMS:
             self.__connection.execute(tb)
 
     def select(self, select, **kwargs):
-        # TODO: this needs changing
-        q = DatabaseQueryBuilder(self.__connection)
-        return q.select(select, **kwargs)
+        q = DatabaseQueryBuilder().build_select_query(select, **kwargs)
+        return map(lambda x: x[0], self.__connection.query(q))
