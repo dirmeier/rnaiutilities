@@ -45,18 +45,10 @@ class DatabaseQueryBuilder:
         logger.info(q)
         return q
 
-    def print(self, **kwargs):
-        q = self._build_file_name_query(**kwargs)
-        logger.info(q)
-        res = self._print(q, **kwargs)
-        return res
-
     def build_query(self, **kwargs):
         q = self._build_file_name_query(**kwargs)
         logger.info(q)
         return q
-        res = self._build_query(q, file_name, **kwargs)
-        return res
 
     def _build_file_name_query(self, **kwargs):
         mq, gq, sq = self._build_subqueries("*", **kwargs)
@@ -100,9 +92,6 @@ class DatabaseQueryBuilder:
         sq = self._build_plate_query(SIRNA, **kwargs)
 
         return mq, gq, sq
-
-    def _print(self, q, **kwargs):
-        return self.__connection.query(q)
 
     @staticmethod
     def read_query_file(file_name):

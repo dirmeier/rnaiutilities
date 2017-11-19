@@ -130,16 +130,14 @@ class DBMS:
 
     def _query(self, file_name, **kwargs):
         if not file_name:
-            query = DatabaseQueryBuilder().build_query(file_name, **kwargs)
+            query = DatabaseQueryBuilder().build_query(**kwargs)
             results = self.__connection.query(query)
         else:
             results = DatabaseQueryBuilder().read_query_file(file_name)
         return results
 
-    def print(self, **kwargs):
-        # TODO: this needs changing
-        q = DatabaseQueryBuilder(self.__connection)
-        return q.print(**kwargs)
+    def query(self, **kwargs):
+        return self._query(file_name=None, **kwargs)
 
     def insert(self, path):
         """

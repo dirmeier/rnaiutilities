@@ -85,7 +85,7 @@ class Query:
 
     def _query(self, **kwargs):
         with DBMS(self._db) as d:
-            res = d.print(**kwargs)
+            res = d.query(**kwargs)
         return res
 
     @staticmethod
