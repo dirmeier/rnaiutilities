@@ -72,14 +72,11 @@ class IO:
 
     def _to_tsv(self, data):
         if self._format is None:
-            print(
-              data.to_csv(
-                None,
-                sep="\t",
-                header=self._print_header,
-                index=False
-              )
-            )
+            print(data.to_csv(
+              None,
+              sep="\t",
+              header=self._print_header,
+              index=False))
         else:
             if pathlib.Path(self._filename).is_file():
                 self._print_header = False
@@ -88,6 +85,5 @@ class IO:
               sep="\t",
               mode="a",
               header=self._print_header,
-              index=False
-            )
+              index=False)
         self._print_header = False
