@@ -80,7 +80,7 @@ class LibraryPlateLayout:
 
         # TODO: this should be ok, but is potentially
         #  buggy with the suffix thing.
-        if suffix is None:
+        if suffix is None or suffix is 'NA':
             cl = "-".join([pathogen,
                            "".join([library, design]),
                            "".join([screen, replicate]),

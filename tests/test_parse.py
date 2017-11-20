@@ -22,9 +22,12 @@
 
 
 import os
+import logging
 import unittest
 import pytest
 from rnaiutilities import Parser, Config
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 class TestParser(unittest.TestCase):
@@ -36,6 +39,7 @@ class TestParser(unittest.TestCase):
     def setUp(self):
         unittest.TestCase.setUp(self)
         self._folder = os.path.join(os.path.dirname(__file__), "..", "data")
+        self._testfolder = os.path.join(self._folder, "out")
         self._file = os.path.join(self._folder, "config.yml")
         conf = Config(self._file)
         conf._plate_id_file = os.path.join(
@@ -43,9 +47,17 @@ class TestParser(unittest.TestCase):
         conf._plate_regex = ".*\/\w+\-\w[P|U]\-[G|K]\d+(-\w+)*\/.*"
         conf._layout_file = os.path.join(self._folder, "layout.tsv")
         conf._plate_folder = self._folder
-        conf._output_path = self._folder
+        conf._output_path = os.path.join(self._folder, "out", "test_files")
+        self._outfolder = conf._output_path
+        if not os.path.exists(conf._output_path):
+            os.makedirs(conf._output_path)
         conf._multiprocessing = False
         self._parser = Parser(conf)
-
-    def test_parse(self):
         self._parser.parse()
+
+    def test_file_count(self):
+        test_files = [x for x in list(os.scandir(self._testfolder)) if
+                      x.is_file()]
+        expected_files = [x for x in list(os.scandir(self._outfolder)) if
+                          x.is_file()]
+        assert len(test_files) == len(expected_files)

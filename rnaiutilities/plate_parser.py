@@ -52,8 +52,8 @@ class PlateFilesParser:
 
         features = self._parse_plate_file_set(pfs)
         if len(features) == 0:
-            logger.error("No files found for platefileset: {}"
-                         .format(pfs.classifier))
+            logger.error(
+              "No files found for platefileset: {}".format(pfs.classifier))
             return None, None, None
 
         mapping = self._parse_plate_mapping(pfs)
@@ -61,12 +61,11 @@ class PlateFilesParser:
             logger.warning("Found no mapping for platefileset: " +
                            pfs.classifier + "!")
             return None, None, None
-
         return pfs, features, mapping
 
     def _parse_plate_file_set(self, pfs):
-        logger.info("Parsing plate file set to memory: " +
-                    str(pfs.classifier))
+        logger.info(
+          "Parsing plate file set to memory: " + str(pfs.classifier))
         features = {}
         for plate_file in pfs:
             cf = self._parse_file(plate_file)
@@ -91,7 +90,7 @@ class PlateFilesParser:
         matrix = None
         try:
             matrix = self._alloc(load_matlab(file), file, featurename)
-        except (ValueError,  TypeError, AssertionError) as e:
+        except (ValueError, TypeError, AssertionError) as e:
             logger.error("Could not statistics: {} -> {}".format(file, str(e)))
         return matrix
 

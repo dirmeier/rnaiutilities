@@ -56,7 +56,8 @@ class PlateWriter:
         if layout is None and pfs.pathogen.lower() != "mock":
             logger.warning("Could not load layout for: " + pfs.classifier)
             return
-        self._write_file(pfs, sorted(features, key=lambda x: x.short_name),
+        self._write_file(pfs,
+                         sorted(features, key=lambda x: x.short_name),
                          feature_group, mapping, layout)
 
     def _get_layout(self, pfs):

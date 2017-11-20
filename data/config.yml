@@ -1,6 +1,6 @@
 layout_file: "layout.tsv"
 plate_folder: "./"
-output_path: "./"
+output_path: "./out/test_files"
 plate_id_file: "experiment_meta_file.tsv"
 plate_regex: '.*\/\w+\-\w[P|U]\-[G|K]\d+(-\w+)*\/.*'
 multiprocessing: False

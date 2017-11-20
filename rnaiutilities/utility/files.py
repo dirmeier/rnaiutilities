@@ -116,5 +116,6 @@ def load_matlab(file):
     :param file: matlab file name
     :return: returns an numpy.array
     """
+
     matlab_matrix = spio.loadmat(file)
     return matlab_matrix["handles"][0][0][0][0][0][0][0][0][0][0]

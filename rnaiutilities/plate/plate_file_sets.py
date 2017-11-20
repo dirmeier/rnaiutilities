@@ -46,7 +46,6 @@ class PlateFileSets:
         self._plate_file_sets = {}
         self._files = []
         self._outfolder = outfolder
-
         self._parse_plate_file_sets(folder)
 
     def __iter__(self):

@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class PlateSirnaGeneMapping:
+class PlateSirnaGeneMapping(object):
     """
     Class that stores plate sirna-gene mappings.
 
@@ -51,9 +51,9 @@ class PlateSirnaGeneMapping:
     def _load(self, plate_file_set):
         """
         Load the sirna-gene mapping file
-
         :param plate_file_set: plate file set object
         """
+
         mlfile = load_matlab(plate_file_set.mapping.filename)
         if mlfile is None:
             return
@@ -67,7 +67,6 @@ class PlateSirnaGeneMapping:
     def _load_entry(self, i, mat):
         """
         Load a single line/image from the well mapping
-
         """
 
         if mat is None:
