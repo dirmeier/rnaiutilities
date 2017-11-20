@@ -25,6 +25,8 @@ import pathlib
 
 import sys
 
+from rnaiutilities.data_set import DataSet
+
 logger = logging.getLogger(__name__)
 
 
@@ -56,7 +58,7 @@ class IO:
         pass
 
     def dump(self, df):
-        if not isinstance(df, pandas.DataFrame):
+        if not isinstance(df, DataSet):
             raise TypeError("Please provide a resultset object")
         if self._format is None or self._format == IO._flat_:
             self._to_tsv(df)

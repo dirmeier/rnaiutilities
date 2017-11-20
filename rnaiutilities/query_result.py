@@ -49,8 +49,7 @@ class QueryResult:
 
     def __init__(self, tablefile_sets, **kwargs):
         self._tablefile_sets = tablefile_sets
-        self._print_header = True
-        # filters applied for qurying
+        # filters applied for querying
         self._filters = self._set_filter(**kwargs)
         self._shared_features = self._get_shared_features()
         self._sample, self._filter_fn = 2 ** 30, lambda x: x
@@ -84,14 +83,10 @@ class QueryResult:
 
         self._set_normalization(*normalize)
         self._set_sample_size(sample)
-
         with IO(fh) as io:
             for data in self:
-                try:
+                if data is not None:
                     io.dump(data)
-                except ValueError as e:
-                    logger.error("Error occured for tablefileset {}: {}"
-                                 .format(data, e))
         logger.info("Successfully wrote table files!")
 
     def _set_normalization(self, *normalize):
@@ -113,18 +108,25 @@ class QueryResult:
         Dumbs a table file to tsv/h5/stdout.
         """
 
-        # test if the data files can be found
-        if all(os.path.isfile(f) for f in tablefileset.filenames):
-            # read the data files, i.e. cells/nuclei/perinuclei
-            data = self._read(tablefileset)
-            data = self._process(data)
-            # append study/pathogen/library/...
-            data = self._insert_columns(data, tablefileset)
-            return data
-        else:
-            raise ValueError(
-              "Could not find files: {}".format(
-                  ", ".join(tablefileset.filenames)))
+        try:
+            # test if the data files can be found
+            if all(os.path.isfile(f) for f in tablefileset.filenames):
+                # read the data files, i.e. cells/nuclei/perinuclei
+                data = self._read(tablefileset)
+                # compile everything together
+                data = self._process(data)
+                # append study/pathogen/library/...
+                data = self._insert_columns(data, tablefileset)
+                return data
+            else:
+                raise ValueError(
+                  "Could not find files: {}".format(
+                    ", ".join(tablefileset.filenames)))
+        except ValueError as e:
+            logger.error(
+              "Error occured for tablefileset {}: {}"
+                  .format(tablefileset.classifier, e))
+        return None
 
     @enforce.runtime_validation
     def _read(self, tablefileset: TableFileSet):
@@ -245,8 +247,7 @@ class QueryResult:
         if len(data.feature_columns) != len(self._shared_features):
             raise ValueError(
               "{} does not have the correct number of features. Skipping."
-              .format(data.filenames))
-            return None
+                  .format(data.filenames))
         if data.data is None:
             raise ValueError("Data is none after setting columns.")
         return data
@@ -311,5 +312,4 @@ class QueryResult:
         data.data.insert(0, "library", table.library)
         data.data.insert(0, "pathogen", table.pathogen)
         data.data.insert(0, "study", table.study)
-
         return data

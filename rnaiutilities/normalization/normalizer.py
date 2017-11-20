@@ -76,7 +76,7 @@ class Normalizer:
               "Please select only functions: {}"
               .format("/".join(Normalizer._nf_)))
 
-    @enforce.runtime_violation
+    @enforce.runtime_validation
     def normalize_plate(self, data: DataSet):
         """
         Normalize a plate.
