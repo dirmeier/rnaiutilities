@@ -110,8 +110,7 @@ class Query:
                 gene=None,
                 sirna=None,
                 well=None,
-                featureclass=None,
-                sample=None):
+                featureclass=None):
         """
         Query a database of image-based RNAi screening features for
          cells/bacteria/nuclei.

@@ -31,6 +31,7 @@ from rnaiutilities.globals import WELL, GENE, SIRNA, \
     SAMPLE, ADDED_COLUMNS_FOR_PRINTING
 from rnaiutilities.io.io import IO
 from rnaiutilities.normalization.normalizer import Normalizer
+from rnaiutilities.query_result import QueryResult
 from rnaiutilities.table_file_set import TableFileSet
 from rnaiutilities.utility.functional import filter_by_prefix, \
     inverse_filter_by_prefix
@@ -39,7 +40,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class QueryResult:
+class QueryResultWriter:
     """
     Set of results derived from a database query.
     """
@@ -47,31 +48,13 @@ class QueryResult:
     _filter_attributes_ = [GENE, SIRNA, WELL, SAMPLE]
     _sar_ = ".*"
 
-    def __init__(self, tablefile_sets, **kwargs):
-        self._tablefile_sets = tablefile_sets
-        self._print_header = True
-        # filters applied for qurying
-        self._filters = self._set_filter(**kwargs)
-        self._shared_features = self._get_shared_features()
-        self._sample, self._filter_fn = 2 ** 30, lambda x: x
-        self._normalizer = Normalizer()
-
-    def __repr__(self):
-        return self.__str__()
-
-    def __str__(self):
-        return str(self._tablefile_sets)
-
-    def __iter__(self):
-        for tablefileset in self._tablefile_sets:
-            yield tablefileset
-
-    def dump(self, sample, normalize="zscore", fh=None):
+    @enforce.runtime_validation()
+    def __init__(self, query_result: QueryResult, fh, sample, normalize):
         """
-        Print the result set of the database query to tsv or stdout. If a string
-        is given as param *fh* prints to file, otherwise if None is given prints
-        to stdout.
+        Constructor for QueryResultWriter.
 
+        :param query_result: the query result wo write
+        :type query_result: QueryResult
         :param sample: number of samples to draw from every well or None
         :param sample: int or None
         :param normalize: a list of normalisation methods to use, e.g. like
@@ -79,30 +62,32 @@ class QueryResult:
         :type normalize: list(str)
         :param fh: name of the file or None
         :type fh: str
-        """
-
-        self._set_normalization(*normalize)
-        self.set_sample_size(sample)
-
-        with IO(fh) as io:
-            for tablefileset in self._tablefile_sets:
-                self._dump(tablefileset, io)
-        logger.info("Successfully wrote table files!")
-
-    def _set_normalization(self, *normalize):
-        """
-        Set the used normalisations.
-
+        :param sample:
         :param normalize:
-        :return:
+        :param fh:
         """
-        self._normalizer.set_normalization(*normalize)
 
-    def set_sample_size(self, sample):
+        self._query_result - query_result
+        self._fh = fh
+        self._print_header = True
         self._sample = sample if sample is not None else 2 ** 30
         # lambda function for sampling
         self._filter_fn = lambda x: x.loc[np.random.choice(
           x.index, self._sample, False), :] if len(x) >= self._sample else x
+        self._normalizer = Normalizer()
+        self._normalizer.set_normalization(*normalize)
+
+    def dump(self):
+        """
+        Print the result set of the database query to tsv or stdout. If a string
+        is given as param *fh* prints to file, otherwise if None is given prints
+        to stdout.
+        """
+
+        with IO(self._fh) as io:
+            for tablefileset in self._query_result.table_file_sets:
+                self._dump(tablefileset, io)
+        logger.info("Successfully wrote table files!")
 
     def _dump(self, tablefileset, io):
         """

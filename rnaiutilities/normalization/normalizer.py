@@ -52,9 +52,9 @@ class Normalizer:
         """
         Set the normalisation methods.
 
-        :param *args: a tuple normalisation methods to use, e.g. like 'zscore'.
+        :param args: a tuple normalisation methods to use, e.g. like 'zscore'.
           Options so far are 'bscore', 'loess' and 'zscore'.
-        :type *args: tuple(str)
+        :type args: tuple(str)
         """
 
         self._check_methods(*args)
@@ -82,7 +82,7 @@ class Normalizer:
         Normalize a plate.
 
         :param data: the data to normalize
-        :type data: pandas.DataFrame
+        :type data: DataSet
         """
 
         logger.info("Normalizing plate.")
@@ -94,23 +94,22 @@ class Normalizer:
         for normal in self._normalize:
             f = self.__getattribute__("_" + normal)
             df, _ = f(df, None, df.feature_columns)
-
         return df
 
     @staticmethod
     def _replace_inf_with_nan(df, feature_columns):
         for col in feature_columns:
-            idx = numpy.isinf(df[col])
-            df.loc[idx, col] = numpy.nan
+            idx = numpy.isinf(df.data[col])
+            df.data.loc[idx, col] = numpy.nan
         return df
 
     @staticmethod
     def _zscore(df, well_df, feature_columns):
         logger.info("\tstandardizing feature columns.")
         for col in feature_columns:
-            mea = numpy.nanmean(df[col])
-            sd = numpy.nanstd(df[col])
-            new_col_vals = (df[col] - mea) / (sd + 0.00000001)
+            mea = numpy.nanmean(df.data[col])
+            sd = numpy.nanstd(df.data[col])
+            new_col_vals = (df.data[col] - mea) / (sd + 0.00000001)
             new_col_vals[numpy.isinf(new_col_vals)] = numpy.nan
-            df[col] = new_col_vals
+            df.data[col] = new_col_vals
         return df, well_df

@@ -205,14 +205,13 @@ def compose(outfile, db, normalize, from_file,
                             gene=gene,
                             sirna=sirna,
                             well=well,
-                            featureclass=featureclass,
-                            sample=sample)
+                            featureclass=featureclass)
 
     if debug:
         for r in res:
             logger.debug(r.detail())
     else:
-        res.dump(outfile, normalize=normalize.split(","))
+        res.dump(sample=sample, normalize=normalize.split(","), fh=outfile)
 
 
 @cli.command()
