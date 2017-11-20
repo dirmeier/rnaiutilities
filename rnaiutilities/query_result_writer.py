@@ -67,7 +67,7 @@ class QueryResultWriter:
         :param fh:
         """
 
-        self._query_result - query_result
+        self._query_result = query_result
         self._fh = fh
         self._print_header = True
         self._sample = sample if sample is not None else 2 ** 30
@@ -86,7 +86,9 @@ class QueryResultWriter:
 
         with IO(self._fh) as io:
             for tablefileset in self._query_result.table_file_sets:
-                self._dump(tablefileset, io)
+                try:
+                    io.dump(tablefileset, io)
+                catch Vaz
         logger.info("Successfully wrote table files!")
 
     def _dump(self, tablefileset, io):
