@@ -78,7 +78,6 @@ class PlateFileSets:
     def _parse_file_name(self, filename):
         clss, st, pa, lib, des, scr, rep, suf, plate, feature \
             = self._parse_plate_name(filename)
-
         self._add_platefileset(
           clss, st, pa, lib, des, scr, rep, suf, plate, self._outfolder)
         self._add_platefile(filename, feature, clss)
@@ -99,7 +98,7 @@ class PlateFileSets:
         # add the current matlab file do the respective platefile
         else:
             self._plate_file_sets[classifier].files.append(
-                PlateFile(f, feature))
+              PlateFile(f, feature))
 
     @staticmethod
     def _find_files(folder):
@@ -133,6 +132,7 @@ class PlateFileSets:
         :param f: the file name
         :return: returns a list of feature names
         """
+
         screen, plate = parse_plate_info(f.strip().lower())
         st, pa, lib, des, scr, rep, suf = parse_screen_details(screen)
         feature = (f.split("/")[-1]).replace(".mat", "")

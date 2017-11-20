@@ -24,6 +24,7 @@ Main module (entry point) for parsing feature files and computing statistics
 regarding download/parsing.
 """
 
+import enforce
 import logging
 import multiprocessing as mp
 from pathlib import Path
@@ -50,16 +51,14 @@ class Parser:
     features.
     """
 
-    def __init__(self, config):
+    @enforce.runtime_validation()
+    def __init__(self, config: Config):
         """
         Constructor for from the command line.
 
         :param config: a configuration for file parsing
         :type config: Config
         """
-
-        if not isinstance(config, Config):
-            raise ValueError("Please provide a config object")
 
         self._config = config
         # where to the plates lie on the hard drive
@@ -74,7 +73,7 @@ class Parser:
         # the actual parser
         self._parser = PlateFilesParser()
         # the actual writer of parsed data
-        self._writer = PlateWriter(config.layout)
+        self._writer = PlateWriter(config.layout_file)
 
     def parse(self):
         """
@@ -97,10 +96,7 @@ class Parser:
         logger.info("All's well that ends well")
 
     def _parse(self, plate):
-        """
-        Parse the files of a single plate folder as tsv.
-        """
-
+        # Parse the files of a single plate folder as tsv
         try:
             platefilesets = PlateFileSets(
               self._plate_folder + "/" + plate, self._output_path)

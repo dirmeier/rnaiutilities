@@ -19,10 +19,12 @@
 #
 # @author = 'Simon Dirmeier'
 # @email = 'simon.dirmeier@bssae.ethz.ch'
+
+
 import os
 import unittest
 import pytest
-from rnaiutilities import Parser
+from rnaiutilities import Parser, Config
 
 
 class TestParser(unittest.TestCase):
@@ -33,9 +35,17 @@ class TestParser(unittest.TestCase):
 
     def setUp(self):
         unittest.TestCase.setUp(self)
-        self._file = os.path.join(
-          os.path.dirname(__file__), "..", "data", "config.yml")
-        self._parser = Parser(self._file)
+        self._folder = os.path.join(os.path.dirname(__file__), "..", "data")
+        self._file = os.path.join(self._folder, "config.yml")
+        conf = Config(self._file)
+        conf._plate_id_file = os.path.join(
+          self._folder, "experiment_meta_file.tsv")
+        conf._plate_regex = ".*\/\w+\-\w[P|U]\-[G|K]\d+(-\w+)*\/.*"
+        conf._layout_file = os.path.join(self._folder, "layout.tsv")
+        conf._plate_folder = self._folder
+        conf._output_path = self._folder
+        conf._multiprocessing = False
+        self._parser = Parser(conf)
 
-    def test_members(self):
-        assert self._parser._config.plate
+    def test_parse(self):
+        self._parser.parse()
