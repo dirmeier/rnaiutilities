@@ -33,7 +33,7 @@ def jaccard(s, t):
     """
 
     try:
-        intr =  len(intersect1d(s, t)) / len(union1d(s, t))
+        intr = len(intersect1d(s, t)) / len(union1d(s, t))
     except ZeroDivisionError:
-        intr  = 0
-    return  intr
+        intr = 0
+    return intr

@@ -27,7 +27,32 @@ class DataSet:
     """
 
     def __init__(self, data, feature_columns):
+        """
+        Constructor of DataSet. Needs a pandas DataFrame and a list of strings
+         representing the feature columns.
+
+        :param data: a pandas dataframe
+        :type data: pandas.DataFrame
+        :param feature_columns: a list of strings names column names for the
+         features
+        :type feature_columns: list(str)
+        """
+
         self.__data = data
         self.__feature_columns = feature_columns
 
+    @property
+    def data(self):
+        return self.__data
 
+    @data.setter
+    def data(self, value):
+        self.__data = value
+
+    @property
+    def feature_columns(self):
+        return self.__feature_columns
+
+    @feature_columns.setter
+    def feature_columns(self, value):
+        self.__feature_columns = value

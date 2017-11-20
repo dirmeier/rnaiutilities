@@ -20,8 +20,11 @@
 
 
 import logging
+
+import enforce
 import numpy
 
+from rnaiutilities.data_set import DataSet
 from rnaiutilities.globals import BSCORE, ZSCORE, LOESS, NONE
 
 logger = logging.getLogger(__name__)
@@ -73,25 +76,24 @@ class Normalizer:
               "Please select only functions: {}"
               .format("/".join(Normalizer._nf_)))
 
-    def normalize_plate(self, data, feature_cols):
+    @enforce.runtime_violation
+    def normalize_plate(self, data: DataSet):
         """
         Normalize a plate.
 
         :param data: the data to normalize
         :type data: pandas.DataFrame
-        :param feature_cols: the columns representing features
-        :type feature_cols: list(str)
         """
 
         logger.info("Normalizing plate.")
-        return self._normalize_plate(data, feature_cols)
+        return self._normalize_plate(data)
 
-    def _normalize_plate(self, df, feature_columns):
-        df = self._replace_inf_with_nan(df, feature_columns)
+    def _normalize_plate(self, df):
+        df = self._replace_inf_with_nan(df, df.feature_columns)
         # do normalisations on the fly
         for normal in self._normalize:
             f = self.__getattribute__("_" + normal)
-            df, _ = f(df, None, feature_columns)
+            df, _ = f(df, None, df.feature_columns)
 
         return df
 

@@ -32,6 +32,8 @@ from rnaiutilities.globals import WELL, GENE, SIRNA, \
     SAMPLE, ADDED_COLUMNS_FOR_PRINTING
 from rnaiutilities.io.io import IO
 from rnaiutilities.normalization.normalizer import Normalizer
+from rnaiutilities.utility.functional import filter_by_prefix, \
+    inverse_filter_by_prefix
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -104,8 +106,9 @@ class ResultSet:
             data = self.read(tablefileset)
             if data is None:
                 return
-            # append study/pathogen/library/..
-            data = self._append_to_data(data, tablefileset)
+            data = self.process(data)
+            # append study/pathogen/library/...
+            data = self._insert_columns(data, tablefileset)
             io.dump(data, tablefileset.filesuffixes)
         else:
             logger.warning("Could not find files: {}"
@@ -127,9 +130,8 @@ class ResultSet:
         """
 
         # read the X files to memory
-        tables = [
-            pandas.read_csv(f, sep="\t", header=0)
-            for f in tablefileset.filenames]
+        tables = [pandas.read_csv(f, sep="\t", header=0)
+                  for f in tablefileset.filenames]
         # check if the dimensions of the tables are the same
         if not self._tables_have_correct_shapes(tables, tablefileset):
             return None
@@ -139,9 +141,39 @@ class ResultSet:
             return None
         # merge the three tables together column-wise
         data_merged = pandas.concat(tables, axis=1)
-        return DataSet(data_merged,
-                       tablefileset.features_classes,
-                       tablefileset.features)
+
+        return DataSet(data_merged, tablefileset.features)
+
+    @staticmethod
+    def _tables_have_correct_shapes(tables, tfs):
+        for i in range(len(tables) - 1):
+            for j in range(i + 1, len(tables)):
+                if tables[i].shape[0] != tables[j].shape[0]:
+                    logger.error("TableFileSet's {} data files do not have "
+                                 "matching dimensions.".format(tfs.classifier))
+                    return False
+        return True
+
+    @staticmethod
+    def _drop_meta_columns(tables, tablefileset):
+        # get meta column names
+        meta_cols = inverse_filter_by_prefix(
+          tables[0].columns, tablefileset.feature_classes)
+        # iterate over the plate meta columns and drop them from the tables
+        for i in range(1, len(tables)):
+            meta_cols_curr = inverse_filter_by_prefix(
+              tables[i], tablefileset.feature_classes)
+
+            if meta_cols != meta_cols_curr:
+                logger.error(
+                  "Meta column names are not equal: {}".format(tablefileset))
+                return None
+
+            feat_col_names = filter_by_prefix(
+              tables[i], tablefileset.feature_classes)
+            tables[i] = tables[i][feat_col_names]
+
+        return tables
 
     @enforce.runtime_validation
     def process(self, data: DataSet):
@@ -161,22 +193,58 @@ class ResultSet:
         :rtype: DataSet
         """
 
-        # only take subset of columns that every thingy has
-        # additionally return the columns in order to check for bad format
-        data, feat_cols = self._get_columns(data)
-        if len(feat_cols) != len(self._shared_features):
+        # only take subset of columns that every tablefileset has
+        # otherwise we don't get a nice tabular dataset in the end
+        data = self._set_correct_columns(data)
+        # TODO: ugly
+        if data is None:
+            return None
+        data = self._normalizer.normalize_plate(data)
+        # filter by well/sirna/gene
+        data = self._filter_data(data)
+        # TODO: ugly
+        if len(data.data) == 0:
+            return None
+        # sample from each well 'sample' number if times
+        data = self._sample_data(data)
+
+        return data
+
+    def _set_correct_columns(self, data):
+        # Subset the dataframe for columns that are shared
+        # in all tablefile sets.
+
+        feature_classes = data.feature_classes
+        # get the columns in data that are feature columns
+        feat_cols = set(filter_by_prefix(data.data.columns, feature_classes))
+        # get the columns that are meta columns, such as gene/well/etc.
+        meta_cols = inverse_filter_by_prefix(data.data.columns, feature_classes)
+        # make sure to only take columns that are in the
+        feat_cols = list(feat_cols & set(self._shared_features))
+        data.data = data.data[meta_cols + feat_cols]
+        # add features that are explicitely desired
+        # but not found in every screen :(
+        for feature_class in feature_classes:
+            if feature_class in ADDED_COLUMNS_FOR_PRINTING:
+                for col in ADDED_COLUMNS_FOR_PRINTING[feature_class]:
+                    add_col = feature_class + "." + col
+                    if add_col not in data.data:
+                        # add the new column
+                        data.data.insert(len(data.data.columns), add_col, 0)
+                        # add the column to the new feature set for later check
+                        feat_cols.append(add_col)
+        # sort columns
+        # (this should be a sufficient condition for optimal overlap)
+        feat_cols = sorted(feat_cols)
+        data.data = data.data.reindex_axis(
+          meta_cols + feat_cols, axis=1, copy=False)
+        data.feature_columns = feat_cols
+
+        if len(data.feature_columns) != len(self._shared_features):
             logger.warning(
               "{} does not have the correct number of features. Skipping."
                   .format(data.filenames))
             return None
-        # normalize the feature columns
-        data = self._normalizer.normalize_plate(data, feat_cols)
-        # filter on well/sirna/gene
-        data = self._filter_data(data)
-        if len(data) == 0:
-            return None
-        # sample from each gene/sirna/well group if wanted
-        data = self._sample_data(data)
 
         return data
 
@@ -186,28 +254,17 @@ class ResultSet:
         sirna = self.__getattribute__("_" + SIRNA)
         logger.info("\tfiltering data on well '{}', gene '{}' and sirna '{}'."
                     .format(well, gene, sirna))
-        data = data[
-            data.well.str.contains(well) &
-            data.gene.str.contains(gene) &
-            data.sirna.str.contains(sirna)
-        ]
+        data.data = data.data[
+            data.data.well.str.contains(well) &
+            data.data.gene.str.contains(gene) &
+            data.data.sirna.str.contains(sirna)]
+
         return data
 
     def _sample_data(self, data):
         if self.__getattribute__("_" + SAMPLE) != ResultSet._sar_:
             logger.info("\tsampling {} cells/well.".format(str(self._sample)))
             data = data.data.groupby([WELL, GENE, SIRNA]).apply(self._filter_fn)
-        return data
-
-    @staticmethod
-    def _append_to_data(data, table):
-        data.data.insert(0, "plate", table.plate)
-        data.data.insert(0, "replicate", table.replicate)
-        data.data.insert(0, "design", table.design)
-        data.data.insert(0, "library", table.library)
-        data.data.insert(0, "pathogen", table.pathogen)
-        data.data.insert(0, "study", table.study)
-
         return data
 
     def _set_filter(self, **kwargs):
@@ -225,102 +282,37 @@ class ResultSet:
         return fls
 
     def _get_shared_features(self):
-        # suppose one plate does not have cells/nuclei/perinuclei?
-        # this messes up the whole featureset
-
+        # Suppose one plate does not have cells/nuclei/perinuclei?
+        # This messes up the whole featureset
         # TODO: check for all three (cells/nuclei/perinuclei) feature classes
         # here??? This would remove some plates.
+        # note in nov 2017: what did i write there?????
+        # second note in nov 2017: write better comments in the future
+        # third note in nov 2017: also write better notes in the future
+
+        # create a minimal set of features for every table set file
         features_set = set()
         for tablefile in self._tablefile_sets:
-            if not features_set:
-                features_set |= tablefile.features
+            if len(features_set) == 0:
+                features_set = tablefile.features
             else:
                 features_set &= tablefile.features
-        # add all required columns that we most definitely want to cell
-        # does that make sense? i guess this introduces crap
+        # add all required columns that we most definitely want all table file
+        # sets to have, e.g. bacterial counts or parent nuclei
         for feature_class, cols in ADDED_COLUMNS_FOR_PRINTING.items():
             for col in cols:
                 add_col = feature_class + "." + col
                 features_set.add(add_col)
+
         return sorted(list(features_set))
 
-    def _get_columns(self, data, feature_classes):
-        # Subset the dataframe for columns that are shared
-        # in all tablefile sets.
-
-        # get the columns in data that are feature columns
-        feat_cols = set(self._get_feature_column_names(data, feature_classes))
-        # get the columns that are meta columns, such as gene/well/etc.
-        meta_cols = self._get_meta_column_names(data, feature_classes)
-        # make sure to only take columns that are in the
-        feat_cols = list(feat_cols & set(self._shared_features))
-        # get the new data
-        data = data[meta_cols + feat_cols]
-        # add features that are explicitely desired
-        # but not found in every screen :(
-        for feature_class in feature_classes:
-            if feature_class in ADDED_COLUMNS_FOR_PRINTING:
-                for col in ADDED_COLUMNS_FOR_PRINTING[feature_class]:
-                    add_col = feature_class + "." + col
-                    if add_col not in data:
-                        # add the new column
-                        data.insert(len(data.columns), add_col, 0)
-                        # add the column to the new feature set for later check
-                        feat_cols.append(add_col)
-        # sort columns (this should be a sufficient condition
-        # for optimal overlap)
-        feat_cols = sorted(feat_cols)
-        # reindex the data set
-        data = data.reindex_axis(meta_cols + feat_cols, axis=1, copy=False)
-        return [data, feat_cols]
-
     @staticmethod
-    def _get_feature_column_names(data, feature_classes):
-        """
-        Get feature column names.
-        """
+    def _insert_columns(data, table):
+        data.data.insert(0, "plate", table.plate)
+        data.data.insert(0, "replicate", table.replicate)
+        data.data.insert(0, "design", table.design)
+        data.data.insert(0, "library", table.library)
+        data.data.insert(0, "pathogen", table.pathogen)
+        data.data.insert(0, "study", table.study)
 
-        feat_cols = list(
-          filter(lambda x: any(x.startswith(f) for f in feature_classes),
-                 data.columns))
-        return feat_cols
-
-    @staticmethod
-    def _get_meta_column_names(data, feature_classes):
-        """
-        Get meta column names.
-        """
-
-        meta_cols = list(
-          filter(lambda x: not any(x.startswith(f) for f in feature_classes),
-                 data.columns))
-        return meta_cols
-
-    @staticmethod
-    def _tables_have_correct_shapes(tables, tablefileset):
-        for i in range(len(tables) - 1):
-            for j in range(i + 1, len(tables)):
-                if tables[i].shape[0] != tables[j].shape[0]:
-                    logger.error("TableFileSet's {} data files do not "
-                                 "have matching dimensions."
-                                 .format(tablefileset.classifier))
-                    return False
-        return True
-
-    def _drop_meta_columns(self, tables, tablefileset):
-        # get meta column names
-        meta_cols = self._get_meta_column_names(
-          tables[0], tablefileset.feature_classes)
-        # iterate over the plate meta columns and drop them from the tables
-        for i in range(1, len(tables)):
-            meta_cols_curr = self._get_meta_column_names(
-              tables[i], tablefileset.feature_classes)
-            if meta_cols != meta_cols_curr:
-                logger.error("Meta column names are not equal: {}"
-                             .format(tablefileset))
-                return None
-            feat_col_names = self._get_feature_column_names(
-              tables[i], tablefileset.feature_classes)
-            tables[i] = tables[i][feat_col_names]
-
-        return tables
+        return data
