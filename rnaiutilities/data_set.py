@@ -26,7 +26,7 @@ class DataSet:
     preprocessing and writing data.
     """
 
-    def __init__(self, data, feature_columns):
+    def __init__(self, data, feature_columns, classifier):
         """
         Constructor of DataSet. Needs a pandas DataFrame and a list of strings
          representing the feature columns.
@@ -40,6 +40,13 @@ class DataSet:
 
         self.__data = data
         self.__feature_columns = feature_columns
+        self.__classifier = classifier
+
+    def __str__(self):
+        return self.__classifier
+
+    def __repr__(self):
+        return self.__str__()
 
     @property
     def data(self):

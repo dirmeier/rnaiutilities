@@ -23,6 +23,8 @@ import logging
 import pandas
 import pathlib
 
+import sys
+
 logger = logging.getLogger(__name__)
 
 
@@ -37,7 +39,7 @@ class IO:
         else:
             out = IO._flat_ if f.endswith(IO._flat_) else IO._h5_
             if pathlib.Path(f).is_file():
-                raise ValueError(
+                sys.exit(
                   "File {} already exists. Please delete/rename the file first"
                   " to avoid erroneously overwriting.".format(f))
             logger.info("Writing to {} ".format(out))
@@ -53,18 +55,18 @@ class IO:
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
-    def dump(self, df, filesuffix):
+    def dump(self, df):
         if not isinstance(df, pandas.DataFrame):
             raise TypeError("Please provide a resultset object")
         if self._format is None or self._format == IO._flat_:
             self._to_tsv(df)
         elif self._format == IO._h5_:
-            self._to_h5(df, filesuffix)
+            self._to_h5(df)
         else:
             raise ValueError("What?")
 
-    def _to_h5(self, df, filesuffix):
-        df.to_hdf(self._filename, filesuffix)
+    def _to_h5(self, df):
+        df.to_hdf(self._filename, str(df))
 
     def _to_tsv(self, data):
         if self._format is None:

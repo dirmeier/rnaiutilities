@@ -88,9 +88,7 @@ class QueryResult:
         with IO(fh) as io:
             for data in self:
                 try:
-                    # TODO: what is tablefile suffixes
-                    # TODO: safe classifier
-                    io.dump(data, tablefileset.filesuffixes)
+                    io.dump(data)
                 except ValueError as e:
                     logger.error("Error occured for tablefileset {}: {}"
                                  .format(data, e))
@@ -153,7 +151,9 @@ class QueryResult:
         # merge the three tables together column-wise
         data_merged = pandas.concat(tables, axis=1)
 
-        return DataSet(data_merged, tablefileset.features)
+        return DataSet(data_merged,
+                       tablefileset.features,
+                       tablefileset.classifier)
 
     @staticmethod
     def _check_table_dimensions(tables, tfs):
