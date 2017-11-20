@@ -23,7 +23,7 @@ import sys
 import logging
 
 from rnaiutilities.db.dbms import DBMS
-from rnaiutilities.query_result_set import ResultSet
+from rnaiutilities.query_result import QueryResult
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
@@ -138,11 +138,10 @@ class Query:
         :param sample: sample from every well x times
 
         :return: returns a lazy ResultSet
-        :rtype: ResultSet
+        :rtype: QueryResult
         """
 
         return self._compose(from_file=from_file,
-                             sample=sample,
                              study=study,
                              pathogen=pathogen,
                              library=library,
@@ -157,7 +156,7 @@ class Query:
     def _compose(self, file_name, sample, **kwargs):
         with DBMS(self._db) as d:
             res = d.tableset(file_name, **kwargs)
-        return ResultSet(res, sample, **kwargs)
+        return QueryResult(res, **kwargs)
 
     def insert(self, path):
         """

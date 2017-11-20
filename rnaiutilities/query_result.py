@@ -27,11 +27,11 @@ import numpy as np
 import pandas
 
 from rnaiutilities.data_set import DataSet
-from rnaiutilities.filesets.table_file_set import TableFileSet
 from rnaiutilities.globals import WELL, GENE, SIRNA, \
     SAMPLE, ADDED_COLUMNS_FOR_PRINTING
 from rnaiutilities.io.io import IO
 from rnaiutilities.normalization.normalizer import Normalizer
+from rnaiutilities.table_file_set import TableFileSet
 from rnaiutilities.utility.functional import filter_by_prefix, \
     inverse_filter_by_prefix
 
@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class ResultSet:
+class QueryResult:
     """
     Set of results derived from a database query.
     """
@@ -47,17 +47,12 @@ class ResultSet:
     _filter_attributes_ = [GENE, SIRNA, WELL, SAMPLE]
     _sar_ = ".*"
 
-    def __init__(self, tablefile_sets, sample, **kwargs):
+    def __init__(self, tablefile_sets, **kwargs):
         self._tablefile_sets = tablefile_sets
         self._print_header = True
         # filters applied for qurying
         self._filters = self._set_filter(**kwargs)
-        self._sample = sample if sample is not None else 2 ** 30
-        # lambda function for sampling
-        self._filter_fn = lambda x: x.loc[np.random.choice(
-          x.index, self._sample, False), :] if len(x) >= self._sample else x
-        # TODO: this is solved so badly
-        # TODO (in nov): what was wrong with that?
+
         self._shared_features = self._get_shared_features()
         self._normalizer = Normalizer()
 
@@ -71,7 +66,12 @@ class ResultSet:
         for tablefileset in self._tablefile_sets:
             yield tablefileset
 
-    def dump(self, fh=None, normalize="zscore"):
+    self._sample = sample if sample is not None else 2 ** 30
+    # lambda function for sampling
+    self._filter_fn = lambda x: x.loc[np.random.choice(
+      x.index, self._sample, False), :] if len(x) >= self._sample else x
+
+    def dump(self, sample, normalize="zscore", fh=None):
         """
         Print the result set of the database query to tsv or stdout. If a string
         is given as param *fh* prints to file, otherwise if None is given prints
@@ -85,8 +85,9 @@ class ResultSet:
         """
 
         # TODO: normalize param should be put into constructor
-
         self._set_normalization(*normalize)
+        self._set_samples(sample, )
+
         with IO(fh) as io:
             for tablefileset in self._tablefile_sets:
                 self._dump(tablefileset, io)
@@ -262,7 +263,7 @@ class ResultSet:
         return data
 
     def _sample_data(self, data):
-        if self.__getattribute__("_" + SAMPLE) != ResultSet._sar_:
+        if self.__getattribute__("_" + SAMPLE) != QueryResult._sar_:
             logger.info("\tsampling {} cells/well.".format(str(self._sample)))
             data = data.data.groupby([WELL, GENE, SIRNA]).apply(self._filter_fn)
         return data
@@ -270,14 +271,14 @@ class ResultSet:
     def _set_filter(self, **kwargs):
         fls = []
         for k, v in kwargs.items():
-            if k in ResultSet._filter_attributes_:
+            if k in QueryResult._filter_attributes_:
                 if v is not None:
                     reg = "^" + "|".join(v.split(",")) + "$"
                     # user provided gene/sirna/well regex to match
                     self.__setattr__("_" + k, reg)
                 else:
                     # if user didnt provide anything match all
-                    self.__setattr__("_" + k, ResultSet._sar_)
+                    self.__setattr__("_" + k, QueryResult._sar_)
                 fls.append(v)
         return fls
 

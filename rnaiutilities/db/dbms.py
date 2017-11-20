@@ -33,8 +33,8 @@ from rnaiutilities.db.db_query_builder import DatabaseQueryBuilder
 from rnaiutilities.db.postgres_connection import PostgresConnection
 from rnaiutilities.db.sqlite_connection import SQLiteConnection
 from rnaiutilities.db.utility import feature_table_name
-from rnaiutilities.filesets.table_file_set import TableFileSet
 from rnaiutilities.globals import GENE, SIRNA, WELL
+from rnaiutilities.table_file_set import TableFileSet
 from rnaiutilities.utility.files import filter_files, read_yaml
 
 logger = logging.getLogger(__name__)

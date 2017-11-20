@@ -56,71 +56,50 @@ def insert(path, db):
 @cli.command()
 @click.argument(
   "select",
-  type=click.Choice(["study", "pathogen", "library", "plate",
-                     "design", "gene", "sirna", "well", "featureclass"]))
-@click.option(
-  "--db", default=None,
-  help="Sqlite database file."
-       " If unset uses a postgres database listening on port 5432."
-       " Otherwise, if set, uses the database file and opens a "
-       "connection to sqlite.")
-@click.option(
-  "--study",
-  default=None,
-  help="The study to query for, e.g. like 'infectx', "
-       "or a comma-separated string of libraries, "
-       "such as 'infectx,infectx_published'.")
-@click.option(
-  "--pathogen",
-  default=None,
-  help="The pathogen to query for, e.g. like 'adeno', "
-       "or a comma-separated string of pathogens, "
-       "such as 'adeno,bartonella'.")
-@click.option(
-  "--library",
-  default=None,
-  help="The library to query for, e.g. like 'd', "
-       "or a comma-separated string of libraries, "
-       "such as 'd,q'.")
-@click.option(
-  "--plate",
-  default=None,
-  help="The plate to query for, e.g. like 'dz03-1k', "
-       "or a comma-separated string of plates, "
-       "such as 'dz03-1k,dz04-1k'.")
-@click.option(
-  "--design",
-  default=None,
-  help="The design to query for, e.g. like 'p'.")
-@click.option(
-  "--replicate",
-  default=None,
-  type=int,
-  help="The replicate to query for, e.g. like '1', "
-       "or a comma-separated string of replicates, "
-       "such as '1,4'.")
-@click.option(
-  "--gene",
-  default=None,
-  help="The gene to query for, e.g. like "
-       "'pik3ca', or a comma-separated string of genes, "
-       "such as 'pik3ca,pik4ca' ")
-@click.option(
-  "--sirna",
-  default=None,
-  help="The sirna to query for, e.g. like 's12312', "
-       "or a comma-separated string of sirnas, "
-       "such as 's12312,s123112'.")
-@click.option(
-  "--well",
-  default=None,
-  help="The well to query for, e.g. like 'a01', "
-       "or a comma-separated string of wells, "
-       "such as 'a01,l05'.")
-@click.option(
-  "--featureclass",
-  default=None,
-  help="The featureclass to query for, e.g. like 'cells'.")
+  type=click.Choice(
+    ["study", "pathogen", "library", "plate", "design", "gene", "sirna", "well",
+     "featureclass"]))
+@click.option("--db", default=None,
+              help="Sqlite database file."
+                   " If unset uses a postgres database listening on port 5432."
+                   " Otherwise, if set, uses the database file and opens a "
+                   "connection to sqlite.")
+@click.option("--study", default=None,
+              help="The study to query for, e.g. like 'infectx', "
+                   "or a comma-separated string of libraries, "
+                   "such as 'infectx,infectx_published'.")
+@click.option("--pathogen", default=None,
+              help="The pathogen to query for, e.g. like 'adeno', "
+                   "or a comma-separated string of pathogens, "
+                   "such as 'adeno,bartonella'.")
+@click.option("--library", default=None,
+              help="The library to query for, e.g. like 'd', "
+                   "or a comma-separated string of libraries, "
+                   "such as 'd,q'.")
+@click.option("--plate", default=None,
+              help="The plate to query for, e.g. like 'dz03-1k', "
+                   "or a comma-separated string of plates, "
+                   "such as 'dz03-1k,dz04-1k'.")
+@click.option("--design", default=None,
+              help="The design to query for, e.g. like 'p'.")
+@click.option("--replicate", default=None, type=int,
+              help="The replicate to query for, e.g. like '1', "
+                   "or a comma-separated string of replicates, "
+                   "such as '1,4'.")
+@click.option("--gene", default=None,
+              help="The gene to query for, e.g. like "
+                   "'pik3ca', or a comma-separated string of genes, "
+                   "such as 'pik3ca,pik4ca' ")
+@click.option("--sirna", default=None,
+              help="The sirna to query for, e.g. like 's12312', "
+                   "or a comma-separated string of sirnas, "
+                   "such as 's12312,s123112'.")
+@click.option("--well", default=None,
+              help="The well to query for, e.g. like 'a01', "
+                   "or a comma-separated string of wells, "
+                   "such as 'a01,l05'.")
+@click.option("--featureclass", default=None,
+              help="The featureclass to query for, e.g. like 'cells'.")
 def select(select, db, study, pathogen, library, design, replicate, plate,
            gene, sirna, well, featureclass):
     """
@@ -145,89 +124,60 @@ def select(select, db, study, pathogen, library, design, replicate, plate,
 
 @cli.command()
 @click.argument("outfile", type=str)
+@click.option("--db", default=None,
+              help="Sqlite database file."
+                   " If unset uses a postgres database listening on port 5432."
+                   " Otherwise, if set, uses the database file and opens a"
+                   " connection to sqlite.")
 @click.option(
-  "--db",
-  default=None,
-  help="Sqlite database file."
-       " If unset uses a postgres database listening on port 5432."
-       " Otherwise, if set, uses the database file and opens a"
-       " connection to sqlite.")
-@click.option(
-  "--normalize",
-  default="zscore",
+  "--normalize", default="zscore",
   help="The normalization methods to use, e.g. like '{}',"
        " or a comma-separated string of normalisations"
        " such as '{},{},{}'. Defaults to 'zscore'."
        " If you do NOT want to normalize you need to explicitely set to 'none'."
       .format(ZSCORE, BSCORE, LOESS, ZSCORE, NONE))
-@click.option(
-  "--from-file",
-  default=None,
-  help="Input file in case you already queried the database using"
-       "`rnai-query query`.")
-@click.option(
-  "--study",
-  default=None,
-  help="The study to query for, e.g. like 'infectx' "
-       " or a comma-separated string of libraries,"
-       " such as 'infectx,infectx_published'.")
-@click.option(
-  "--pathogen",
-  default=None,
-  help="The pathogen to query for, e.g. like 'adeno', "
-       "or a comma-separated string of pathogens, "
-       "such as 'adeno,bartonella'.")
-@click.option(
-  "--library",
-  default=None,
-  help="The library to query for, e.g. like 'd', "
-       "or a comma-separated string of libraries, "
-       "such as 'd,q'.")
-@click.option(
-  "--plate",
-  default=None,
-  help="The plate to query for, e.g. like 'dz03-1k', "
-       "or a comma-separated string of plates, "
-       "such as 'dz03-1k,dz04-1k'.")
-@click.option(
-  "--design",
-  default=None,
-  help="The design to query for, e.g. like 'p'.")
-@click.option(
-  "--replicate",
-  default=None,
-  type=int,
-  help="The replicate to query for, e.g. like '1', "
-       "or a comma-separated string of replicates, "
-       "such as '1,4'.")
-@click.option(
-  "--gene",
-  default=None,
-  help="The gene to query for, e.g. like "
-       "'pik3ca', or a comma-separated string of genes, "
-       "such as 'pik3ca,pik4ca' ")
-@click.option(
-  "--sirna",
-  default=None,
-  help="The sirna to query for, e.g. like 's12312', "
-       "or a comma-separated string of sirnas, "
-       "such as 's12312,s123112'.")
-@click.option(
-  "--well",
-  default=None,
-  help="The well to query for, e.g. like 'a01', "
-       "or a comma-separated string of wells, "
-       "such as 'a01,l05'.")
-@click.option(
-  "--featureclass",
-  default=None,
-  help="The featureclass to query for, e.g. like 'cells'.")
-@click.option(
-  "--sample",
-  default=None,
-  type=int,
-  help="The amount of single cells that are sampled per well, "
-       "like '100'. If unset defaults to all cells.")
+@click.option("--from-file", default=None,
+              help="Input file in case you already queried the database using"
+                   "`rnai-query query`.")
+@click.option("--study", default=None,
+              help="The study to query for, e.g. like 'infectx' "
+                   " or a comma-separated string of libraries,"
+                   " such as 'infectx,infectx_published'.")
+@click.option("--pathogen", default=None,
+              help="The pathogen to query for, e.g. like 'adeno', "
+                   "or a comma-separated string of pathogens, "
+                   "such as 'adeno,bartonella'.")
+@click.option("--library", default=None,
+              help="The library to query for, e.g. like 'd', "
+                   "or a comma-separated string of libraries, "
+                   "such as 'd,q'.")
+@click.option("--plate", default=None,
+              help="The plate to query for, e.g. like 'dz03-1k', "
+                   "or a comma-separated string of plates, "
+                   "such as 'dz03-1k,dz04-1k'.")
+@click.option("--design", default=None,
+              help="The design to query for, e.g. like 'p'.")
+@click.option("--replicate", default=None, type=int,
+              help="The replicate to query for, e.g. like '1', "
+                   "or a comma-separated string of replicates, "
+                   "such as '1,4'.")
+@click.option("--gene", default=None,
+              help="The gene to query for, e.g. like "
+                   "'pik3ca', or a comma-separated string of genes, "
+                   "such as 'pik3ca,pik4ca' ")
+@click.option("--sirna", default=None,
+              help="The sirna to query for, e.g. like 's12312', "
+                   "or a comma-separated string of sirnas, "
+                   "such as 's12312,s123112'.")
+@click.option("--well", default=None,
+              help="The well to query for, e.g. like 'a01', "
+                   "or a comma-separated string of wells, "
+                   "such as 'a01,l05'.")
+@click.option("--featureclass", default=None,
+              help="The featureclass to query for, e.g. like 'cells'.")
+@click.option("--sample", default=None, type=int,
+              help="The amount of single cells that are sampled per well, "
+                   "like '100'. If unset defaults to all cells.")
 @click.option(
   "--debug",
   is_flag=True,
@@ -257,6 +207,7 @@ def compose(outfile, db, normalize, from_file,
                             well=well,
                             featureclass=featureclass,
                             sample=sample)
+
     if debug:
         for r in res:
             logger.debug(r.detail())
@@ -266,12 +217,11 @@ def compose(outfile, db, normalize, from_file,
 
 @cli.command()
 @click.argument("outfile", type=str)
-@click.option(
-  "--db", default=None,
-  help="Sqlite database file."
-       " If unset uses a postgres database listening on port 5432."
-       " Otherwise, if set, uses the database file and opens a"
-       " connection to sqlite.")
+@click.option("--db", default=None,
+              help="Sqlite database file."
+                   " If unset uses a postgres database listening on port 5432."
+                   " Otherwise, if set, uses the database file and opens a"
+                   " connection to sqlite.")
 @click.option("--study", default=None,
               help="The study to query for, e.g. like 'infectx' "
                    " or a comma-separated string of libraries,"

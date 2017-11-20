@@ -1,3 +1,4 @@
+.coverage
 sql/*
 tix.db
 .ipynb_checkpoints

@@ -20,11 +20,7 @@
 
 
 import logging
-import re
-from itertools import chain
 
-from rnaiutilities.db.db_setup import DatabaseInserter
-from rnaiutilities.filesets.table_file_set import TableFileSet
 from rnaiutilities.globals import FEATURECLASS, WELL
 from rnaiutilities.globals import GENE, SIRNA, LIBRARY, DESIGN
 from rnaiutilities.globals import REPLICATE, PLATE, STUDY, PATHOGEN
