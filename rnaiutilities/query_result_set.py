@@ -25,6 +25,7 @@ import os
 import numpy as np
 import pandas
 
+from rnaiutilities.data_set import DataSet
 from rnaiutilities.filesets.table_file_set import TableFileSet
 from rnaiutilities.globals import WELL, GENE, SIRNA, \
     SAMPLE, ADDED_COLUMNS_FOR_PRINTING
@@ -53,6 +54,7 @@ class ResultSet:
         self._filter_fn = lambda x: x.loc[np.random.choice(
           x.index, self._sample, False), :] if len(x) >= self._sample else x
         # TODO: this is solved so badly
+        # TODO (in nov): what was wrong with that?
         self._shared_features = self._get_shared_features()
         self._normalizer = Normalizer()
 
@@ -79,8 +81,9 @@ class ResultSet:
         :type normalize: list(str)
         """
 
-        self._set_normalization(*normalize)
+        # TODO: normalize param should be put into constructor
 
+        self._set_normalization(*normalize)
         with IO(fh) as io:
             for tablefileset in self._tablefile_sets:
                 self._dump(tablefileset, io)
@@ -100,25 +103,6 @@ class ResultSet:
             data = self.read(tablefileset)
             if data is None:
                 return
-            # only take subset of columns that every thingy has
-            # additionally return the columns in order to check for bad format
-            data, feat_cols = self._get_columns(
-              data, tablefileset.feature_classes)
-            if len(feat_cols) != len(self._shared_features):
-                logger.warning(
-                  "{} does not have the correct number of features. Skipping."
-                      .format(tablefileset.filenames))
-                return
-            # normalize the feature columns
-            data = self._normalizer.normalize_plate(data, feat_cols)
-            # filter on well/sirna/gene
-            data = self._filter_data(data)
-            if len(data) == 0:
-                return
-            # sample from each gene/sirna/well group if wanted
-            data = self._sample_data(data)
-            # append study/pathogen/library/..
-            data = self._append_to_data(data, tablefileset)
             io.dump(data, tablefileset.filesuffixes)
         else:
             logger.warning("Could not find files: {}"
@@ -126,17 +110,16 @@ class ResultSet:
 
     def read(self, tablefileset):
         """
-        Read the table files from a plate and concatenate the single tables.
+        Read the data files from a plate and concatenate the single tables.
         Since the dimensions of the tables should be the same, the concatenation
          should work. If the dimensions do not fit (i.e. the mapping did not
          work), `None` is returned.
 
         :param tablefileset: the object to be parsed
         :type tablefileset: TableFileSet
-
-        :return: returns the merged data as dataframe or None if the concat did
+        :return: returns the merged data as DataSet or None if the concat did
          not work
-        :rtype: pandas.DataFrame
+        :rtype: DataSet
         """
 
         if not isinstance(tablefileset, TableFileSet):
@@ -144,8 +127,7 @@ class ResultSet:
         # read the X files to memory
         tables = [
             pandas.read_csv(f, sep="\t", header=0)
-            for f in tablefileset.filenames
-        ]
+            for f in tablefileset.filenames]
         # check if the dimensions of the tables are the same
         if not self._tables_have_correct_shapes(tables, tablefileset):
             return None
@@ -155,7 +137,49 @@ class ResultSet:
             return None
         # merge the three tables together column-wise
         data_merged = pandas.concat(tables, axis=1)
-        return data_merged
+        return DataSet(data_merged,
+                       tablefileset.features_classes,
+                       tablefileset.features)
+
+    def process(self, data):
+        """
+        Process a plate data set file. The following preprocessing
+         steps are done:
+
+        * drop columns that are not in the shared feature set, i.e., keep only
+          columns taht every TableFileSet has
+        * normalize the features using the set normalisation parameters
+
+        :param data: a plate data set
+        :type data: DataSet
+        :return: returns the preprocessed data set or None
+        :rtype: DataSet
+        """
+
+        if not isinstance(data, DataSet):
+            raise ValueError("Please privide an instance of 'DataSet'.")
+
+        # only take subset of columns that every thingy has
+        # additionally return the columns in order to check for bad format
+        data, feat_cols = self._get_columns(
+          data, data.feature_classes)
+        if len(feat_cols) != len(self._shared_features):
+            logger.warning(
+              "{} does not have the correct number of features. Skipping."
+                  .format(data.filenames))
+            return None
+        # normalize the feature columns
+        data = self._normalizer.normalize_plate(data, feat_cols)
+        # filter on well/sirna/gene
+        data = self._filter_data(data)
+        if len(data) == 0:
+            return None
+        # sample from each gene/sirna/well group if wanted
+        data = self._sample_data(data)
+        # append study/pathogen/library/..
+        data = self._append_to_data(data, data)
+
+
 
     def _filter_data(self, data):
         well = self.__getattribute__("_" + WELL)

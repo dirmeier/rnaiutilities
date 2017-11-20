@@ -154,10 +154,10 @@ class Query:
                              well=well,
                              featureclass=self._featureclass(featureclass))
 
-    def _compose(self, file_name, **kwargs):
+    def _compose(self, file_name, sample, **kwargs):
         with DBMS(self._db) as d:
             res = d.tableset(file_name, **kwargs)
-        return ResultSet(res, **kwargs)
+        return ResultSet(res, sample, **kwargs)
 
     def insert(self, path):
         """
