@@ -28,6 +28,6 @@ class DataSet:
 
     def __init__(self, data, feature_columns):
         self.__data = data
-        self.__feature_columns  = feature_columns
+        self.__feature_columns = feature_columns
 
 

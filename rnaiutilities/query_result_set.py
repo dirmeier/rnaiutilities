@@ -22,6 +22,7 @@
 import logging
 import os
 
+import enforce
 import numpy as np
 import pandas
 
@@ -103,17 +104,20 @@ class ResultSet:
             data = self.read(tablefileset)
             if data is None:
                 return
+            # append study/pathogen/library/..
+            data = self._append_to_data(data, tablefileset)
             io.dump(data, tablefileset.filesuffixes)
         else:
             logger.warning("Could not find files: {}"
                            .format(", ".join(tablefileset.filenames)))
 
-    def read(self, tablefileset):
+    @enforce.runtime_validation
+    def read(self, tablefileset: TableFileSet):
         """
         Read the data files from a plate and concatenate the single tables.
         Since the dimensions of the tables should be the same, the concatenation
-         should work. If the dimensions do not fit (i.e. the mapping did not
-         work), `None` is returned.
+        should work. If the dimensions do not fit (i.e. the mapping did not
+        work), `None` is returned.
 
         :param tablefileset: the object to be parsed
         :type tablefileset: TableFileSet
@@ -122,8 +126,6 @@ class ResultSet:
         :rtype: DataSet
         """
 
-        if not isinstance(tablefileset, TableFileSet):
-            raise ValueError("Provide a TableFileSet object.")
         # read the X files to memory
         tables = [
             pandas.read_csv(f, sep="\t", header=0)
@@ -141,14 +143,17 @@ class ResultSet:
                        tablefileset.features_classes,
                        tablefileset.features)
 
-    def process(self, data):
+    @enforce.runtime_validation
+    def process(self, data: DataSet):
         """
         Process a plate data set file. The following preprocessing
          steps are done:
 
         * drop columns that are not in the shared feature set, i.e., keep only
-          columns taht every TableFileSet has
+          columns that every TableFileSet has
         * normalize the features using the set normalisation parameters
+        * filter the data by the defined criteria (i.e. genes/sirna)
+        * sample the cells from every well
 
         :param data: a plate data set
         :type data: DataSet
@@ -156,13 +161,9 @@ class ResultSet:
         :rtype: DataSet
         """
 
-        if not isinstance(data, DataSet):
-            raise ValueError("Please privide an instance of 'DataSet'.")
-
         # only take subset of columns that every thingy has
         # additionally return the columns in order to check for bad format
-        data, feat_cols = self._get_columns(
-          data, data.feature_classes)
+        data, feat_cols = self._get_columns(data)
         if len(feat_cols) != len(self._shared_features):
             logger.warning(
               "{} does not have the correct number of features. Skipping."
@@ -176,10 +177,8 @@ class ResultSet:
             return None
         # sample from each gene/sirna/well group if wanted
         data = self._sample_data(data)
-        # append study/pathogen/library/..
-        data = self._append_to_data(data, data)
 
-
+        return data
 
     def _filter_data(self, data):
         well = self.__getattribute__("_" + WELL)
@@ -196,19 +195,19 @@ class ResultSet:
 
     def _sample_data(self, data):
         if self.__getattribute__("_" + SAMPLE) != ResultSet._sar_:
-            logger.info("\tsampling {} cells per well."
-                        .format(str(self._sample)))
-            data = data.groupby([WELL, GENE, SIRNA]).apply(self._filter_fn)
+            logger.info("\tsampling {} cells/well.".format(str(self._sample)))
+            data = data.data.groupby([WELL, GENE, SIRNA]).apply(self._filter_fn)
         return data
 
     @staticmethod
     def _append_to_data(data, table):
-        data.insert(0, "plate", table.plate)
-        data.insert(0, "replicate", table.replicate)
-        data.insert(0, "design", table.design)
-        data.insert(0, "library", table.library)
-        data.insert(0, "pathogen", table.pathogen)
-        data.insert(0, "study", table.study)
+        data.data.insert(0, "plate", table.plate)
+        data.data.insert(0, "replicate", table.replicate)
+        data.data.insert(0, "design", table.design)
+        data.data.insert(0, "library", table.library)
+        data.data.insert(0, "pathogen", table.pathogen)
+        data.data.insert(0, "study", table.study)
+
         return data
 
     def _set_filter(self, **kwargs):
@@ -246,9 +245,8 @@ class ResultSet:
         return sorted(list(features_set))
 
     def _get_columns(self, data, feature_classes):
-        """
-        Subset the dataframe for columns that are shared in all tablefile sets.
-        """
+        # Subset the dataframe for columns that are shared
+        # in all tablefile sets.
 
         # get the columns in data that are feature columns
         feat_cols = set(self._get_feature_column_names(data, feature_classes))

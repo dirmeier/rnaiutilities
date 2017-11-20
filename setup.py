@@ -36,7 +36,8 @@ setup(
       'tables>=3.3.0',
       'click>=6.7',
       'pytest>=3.0.5',
-      'tabulate>=0.7.7'
+      'tabulate>=0.7.7',
+      'enforce>=0.3.4'
   ],
   classifiers=[
       'Development Status :: 3 - Alpha',
