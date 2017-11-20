@@ -1,7 +1,34 @@
 #!/usr/bin/env bash
 
-pip uninstall rnaiutilities && pip install .
+function install {
+    pip uninstall rnaiutilities && pip install .
+    exit
+}
 
-rnai-query query --help
-rnai-parse parsereport --help
-py.test --cov=./
+function test {
+    rnai-query query --help
+    rnai-parse parsereport --help
+    coverage
+    exit
+}
+
+function coverage {
+    py.test --cov=./
+    exit
+}
+
+CMD=$1
+case "$CMD" in
+  install)
+    install
+  ;;
+  test)
+    test
+  ;;
+  coverage)
+    coverage
+  ;;
+  *)
+  install
+  test
+esac
