@@ -42,13 +42,13 @@ class TestConfig(unittest.TestCase):
         assert self._c.plate_id_file == "experiment_meta_file.tsv"
 
     def test_layout_file(self):
-        assert self._c.layout_file == "layout_file.tsv"
+        assert self._c.layout_file == "layout.tsv"
 
     def test_plate_folder(self):
         assert self._c.plate_folder == "./"
 
     def test_output_path(self):
-        assert self._c.output_path == "./"
+        assert self._c.output_path == "./out/test_files/"
 
     def test_plate_regex(self):
         assert self._c.plate_regex == ".*\/\w+\-\w[P|U]\-[G|K]\d+(-\w+)*\/.*"
