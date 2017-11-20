@@ -64,7 +64,8 @@ class QueryResult:
 
     def __iter__(self):
         for tablefileset in self._tablefile_sets:
-            yield tablefileset
+            # TODO: other name for that
+            yield self._compile(tablefileset)
 
     def dump(self, sample, normalize="zscore", fh=None):
         """
@@ -82,29 +83,34 @@ class QueryResult:
         """
 
         self._set_normalization(*normalize)
-        self.set_sample_size(sample)
+        self._set_sample_size(sample)
 
         with IO(fh) as io:
-            for tablefileset in self._tablefile_sets:
-                self._dump(tablefileset, io)
+            for data in self:
+                try:
+                    # TODO: what is tablefile suffixes
+                    # TODO: safe classifier
+                    io.dump(data, tablefileset.filesuffixes)
+                except ValueError as e:
+                    logger.error("Error occured for tablefileset {}: {}"
+                                 .format(data, e))
         logger.info("Successfully wrote table files!")
 
     def _set_normalization(self, *normalize):
         """
         Set the used normalisations.
 
-        :param normalize:
-        :return:
+        :param normalize: string of normalisation technmethodsiques
         """
         self._normalizer.set_normalization(*normalize)
 
-    def set_sample_size(self, sample):
+    def _set_sample_size(self, sample):
         self._sample = sample if sample is not None else 2 ** 30
         # lambda function for sampling
         self._filter_fn = lambda x: x.loc[np.random.choice(
           x.index, self._sample, False), :] if len(x) >= self._sample else x
 
-    def _dump(self, tablefileset, io):
+    def _compile(self, tablefileset):
         """
         Dumbs a table file to tsv/h5/stdout.
         """
@@ -112,19 +118,18 @@ class QueryResult:
         # test if the data files can be found
         if all(os.path.isfile(f) for f in tablefileset.filenames):
             # read the data files, i.e. cells/nuclei/perinuclei
-            data = self.read(tablefileset)
-            if data is None:
-                return
-            data = self.process(data)
+            data = self._read(tablefileset)
+            data = self._process(data)
             # append study/pathogen/library/...
             data = self._insert_columns(data, tablefileset)
-            io.dump(data, tablefileset.filesuffixes)
+            return data
         else:
-            logger.warning("Could not find files: {}"
-                           .format(", ".join(tablefileset.filenames)))
+            raise ValueError(
+              "Could not find files: {}".format(
+                  ", ".join(tablefileset.filenames)))
 
     @enforce.runtime_validation
-    def read(self, tablefileset: TableFileSet):
+    def _read(self, tablefileset: TableFileSet):
         """
         Read the data files from a plate and concatenate the single tables.
         Since the dimensions of the tables should be the same, the concatenation
@@ -142,26 +147,22 @@ class QueryResult:
         tables = [pandas.read_csv(f, sep="\t", header=0)
                   for f in tablefileset.filenames]
         # check if the dimensions of the tables are the same
-        if not self._tables_have_correct_shapes(tables, tablefileset):
-            return None
+        self._check_table_dimensions(tables, tablefileset)
         # iterate over the tables and drop the redundant meta information
         tables = self._drop_meta_columns(tables, tablefileset)
-        if tables is None:
-            return None
         # merge the three tables together column-wise
         data_merged = pandas.concat(tables, axis=1)
 
         return DataSet(data_merged, tablefileset.features)
 
     @staticmethod
-    def _tables_have_correct_shapes(tables, tfs):
+    def _check_table_dimensions(tables, tfs):
         for i in range(len(tables) - 1):
             for j in range(i + 1, len(tables)):
                 if tables[i].shape[0] != tables[j].shape[0]:
-                    logger.error("TableFileSet's {} data files do not have "
-                                 "matching dimensions.".format(tfs.classifier))
-                    return False
-        return True
+                    raise ValueError(
+                      "TableFileSet's {} data files do not have "
+                      "matching dimensions.".format(tfs.classifier))
 
     @staticmethod
     def _drop_meta_columns(tables, tablefileset):
@@ -172,11 +173,9 @@ class QueryResult:
         for i in range(1, len(tables)):
             meta_cols_curr = inverse_filter_by_prefix(
               tables[i], tablefileset.feature_classes)
-
             if meta_cols != meta_cols_curr:
-                logger.error(
+                raise ValueError(
                   "Meta column names are not equal: {}".format(tablefileset))
-                return None
 
             feat_col_names = filter_by_prefix(
               tables[i], tablefileset.feature_classes)
@@ -185,7 +184,7 @@ class QueryResult:
         return tables
 
     @enforce.runtime_validation
-    def process(self, data: DataSet):
+    def _process(self, data: DataSet):
         """
         Process a plate data set file. The following preprocessing
          steps are done:
@@ -205,15 +204,9 @@ class QueryResult:
         # only take subset of columns that every tablefileset has
         # otherwise we don't get a nice tabular dataset in the end
         data = self._set_correct_columns(data)
-        # TODO: ugly
-        if data is None:
-            return None
         data = self._normalizer.normalize_plate(data)
         # filter by well/sirna/gene
         data = self._filter_data(data)
-        # TODO: ugly
-        if len(data.data) == 0:
-            return None
         # sample from each well 'sample' number if times
         data = self._sample_data(data)
 
@@ -250,11 +243,12 @@ class QueryResult:
         data.feature_columns = feat_cols
 
         if len(data.feature_columns) != len(self._shared_features):
-            logger.warning(
+            raise ValueError(
               "{} does not have the correct number of features. Skipping."
-                  .format(data.filenames))
+              .format(data.filenames))
             return None
-
+        if data.data is None:
+            raise ValueError("Data is none after setting columns.")
         return data
 
     def _filter_data(self, data):
@@ -267,13 +261,16 @@ class QueryResult:
             data.data.well.str.contains(well) &
             data.data.gene.str.contains(gene) &
             data.data.sirna.str.contains(sirna)]
-
+        if len(data.data) == 0:
+            raise ValueError("Data is zero after filtering")
         return data
 
     def _sample_data(self, data):
         if self.__getattribute__("_" + SAMPLE) != QueryResult._sar_:
             logger.info("\tsampling {} cells/well.".format(str(self._sample)))
             data = data.data.groupby([WELL, GENE, SIRNA]).apply(self._filter_fn)
+            if len(data.data) == 0:
+                raise ValueError("Data is zero after sampling.")
         return data
 
     def _set_filter(self, **kwargs):
@@ -291,14 +288,6 @@ class QueryResult:
         return fls
 
     def _get_shared_features(self):
-        # Suppose one plate does not have cells/nuclei/perinuclei?
-        # This messes up the whole featureset
-        # TODO: check for all three (cells/nuclei/perinuclei) feature classes
-        # here??? This would remove some plates.
-        # note in nov 2017: what did i write there?????
-        # second note in nov 2017: write better comments in the future
-        # third note in nov 2017: also write better notes in the future
-
         # create a minimal set of features for every table set file
         features_set = set()
         for tablefile in self._tablefile_sets:
@@ -312,7 +301,6 @@ class QueryResult:
             for col in cols:
                 add_col = feature_class + "." + col
                 features_set.add(add_col)
-
         return sorted(list(features_set))
 
     @staticmethod
