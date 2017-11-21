@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Copyright (C) 2016 Simon Dirmeier
 #
 # This file is part of rnaiutilities.
@@ -21,10 +19,12 @@
 # @email = 'simon.dirmeier@bssae.ethz.ch'
 
 
-import os
+import glob
 import logging
+import os
 import unittest
-import pytest
+import shutil
+
 from rnaiutilities import Parser, Config
 
 logging.basicConfig(level=logging.DEBUG)
@@ -41,6 +41,7 @@ class TestParser(unittest.TestCase):
         self._folder = os.path.join(os.path.dirname(__file__), "..", "data")
         self._testfolder = os.path.join(self._folder, "out")
         self._file = os.path.join(self._folder, "config.yml")
+
         conf = Config(self._file)
         conf._plate_id_file = os.path.join(
           self._folder, "experiment_meta_file.tsv")
@@ -48,16 +49,17 @@ class TestParser(unittest.TestCase):
         conf._layout_file = os.path.join(self._folder, "layout.tsv")
         conf._plate_folder = self._folder
         conf._output_path = os.path.join(self._folder, "out", "test_files")
-        self._outfolder = conf._output_path
-        if not os.path.exists(conf._output_path):
-            os.makedirs(conf._output_path)
         conf._multiprocessing = False
+
+        self._outfolder = conf._output_path
+        if os.path.exists(self._outfolder):
+            shutil.rmtree(self._outfolder)
+        os.makedirs(self._outfolder)
+
         self._parser = Parser(conf)
         self._parser.parse()
 
     def test_file_count(self):
-        test_files = [x for x in list(os.scandir(self._testfolder)) if
-                      x.is_file()]
-        expected_files = [x for x in list(os.scandir(self._outfolder)) if
-                          x.is_file()]
+        test_files = glob.glob1(self._testfolder, ".tsv")
+        expected_files = glob.glob1(self._outfolder, ".tsv")
         assert len(test_files) == len(expected_files)

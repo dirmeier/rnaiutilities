@@ -226,7 +226,7 @@ class DatabaseQueryBuilder:
         return s
 
     @staticmethod
-    def create_file_fesature_table(tab):
+    def create_file_feature_table(tab):
         s = "CREATE TABLE IF NOT EXISTS {}".format(tab) + \
             " (feature varchar(1000) NOT NULL, " + \
             "PRIMARY KEY(feature));"

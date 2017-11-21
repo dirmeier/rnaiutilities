@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Copyright (C) 2016 Simon Dirmeier
 #
 # This file is part of rnaiutilities.
@@ -48,7 +46,7 @@ class TestConfig(unittest.TestCase):
         assert self._c.plate_folder == "./"
 
     def test_output_path(self):
-        assert self._c.output_path == "./out/test_files/"
+        assert self._c.output_path == "./out/"
 
     def test_plate_regex(self):
         assert self._c.plate_regex == ".*\/\w+\-\w[P|U]\-[G|K]\d+(-\w+)*\/.*"
