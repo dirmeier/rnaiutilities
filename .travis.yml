@@ -14,7 +14,8 @@ install:
   - pip install tox-travis
 
 script:
-  - tox
+  - rnai-query query --help
+  - rnai-parse parse --help
 
 after_success:
   - codecov
