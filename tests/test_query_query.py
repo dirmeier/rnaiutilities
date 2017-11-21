@@ -32,72 +32,40 @@ from rnaiutilities import Query
 logging.basicConfig(level=logging.DEBUG)
 
 
-class TestQueryInsert(unittest.TestCase):
+class TestQuery(unittest.TestCase):
     """
-    Tests the control querying module.
-
+    Tests the control querying module for data base querying.
     """
-
-    folder = os.path.join(os.path.dirname(__file__), "..", "data")
-    db_folder = os.path.join(folder, "out", "test_db")
-    db_file = os.path.join(db_folder, "database.db")
-    path = os.path.join(folder, "out")
-
-    @classmethod
-    def setUpClass(cls):
-        if os.path.exists(TestQueryInsert.db_folder):
-            shutil.rmtree(TestQueryInsert.db_folder)
-        os.makedirs(TestQueryInsert.db_folder)
-
-        Query(TestQueryInsert.db_file).insert(TestQueryInsert.path)
 
     def setUp(self):
         unittest.TestCase.setUp(self)
-        self._conn = sqlite3.connect(TestQueryInsert.db_file)
+        folder = os.path.join(os.path.dirname(__file__), "..", "data")
+        db_folder = os.path.join(folder, "out")
+        db_file = os.path.join(db_folder, "database.db")
+        self._query = Query(db_file)
 
-    def tearDown(self):
-        self._conn.close()
+    def test_query_size(self):
+        res = self._query.query()
+        assert len(res) == 3
 
-    def test_insertion_creates_db(self):
-        assert os.path.exists(TestQueryInsert.db_file)
+    def test_query_featureclass(self):
+        assert len(self._query.query(featureclass="cells")) == 1
+        assert len(self._query.query(featureclass="nuclei")) == 1
+        assert len(self._query.query(featureclass="perinuclei")) == 1
 
-    def test_number_of_tables_created(self):
-        c = self._conn.cursor()
-        result = c.execute(
-            "SELECT name FROM sqlite_master WHERE type='table';").fetchall()
-        assert len(result) == 7
-
-    def test_table_names(self):
-        c = self._conn.cursor()
-        result = c.execute(
-            "SELECT name FROM sqlite_master WHERE type='table';").fetchall()
-        expected_names = ["gene", "sirna", "well", "meta",
-                          "study_bacteria_d_p_k_1_kb03_1a_cells",
-                          "study_bacteria_d_p_k_1_kb03_1a_nuclei",
-                          "study_bacteria_d_p_k_1_kb03_1a_perinucleo"]
-        for x in result:
-            assert x[0] in expected_names
-
-    def test_number_of_meta_elements(self):
-        c = self._conn.cursor()
-        result = c.execute("SELECT * FROM meta;").fetchall()
-        assert len(result) == 3
-
-    def test_number_of_gene_elements(self):
-        c = self._conn.cursor()
-        result = c.execute("SELECT * FROM gene;").fetchall()
-        assert len(result) == 3 * 384
-
-    def test_number_of_sirna_elements(self):
-        c = self._conn.cursor()
-        result = c.execute("SELECT * FROM sirna;").fetchall()
-        assert len(result) == 3 * 384
-
-    def test_number_of_sirna_elements(self):
-        c = self._conn.cursor()
-        result = c.execute("SELECT * FROM sirna;").fetchall()
-        assert len(result) == 3 * 384
-
-    def test_no_featurclass_raises_error(self):
+    def test_query_wrong_featureclass(self):
         with pytest.raises(SystemExit):
-            Query.compose(featureclass="test")
+            _ = self._query.query(featureclass="hallo")
+
+    def test_query_elements(self):
+        q = self._query.query(
+          featureclass="cells", study="study", pathogen="bacteria",
+          library="d", design="p", plate="kb03-1a")
+        assert list(q[0][1:-1]) == \
+               ["study", "bacteria", "d", "p", "1", "kb03-1a", "cells"]
+
+    def test_compose(self):
+        res = self._query.compose()
+        res.dump(sample=10, normalize="zscore",
+                 fh="/Users/simondi/Desktop/data.tsv")
+        assert 1 == 1

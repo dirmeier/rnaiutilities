@@ -63,7 +63,6 @@ class QueryResult:
 
     def __iter__(self):
         for tablefileset in self._tablefile_sets:
-            # TODO: other name for that
             yield self._compile(tablefileset)
 
     def dump(self, sample, normalize="zscore", fh=None):
@@ -81,7 +80,7 @@ class QueryResult:
         :type fh: str
         """
 
-        self._set_normalization(*normalize)
+        self._set_normalization(normalize)
         self._set_sample_size(sample)
         with IO(fh) as io:
             for data in self:
@@ -89,13 +88,14 @@ class QueryResult:
                     io.dump(data)
         logger.info("Successfully wrote table files!")
 
-    def _set_normalization(self, *normalize):
+    def _set_normalization(self, normalize):
         """
         Set the used normalisations.
 
         :param normalize: string of normalisation technmethodsiques
         """
-        self._normalizer.set_normalization(*normalize)
+
+        self._normalizer.set_normalization(normalize)
 
     def _set_sample_size(self, sample):
         self._sample = sample if sample is not None else 2 ** 30
@@ -154,6 +154,7 @@ class QueryResult:
         data_merged = pandas.concat(tables, axis=1)
 
         return DataSet(data_merged,
+                       tablefileset.feature_classes,
                        tablefileset.features,
                        tablefileset.classifier)
 
@@ -269,7 +270,7 @@ class QueryResult:
     def _sample_data(self, data):
         if self.__getattribute__("_" + SAMPLE) != QueryResult._sar_:
             logger.info("\tsampling {} cells/well.".format(str(self._sample)))
-            data = data.data.groupby([WELL, GENE, SIRNA]).apply(self._filter_fn)
+            data.data = data.data.groupby([WELL, GENE, SIRNA]).apply(self._filter_fn)
             if len(data.data) == 0:
                 raise ValueError("Data is zero after sampling.")
         return data

@@ -48,19 +48,20 @@ class Normalizer:
         if args:
             self.set_normalization(*args)
 
-    def set_normalization(self, *args):
+    def set_normalization(self, args):
         """
         Set the normalisation methods.
 
-        :param args: a tuple normalisation methods to use, e.g. like 'zscore'.
+        :param args: a list if normalisation methods to use, e.g. like 'zscore'.
           Options so far are 'bscore', 'loess' and 'zscore'.
-        :type args: tuple(str)
+        :type args: list(str) or str
         """
 
-        self._check_methods(*args)
         if not args:
             return
-        args = list(args)
+        if not isinstance(args, list):
+            args = [args]
+        self._check_methods(args)
         if NONE in args and len(args) > 1:
             raise ValueError(
               "You cannot use '{}' in combination with other normalisations {}"
@@ -69,8 +70,7 @@ class Normalizer:
             self._normalize = list(args)
 
     @staticmethod
-    def _check_methods(*args):
-
+    def _check_methods(args):
         if any(arg not in Normalizer._nf_ for arg in args):
             raise ValueError(
               "Please select only functions: {}"

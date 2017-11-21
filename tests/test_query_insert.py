@@ -32,10 +32,9 @@ from rnaiutilities import Query
 logging.basicConfig(level=logging.DEBUG)
 
 
-class TestQueryInsert(unittest.TestCase):
+class TestInsert(unittest.TestCase):
     """
-    Tests the control querying module.
-
+    Tests the control querying module for data base insertion.
     """
 
     folder = os.path.join(os.path.dirname(__file__), "..", "data")
@@ -45,21 +44,21 @@ class TestQueryInsert(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        if os.path.exists(TestQueryInsert.db_folder):
-            shutil.rmtree(TestQueryInsert.db_folder)
-        os.makedirs(TestQueryInsert.db_folder)
+        if os.path.exists(TestInsert.db_folder):
+            shutil.rmtree(TestInsert.db_folder)
+        os.makedirs(TestInsert.db_folder)
 
-        Query(TestQueryInsert.db_file).insert(TestQueryInsert.path)
+        Query(TestInsert.db_file).insert(TestInsert.path)
 
     def setUp(self):
         unittest.TestCase.setUp(self)
-        self._conn = sqlite3.connect(TestQueryInsert.db_file)
+        self._conn = sqlite3.connect(TestInsert.db_file)
 
     def tearDown(self):
         self._conn.close()
 
     def test_insertion_creates_db(self):
-        assert os.path.exists(TestQueryInsert.db_file)
+        assert os.path.exists(TestInsert.db_file)
 
     def test_number_of_tables_created(self):
         c = self._conn.cursor()
@@ -74,7 +73,7 @@ class TestQueryInsert(unittest.TestCase):
         expected_names = ["gene", "sirna", "well", "meta",
                           "study_bacteria_d_p_k_1_kb03_1a_cells",
                           "study_bacteria_d_p_k_1_kb03_1a_nuclei",
-                          "study_bacteria_d_p_k_1_kb03_1a_perinucleo"]
+                          "study_bacteria_d_p_k_1_kb03_1a_perinuclei"]
         for x in result:
             assert x[0] in expected_names
 
@@ -97,7 +96,3 @@ class TestQueryInsert(unittest.TestCase):
         c = self._conn.cursor()
         result = c.execute("SELECT * FROM sirna;").fetchall()
         assert len(result) == 3 * 384
-
-    def test_no_featurclass_raises_error(self):
-        with pytest.raises(SystemExit):
-            Query.compose(featureclass="test")

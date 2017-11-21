@@ -59,7 +59,7 @@ class IO:
 
     def dump(self, df):
         if not isinstance(df, DataSet):
-            raise TypeError("Please provide a resultset object")
+            raise TypeError("Please provide a DataSet instance")
         if self._format is None or self._format == IO._flat_:
             self._to_tsv(df)
         elif self._format == IO._h5_:
@@ -72,7 +72,7 @@ class IO:
 
     def _to_tsv(self, data):
         if self._format is None:
-            print(data.to_csv(
+            print(data.data.to_csv(
               None,
               sep="\t",
               header=self._print_header,
@@ -80,7 +80,7 @@ class IO:
         else:
             if pathlib.Path(self._filename).is_file():
                 self._print_header = False
-            data.to_csv(
+            data.data.to_csv(
               self._filename,
               sep="\t",
               mode="a",

@@ -26,20 +26,26 @@ class DataSet:
     preprocessing and writing data.
     """
 
-    def __init__(self, data, feature_columns, classifier):
+    def __init__(self, data, feature_classes, feature_columns, classifier):
         """
         Constructor of DataSet. Needs a pandas DataFrame and a list of strings
          representing the feature columns.
 
         :param data: a pandas dataframe
         :type data: pandas.DataFrame
+        :param feature_classes: a list of strings of faeture classes, like
+          'cells', 'nuclei', etc.
+        :type feature_classes: list(str)
         :param feature_columns: a list of strings names column names for the
          features
         :type feature_columns: list(str)
+        :param classifier: the classifier for the plate
+        :type classifier: str
         """
 
         self.__data = data
         self.__feature_columns = feature_columns
+        self.__feature_classes  = feature_classes
         self.__classifier = classifier
 
     def __str__(self):
@@ -63,3 +69,11 @@ class DataSet:
     @feature_columns.setter
     def feature_columns(self, value):
         self.__feature_columns = value
+
+    @property
+    def feature_classes(self):
+        return self.__feature_classes
+
+    @feature_classes.setter
+    def feature_classes(self, value):
+        self.__feature_classes = value

@@ -151,9 +151,9 @@ class Query:
                              well=well,
                              featureclass=self._featureclass(featureclass))
 
-    def _compose(self, file_name, **kwargs):
+    def _compose(self, from_file, **kwargs):
         with DBMS(self._db) as d:
-            res = d.tableset(file_name, **kwargs)
+            res = d.tableset(from_file, **kwargs)
         return QueryResult(res, **kwargs)
 
     def insert(self, path):
