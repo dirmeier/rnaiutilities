@@ -215,14 +215,13 @@ class DatabaseQueryBuilder:
             "VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}');" \
                 .format(study, bacteria, library, design, replicate, plate,
                         featureclass, file)
-        logger.info(s)
+
         return s
 
     @staticmethod
     def insert_into_statement(k, v, file):
         s = "INSERT INTO {} ({}, filename) VALUES('{}', '{}')" \
             .format(k, k, v, file)
-        logger.info(s)
         return s
 
     @staticmethod

@@ -33,7 +33,7 @@ from rnaiutilities.db.db_query_builder import DatabaseQueryBuilder
 from rnaiutilities.db.postgres_connection import PostgresConnection
 from rnaiutilities.db.sqlite_connection import SQLiteConnection
 from rnaiutilities.db.utility import feature_table_name
-from rnaiutilities.globals import GENE, SIRNA, WELL
+from rnaiutilities.globals import GENE, SIRNA, WELL, ELEMENTS, FEATURES
 from rnaiutilities.table_file_set import TableFileSet
 from rnaiutilities.utility.files import filter_files, read_yaml
 
@@ -181,7 +181,7 @@ class DBMS:
         fls = filter_files(path, "_meta.tsv")
         for i, file in enumerate(fls):
             if i % 100 == 0:
-                logger.info("Doing file {} of {}".format(i, len(fls)))
+                logger.info("Doing file {} of {}".format(i + 1, len(fls)))
             self._insert_file(d, path, file)
 
     def _insert_file(self, d, path, file):
@@ -198,15 +198,19 @@ class DBMS:
             # read the meta file and put the meta plate information
             # (genes, sirnas) into the database for the plate
             meta = read_yaml(filename)
-            self.__connection.insert_elements(
-              file, meta, d.insert_into_statement)
-            tab = feature_table_name(file)
-            if not self.__connection.exists(tab):
-                s = d.create_file_feature_table(tab)
-                self.__connection.execute(s)
-                self.__connection.insert_many(meta, tab)
+            self._insert_meta(filename, meta, d)
         except ValueError:
             logger.error("Could not match meta file {}".format(file))
+
+    def _insert_meta(self, file, meta, d):
+        self.__connection.insert_elements(
+          file, meta[ELEMENTS], d.insert_into_statement)
+
+        tab = feature_table_name(file)
+        if not self.__connection.exists(tab):
+            s = d.create_file_feature_table(tab)
+            self.__connection.execute(s)
+            self.__connection.insert_many(meta[FEATURES], tab)
 
     def _create_indexes(self, d):
         self.__connection.execute(d.create_meta_index())

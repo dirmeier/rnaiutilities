@@ -134,9 +134,8 @@ class Query:
         :param well: filters by gene, i.e.: 'a01'
         :param featureclass: filters by featureclass,
           e.g. 'nuclei'/'cells'/'bacteria'
-        :param sample: sample from every well x times
 
-        :return: returns a lazy ResultSet
+        :return: returns a lazy QueryResult
         :rtype: QueryResult
         """
 
@@ -152,7 +151,7 @@ class Query:
                              well=well,
                              featureclass=self._featureclass(featureclass))
 
-    def _compose(self, file_name, sample, **kwargs):
+    def _compose(self, file_name, **kwargs):
         with DBMS(self._db) as d:
             res = d.tableset(file_name, **kwargs)
         return QueryResult(res, **kwargs)

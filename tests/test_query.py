@@ -23,6 +23,9 @@ import logging
 import os
 import unittest
 import shutil
+import sqlite3
+
+import pytest
 
 from rnaiutilities import Query
 
@@ -35,19 +38,40 @@ class TestQuery(unittest.TestCase):
 
     """
 
+    folder = os.path.join(os.path.dirname(__file__), "..", "data")
+    db_folder = os.path.join(folder, "out", "test_db")
+    db_file = os.path.join(db_folder, "database.db")
+    path = os.path.join(folder, "out")
+
+    @classmethod
+    def setUpClass(cls):
+        if os.path.exists(TestQuery.db_folder):
+            shutil.rmtree(TestQuery.db_folder)
+        os.makedirs(TestQuery.db_folder)
+
+        Query(TestQuery.db_file).insert(TestQuery.path)
+
     def setUp(self):
         unittest.TestCase.setUp(self)
-        self._folder = os.path.join(os.path.dirname(__file__), "..", "data")
-        self._db_folder = os.path.join(self._folder, "out", "test_files")
-        self._db_file = os.path.join(self._db_folder, "database.db")
-        self._path = os.path.join(self._folder, "out")
+        self._conn = sqlite3.connect(TestQuery.db_file)
 
-        if os.path.exists(self._db_folder):
-            shutil.rmtree(self._db_folder)
-        os.makedirs(self._db_folder)
-
-        self._query = Query(self._db_file)
-        self._query.insert(self._path)
+    def tearDown(self):
+        self._conn.close()
 
     def test_insertion_creates_db(self):
-        assert os.path.exists(self._db_file)
+        assert os.path.exists(TestQuery.db_file)
+
+    def test_number_of_tables_created(self):
+        c = self._conn.cursor()
+        result = c.execute(
+            "SELECT name FROM sqlite_master WHERE type='table';").fetchall()
+        assert len(result) == 7
+
+    def test_count_elemems_meta(self):
+        c = self._conn.cursor()
+        result = c.execute("SELECT * FROM meta;").fetchall()
+        assert len(result) == 3
+
+    def test_no_featurclass_raises_error(self):
+        with pytest.raises(SystemExit):
+            Query.compose(featureclass="test")

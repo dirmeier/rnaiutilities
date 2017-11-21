@@ -30,7 +30,6 @@ logger.setLevel(logging.INFO)
 
 
 class SQLiteConnection(DatabaseConnection):
-
     def __init__(self, path):
         super().__init__()
         logger.info("Connecting to sqlite db")
@@ -68,8 +67,8 @@ class SQLiteConnection(DatabaseConnection):
                     ins = f(k, v, file)
                     cursor.execute(ins)
             except ValueError as e:
-                logger.error("Could not match element {} and error {}"
-                             .format(element, e))
+                logger.error(
+                  "Could not match element {} and error {}".format(element, e))
         cursor.close()
         self._connection.commit()
 
