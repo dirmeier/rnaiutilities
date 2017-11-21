@@ -1,3 +1,4 @@
+.tox
 .coverage
 sql/*
 tix.db
