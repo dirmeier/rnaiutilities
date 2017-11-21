@@ -59,6 +59,9 @@ class TestParser(unittest.TestCase):
         self._parser = Parser(conf)
         self._parser.parse()
 
+    def tearDown(self):
+        shutil.rmtree(self._outfolder)
+
     def test_file_count(self):
         test_files = glob.glob1(self._testfolder, ".tsv")
         expected_files = glob.glob1(self._outfolder, ".tsv")

@@ -21,11 +21,9 @@
 
 import logging
 import os
-import unittest
 import shutil
 import sqlite3
-
-import pytest
+import unittest
 
 from rnaiutilities import Query
 
@@ -49,6 +47,10 @@ class TestInsert(unittest.TestCase):
         os.makedirs(TestInsert.db_folder)
 
         Query(TestInsert.db_file).insert(TestInsert.path)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(TestInsert.db_folder)
 
     def setUp(self):
         unittest.TestCase.setUp(self)
