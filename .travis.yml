@@ -3,7 +3,6 @@ language: python
 sudo: required
 
 cache: packages
-install: pip install tox-travis
 
 python:
   - "3.6"
@@ -13,8 +12,10 @@ install:
   - pip install -e .
   - pip install codecov
   - pip install pytest-cov
+  - pip install tox-travis
 
-script: tox
+script:
+  - tox
 
 after_success:
   - codecov
