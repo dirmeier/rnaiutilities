@@ -32,7 +32,7 @@ from rnaiutilities import Query
 logging.basicConfig(level=logging.DEBUG)
 
 
-class TestQuery(unittest.TestCase):
+class TestQueryInsert(unittest.TestCase):
     """
     Tests the control querying module.
 
@@ -45,21 +45,21 @@ class TestQuery(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        if os.path.exists(TestQuery.db_folder):
-            shutil.rmtree(TestQuery.db_folder)
-        os.makedirs(TestQuery.db_folder)
+        if os.path.exists(TestQueryInsert.db_folder):
+            shutil.rmtree(TestQueryInsert.db_folder)
+        os.makedirs(TestQueryInsert.db_folder)
 
-        Query(TestQuery.db_file).insert(TestQuery.path)
+        Query(TestQueryInsert.db_file).insert(TestQueryInsert.path)
 
     def setUp(self):
         unittest.TestCase.setUp(self)
-        self._conn = sqlite3.connect(TestQuery.db_file)
+        self._conn = sqlite3.connect(TestQueryInsert.db_file)
 
     def tearDown(self):
         self._conn.close()
 
     def test_insertion_creates_db(self):
-        assert os.path.exists(TestQuery.db_file)
+        assert os.path.exists(TestQueryInsert.db_file)
 
     def test_number_of_tables_created(self):
         c = self._conn.cursor()
@@ -67,10 +67,36 @@ class TestQuery(unittest.TestCase):
             "SELECT name FROM sqlite_master WHERE type='table';").fetchall()
         assert len(result) == 7
 
-    def test_count_elemems_meta(self):
+    def test_table_names(self):
+        c = self._conn.cursor()
+        result = c.execute(
+            "SELECT name FROM sqlite_master WHERE type='table';").fetchall()
+        expected_names = ["gene", "sirna", "well", "meta",
+                          "study_bacteria_d_p_k_1_kb03_1a_cells",
+                          "study_bacteria_d_p_k_1_kb03_1a_nuclei",
+                          "study_bacteria_d_p_k_1_kb03_1a_perinucleo"]
+        for x in result:
+            assert x[0] in expected_names
+
+    def test_number_of_meta_elements(self):
         c = self._conn.cursor()
         result = c.execute("SELECT * FROM meta;").fetchall()
         assert len(result) == 3
+
+    def test_number_of_gene_elements(self):
+        c = self._conn.cursor()
+        result = c.execute("SELECT * FROM gene;").fetchall()
+        assert len(result) == 3 * 384
+
+    def test_number_of_sirna_elements(self):
+        c = self._conn.cursor()
+        result = c.execute("SELECT * FROM sirna;").fetchall()
+        assert len(result) == 3 * 384
+
+    def test_number_of_sirna_elements(self):
+        c = self._conn.cursor()
+        result = c.execute("SELECT * FROM sirna;").fetchall()
+        assert len(result) == 3 * 384
 
     def test_no_featurclass_raises_error(self):
         with pytest.raises(SystemExit):
