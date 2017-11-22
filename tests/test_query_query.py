@@ -54,11 +54,14 @@ class TestQuery(unittest.TestCase):
     folder = os.path.join(os.path.dirname(__file__), "..", "data")
     db_folder = os.path.join(folder, "out")
     db_file = os.path.join(db_folder, "database.db")
+
     exp_file = os.path.join(db_folder, "data.tsv")
     out_folder = os.path.join(db_folder, "test_data")
 
-    out_file_sampled = os.path.join(out_folder, "data_sampled.tsv")
-    out_file_full = os.path.join(out_folder, "data_full.tsv")
+    out_file_sampled = os.path.join(
+      out_folder, "data_sampled.tsv")
+    out_file_full = os.path.join(
+      out_folder, "data_full.tsv")
 
     @classmethod
     def setUpClass(cls):
@@ -66,19 +69,25 @@ class TestQuery(unittest.TestCase):
             shutil.rmtree(TestQuery.out_folder)
         os.makedirs(TestQuery.out_folder)
 
-        res = Query(TestQuery.db_file).compose()
+        TestQuery.res = Query(TestQuery.db_file).compose()
         numpy.random.seed(23)
-        res.dump(sample=10, normalize="zscore", fh=TestQuery.out_file_sampled)
-        res.dump(sample=None, normalize="zscore", fh=TestQuery.out_file_full)
-
-        TestQuery.expected_data = pandas.DataFrame.from_csv(
+        TestQuery.res.dump(sample=10, normalize="zscore",
+                           fh=TestQuery.out_file_sampled)
+        TestQuery.res.dump(sample=None, normalize="zscore",
+                           fh=TestQuery.out_file_full)
+        TestQuery.expected_data = pandas.read_csv(
           TestQuery.exp_file, sep='\t', header=0)
-
-        TestQuery.composed_sampled_data = pandas.DataFrame.from_csv(
+        TestQuery.composed_sampled_data = pandas.read_csv(
           TestQuery.out_file_sampled, sep='\t', header=0)
-
-        TestQuery.composed_full_data = pandas.DataFrame.from_csv(
+        TestQuery.composed_full_data = pandas.read_csv(
           TestQuery.out_file_full, sep='\t', header=0)
+
+        ou = os.path.join(TestQuery.out_folder, "data_sampled_unnorm.tsv")
+        numpy.random.seed(23)
+        TestQuery.res.dump(sample=10, normalize=None, fh=ou)
+        exf = os.path.join(TestQuery.db_folder, "data_unnormalized.tsv")
+        TestQuery.ex_non_norm = pandas.read_csv(exf, sep='\t', header=0)
+        TestQuery.composed_non_norm = pandas.read_csv(ou, sep='\t', header=0)
 
     @classmethod
     def tearDownClass(cls):
@@ -111,6 +120,23 @@ class TestQuery(unittest.TestCase):
     def test_compose_creates_correct_data(self):
         assert TestQuery.expected_data.equals(TestQuery.composed_sampled_data)
 
+    def test_compose_creates_correct_non_norm_data(self):
+        assert TestQuery.ex_non_norm.equals(TestQuery.composed_non_norm)
+
+    def test_compose_creates_correct_non_norm_data_values(self):
+        cell_col = TestQuery.composed_non_norm[
+            "cells.intensity_maxintensityedge_corr1actin"]
+        nuc_col = TestQuery.composed_non_norm[
+            "nuclei.intensity_uppertenpercentintensity_corr1pathogen"]
+        per_col = TestQuery.composed_non_norm[
+            "perinuclei.intensity_upperquartileintensity_corr1actin"]
+        assert cell_col.values[0] == pytest.approx(0.1628, 0.01)
+        assert cell_col.values[6] == pytest.approx(0.206, 0.01)
+        assert nuc_col.values[0] == pytest.approx(0.0145, 0.01)
+        assert nuc_col.values[6] == pytest.approx(0.01498, 0.01)
+        assert per_col.values[0] == pytest.approx(0.100, 0.01)
+        assert per_col.values[6] == pytest.approx(0.066, 0.01)
+
     def test_compose_creates_correct_columns(self):
         for c in TestQuery.composed_sampled_data.columns:
             assert c in TestQuery.expected_columns
@@ -124,6 +150,12 @@ class TestQuery(unittest.TestCase):
         for c in TestQuery.expected_feature_columns:
             assert TestQuery.composed_full_data[c].mean() == \
                    pytest.approx(0, 0.01)
+
+    def test_compose_creates_unit_variance_columns(self):
+        for c in TestQuery.expected_feature_columns:
+            st = TestQuery.composed_full_data[c].std()
+            assert (st == pytest.approx(1, 0.01) or
+                    st == pytest.approx(0, 0.01))
 
     def test_compose_creates_unit_variance_columns(self):
         for c in TestQuery.expected_feature_columns:

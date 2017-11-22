@@ -65,7 +65,7 @@ class QueryResult:
         for tablefileset in self._tablefile_sets:
             yield self._compile(tablefileset)
 
-    def dump(self, sample, normalize="zscore", fh=None):
+    def dump(self, sample, normalize, fh=None):
         """
         Print the result set of the database query to tsv or stdout. If a string
         is given as param *fh* prints to file, otherwise if None is given prints
@@ -119,13 +119,11 @@ class QueryResult:
                 data = self._insert_columns(data, tablefileset)
                 return data
             else:
-                raise ValueError(
-                  "Could not find files: {}".format(
-                    ", ".join(tablefileset.filenames)))
+                raise ValueError("Could not find files: {}".format(
+                  ", ".join(tablefileset.filenames)))
         except ValueError as e:
-            logger.error(
-              "Error occured for tablefileset {}: {}"
-                  .format(tablefileset.classifier, e))
+            logger.error("Error occured for tablefileset {}: {}"
+                         .format(tablefileset.classifier, e))
         return None
 
     @enforce.runtime_validation
@@ -270,7 +268,8 @@ class QueryResult:
     def _sample_data(self, data):
         if self.__getattribute__("_" + SAMPLE) != QueryResult._sar_:
             logger.info("\tsampling {} cells/well.".format(str(self._sample)))
-            data.data = data.data.groupby([WELL, GENE, SIRNA]).apply(self._filter_fn)
+            data.data = data.data.groupby([WELL, GENE, SIRNA]).apply(
+              self._filter_fn)
             if len(data.data) == 0:
                 raise ValueError("Data is zero after sampling.")
         return data

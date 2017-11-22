@@ -29,6 +29,7 @@ import shutil
 import pytest
 
 from rnaiutilities import Parser, Config
+from rnaiutilities.utility.files import read_yaml
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -45,7 +46,7 @@ class TestParser(unittest.TestCase):
         "study-bacteria-d-p-k-1-kb03-1a_perinuclei_data.tsv"]
     meta = [
         "study-bacteria-d-p-k-1-kb03-1a_nuclei_meta.tsv",
-        "study-bacteria-d-p-k-1-kb03-1a_cells_meat.tsv",
+        "study-bacteria-d-p-k-1-kb03-1a_cells_meta.tsv",
         "study-bacteria-d-p-k-1-kb03-1a_perinuclei_meta.tsv"]
 
     @classmethod
@@ -62,6 +63,8 @@ class TestParser(unittest.TestCase):
         conf._output_path = os.path.join(folder, "out", "test_files")
         conf._multiprocessing = False
 
+        TestParser.layoutfile = os.path.join(TestParser.exp_folder,
+                                             "layout.tsv")
         TestParser.outfolder = conf._output_path
         if os.path.exists(TestParser.outfolder):
             shutil.rmtree(TestParser.outfolder)
@@ -86,6 +89,14 @@ class TestParser(unittest.TestCase):
             parsed_data = pandas.read_csv(
               os.path.join(TestParser.outfolder, f), sep="\t", header=0)
             assert exp_data.equals(parsed_data)
+
+    def test_meta_file_equality(self):
+        for f in TestParser.meta:
+            exp_data = read_yaml(os.path.join(TestParser.exp_folder, f))
+            parsed_data = read_yaml(os.path.join(TestParser.outfolder, f))
+            assert \
+                sorted(exp_data["elements"]) == sorted(parsed_data["elements"])
+            assert exp_data["features"] == parsed_data["features"]
 
     def test_cell_data_file_values(self):
         parsed_data = pandas.read_csv(os.path.join(
@@ -129,4 +140,19 @@ class TestParser(unittest.TestCase):
                                                                    0.01)
         assert parsed_data[exp_col].values[192 - 1 + 1] == pytest.approx(0.0322,
                                                                          0.01)
+        assert parsed_data[exp_col].values[-1] == pytest.approx(0.0287, 0.01)
+
+    def test_perinuclei_data_file_values(self):
+        parsed_data = pandas.read_csv(os.path.join(
+          TestParser.outfolder,
+          "study-bacteria-d-p-k-1-kb03-1a_perinuclei_data.tsv"),
+          sep="\t", header=0)
+        exp_col = "perinuclei.intensity_upperquartileintensity_corr1actin"
+        # these values are manually looked up, so you need to have a look in
+        # the respective matlab files
+        assert exp_col in parsed_data.columns
+        assert parsed_data[exp_col].values[1 - 1] == pytest.approx(
+          0.1822, 0.01)
+        assert parsed_data[exp_col].values[192 - 1 + 1] == pytest.approx(
+          0.0322, 0.01)
         assert parsed_data[exp_col].values[-1] == pytest.approx(0.0287, 0.01)

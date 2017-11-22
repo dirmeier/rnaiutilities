@@ -57,7 +57,8 @@ class Normalizer:
         :type args: list(str) or str
         """
 
-        if not args:
+        self._normalize = []
+        if not args or args is None:
             return
         if not isinstance(args, list):
             args = [args]
@@ -66,8 +67,8 @@ class Normalizer:
             raise ValueError(
               "You cannot use '{}' in combination with other normalisations {}"
               .format(NONE, "/".join(args)))
-        if NONE not in list(args):
-            self._normalize = list(args)
+        if NONE not in args:
+            self._normalize = args
 
     @staticmethod
     def _check_methods(args):
