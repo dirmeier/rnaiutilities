@@ -16,8 +16,9 @@ install:
 script:
   - rnai-query query --help
   - rnai-parse parse --help
+  - tox
+  - py.test --cov=./
 
 after_success:
-  - py.test --cov=./
   - codecov
 

@@ -53,10 +53,10 @@ class TestQuery(unittest.TestCase):
 
     folder = os.path.join(os.path.dirname(__file__), "..", "data")
     db_folder = os.path.join(folder, "out")
-    db_file = os.path.join(db_folder, "database.db")
 
     exp_file = os.path.join(db_folder, "data.tsv")
     out_folder = os.path.join(db_folder, "test_data")
+    out_db_file = os.path.join(out_folder, "database.db")
 
     out_file_sampled = os.path.join(
       out_folder, "data_sampled.tsv")
@@ -69,12 +69,15 @@ class TestQuery(unittest.TestCase):
             shutil.rmtree(TestQuery.out_folder)
         os.makedirs(TestQuery.out_folder)
 
-        TestQuery.res = Query(TestQuery.db_file).compose()
+        Query(TestQuery.out_db_file).insert(TestQuery.db_folder)
+
+        TestQuery.res = Query(TestQuery.out_db_file).compose()
         numpy.random.seed(23)
         TestQuery.res.dump(sample=10, normalize="zscore",
                            fh=TestQuery.out_file_sampled)
         TestQuery.res.dump(sample=None, normalize="zscore",
                            fh=TestQuery.out_file_full)
+
         TestQuery.expected_data = pandas.read_csv(
           TestQuery.exp_file, sep='\t', header=0)
         TestQuery.composed_sampled_data = pandas.read_csv(
@@ -95,7 +98,7 @@ class TestQuery(unittest.TestCase):
 
     def setUp(self):
         unittest.TestCase.setUp(self)
-        self._query = Query(TestQuery.db_file)
+        self._query = Query(TestQuery.out_db_file)
 
     def test_query_size(self):
         res = self._query.query()
