@@ -128,5 +128,5 @@ class TestQuery(unittest.TestCase):
     def test_compose_creates_unit_variance_columns(self):
         for c in TestQuery.expected_feature_columns:
             st = TestQuery.composed_full_data[c].std()
-            assert (st == pytest.approx(1, 0.01) or \
+            assert (st == pytest.approx(1, 0.01) or
                     st == pytest.approx(0, 0.01))
