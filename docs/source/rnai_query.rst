@@ -13,7 +13,7 @@ The following sections will explain how ``rnai-query`` and its subcommands
 are used. So far the following subcommands are available:
 
 * ``rnai-query insert`` for inserting meta information to a database,
-* ``rnai-query query`` for creating datasets,
+* ``rnai-query compose`` for querying from the database and composing data sets,
 * ``rnai-query select`` for selecting single variables from the database.
 
 **The steps have to be taken in succession (or at least insert has to be the first command to be executed), so make sure to read it all**.
@@ -27,7 +27,7 @@ We can to that by calling:
 
 .. code-block:: bash
 
-  rnai-query insert --db /i/am/a/file/called/tix.db
+  rnai-query insert /i/am/a/file/called/tix.db
                     /i/am/a/path/to/parsed/data
 
 where ``/i/am/a/path/to/parsed/data`` points to the folder where the ``*meta.tsv``
@@ -45,17 +45,17 @@ example consider these two scripts:
 
 .. code-block:: bash
 
-  rnai-query query --db /i/am/a/file/called/tix.db
-                   --sample 10 OUTFILE
-  rnai-query query --db /i/am/a/file/called/tix.db
-                   --plate dz05-1e --gene pik3ca OUTFILE
+  rnai-query compose --sample 10 /i/am/a/file/called/tix.db OUTFILE
+  rnai-query compose --plate dz05-1e --gene pik3ca
+                     /i/am/a/file/called/tix.db
+                     OUTFILE
 
 The first query would return 10 single cells randomly sampled from each well
 from all plates and write it to the file `OUTFILE`. The second query would
 only look at plate *dz05-1e* and gene *pik3ca* and write the single cells
 that fit the criteria to `OUTFILE`.
 
-The next sections walk you through using ``rnai-query query``.
+The next sections walk you through using ``rnai-query compose``.
 
 
 .. _cmdlineargs-label:
@@ -64,7 +64,7 @@ Command line arguments
 ======================
 
 Say we would want to filter the database on some critera and only write the
-single-cell features that fit these conditions. Using ``rnai-query query`` you
+single-cell features that fit these conditions. Using ``rnai-query compose`` you
 can choose which plates/gene/sirnas/etc. to choose from, by setting the
 respective command line arguments:
 
@@ -126,9 +126,8 @@ to *OUTFILE*.
 
 .. code-block:: bash
 
-  rnai-query query --db database.db
-                   --sample 100
-                   OUTFILE
+  rnai-query compose --sample 100
+                     database.db OUTFILE
 
 
 Filter by pathogens *shigella* and *bartonella* and write **standardized** data
@@ -136,9 +135,8 @@ to *OUTFILE*.
 
 .. code-block:: bash
 
-  rnai-query query --db database.db
-                   --pathogen shigella,bartonella
-                   OUTFILE
+  rnai-query compose --pathogen shigella,bartonella
+                     database.db OUTFILE
 
 
 Filter by pathogens *Shigella* and *Bartonella* and gene *pik3ca* and write
@@ -146,11 +144,10 @@ standardized data to *OUTFILE*.
 
 .. code-block:: bash
 
-  rnai-query query --db database.db
-                   --pathogen shigella,bartonella
-                   --gene pik3ca
-                   --normalize zscore
-                   OUTFILE
+  rnai-query compose --pathogen shigella,bartonella
+                     --gene pik3ca
+                     --normalize zscore
+                     database.db OUTFILE
 
 
 Filter by pathogens *Shigella* and *Bartonella* and gene *pik3ca* and only
@@ -158,11 +155,10 @@ write debug info.
 
 .. code-block:: bash
 
-  rnai-query query --db database.db
-                   --pathogen shigella,bartonella
-                   --gene pik3ca
-                   --debug
-                   OUTFILE
+  rnai-query compose --pathogen shigella,bartonella
+                     --gene pik3ca
+                     --debug
+                     database.db OUTFILE
 
 
 Filter by gene *nfkb1*, pathogen *Shigella*, study *infectx*, *pooled*
@@ -170,14 +166,13 @@ designs, sample 1000 cells per well and write *un-normalized* data to *OUTFILE*.
 
 .. code-block:: bash
 
-  rnai-query query --db database.db
-                   --gene nfkb1
-                   --pathogen shigella
-                   --study infectx
-                   --design p
-                   --sample 1000
-                   --normalize none
-                   OUTFILE
+  rnai-query compose  --gene nfkb1
+                      --pathogen shigella
+                      --study infectx
+                      --design p
+                      --sample 1000
+                      --normalize none
+                      database.db OUTFILE
 
 
 Filter by gene *pik3ca* and *mock*, feature classes *cells* and *perinuclei*,
@@ -187,15 +182,13 @@ to *OUTFILE*.
 
 .. code-block:: bash
 
-  rnai-query query --db /i/am/a/file/called/tix.db
-                   --featureclass cells,perinuclei
-                   --gene pik3ca,mock
-                   --library d
-                   --design p
-                   --pathogen shigella,bartonella
-                   --sample 100
-                   OUTFILE
-
+  rnai-query compose --featureclass cells,perinuclei
+                     --gene pik3ca,mock
+                     --library d
+                     --design p
+                     --pathogen shigella,bartonella
+                     --sample 100
+                     database.db OUTFILE
 
 Selecting single variables from the database
 ............................................
@@ -214,9 +207,9 @@ would call
 
 .. code-block:: bash
 
-   rnai-query select --plate dz05-1e gene
+   rnai-query select --plate dz05-1e database.db gene
 
-``rnai-query select`` takes the same filters as ``rnai-query query``, except
+``rnai-query select`` takes the same filters as ``rnai-query compose``, except
 *sample*, *normalize* and *debug*, so check section :ref:`cmdlineargs-label`.
 
 
@@ -231,9 +224,8 @@ Select which genes are available for pathogens *shigella* and *bartonella*.
 
 .. code-block:: bash
 
-  rnai-query select --db database.db
-                    --pathogen shigella,bartonella
-                    genes
+  rnai-query select --pathogen shigella,bartonella
+                    database.db gene
 
 
 Select which libraries are available for pathogens *shigella* and
@@ -241,10 +233,9 @@ Select which libraries are available for pathogens *shigella* and
 
 .. code-block:: bash
 
-  rnai-query select --db database.db
-                    --pathogen shigella,bartonella
+  rnai-query select --pathogen shigella,bartonella
                     --gene pik3ca
-                    library
+                    database.db library
 
 
 Select pathogens for which *pik3ca* and *mock*, feature classes *cells*
@@ -253,9 +244,8 @@ available.
 
 .. code-block:: bash
 
-  rnai-query select --db /i/am/a/file/called/tix.db
-                    --featureclass cells,perinuclei
+  rnai-query select --featureclass cells,perinuclei
                     --gene pik3ca,mock
                     --library d
                     --design p
-                    pathogen
+                    database.db pathogen

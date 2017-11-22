@@ -18,10 +18,3 @@ TODO
   res = q.query(library="d", featureclass="cells", gene="star", sample=10)
   # print to tsv
   res.dump("~/Desktop/bla.tsv")
-
-
-
-Analyser
---------
-
-TODO

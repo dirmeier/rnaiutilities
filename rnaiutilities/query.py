@@ -30,6 +30,10 @@ logger.setLevel(logging.WARNING)
 
 
 class Query:
+    """
+    Class for querying a database and composing result sets.
+    """
+
     __selectable_features__ = ["cells", "perinuclei", "nuclei"]
     __filterable_features__ = ["study", "pathogen", "library",
                                "design", "gene", "sirna", "well",
@@ -61,7 +65,7 @@ class Query:
               featureclass=None):
         """
         Query a database of image-based RNAi screening features for
-         cells/bacteria/nuclei. The result will be printed to stdout.
+        cells/bacteria/nuclei. The result will be printed to stdout.
 
         :param study: filters by study, e.g.
          'infectx'/'group_cossart'/'infectx_published'
@@ -112,8 +116,7 @@ class Query:
                 well=None,
                 featureclass=None):
         """
-        Query a database of image-based RNAi screening features for
-         cells/bacteria/nuclei.
+        Query a database of image-based RNAi screening features for cells/bacteria/nuclei.
         The query can use filters, so that only a subset is selected.
         A lazy result set is returned, i.e. a set of plate files that meets the
         filtered criteria.
@@ -134,7 +137,6 @@ class Query:
         :param well: filters by gene, i.e.: 'a01'
         :param featureclass: filters by featureclass,
           e.g. 'nuclei'/'cells'/'bacteria'
-
         :return: returns a lazy QueryResult
         :rtype: QueryResult
         """
@@ -188,7 +190,7 @@ class Query:
         features to get an overview over meta information. The query returns
         the result as a list of strings.
 
-        Parameter <i>select</i> can be any of the following choices:
+        Parameter *select* can be any of the following choices:
           * study
           * pathogen
           * library

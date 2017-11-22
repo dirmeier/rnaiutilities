@@ -64,9 +64,18 @@ Command line scripts
    rnai_query
 
 API
----
+----
+
+.. toctree::
+   :maxdepth: 2
+
+   modules
+
+Examples
+--------
 
 .. toctree::
    :maxdepth: 2
 
    api
+

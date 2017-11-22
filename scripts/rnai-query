@@ -164,9 +164,7 @@ def select(select, db, study, pathogen, library, design, replicate, plate,
 @click.option("--sample", default=None, type=int,
               help="The amount of single cells that are sampled per well, "
                    "like '100'. If unset defaults to all cells.")
-@click.option(
-  "--debug",
-  is_flag=True,
+@click.option("--debug", is_flag=True,
   help="Print some debug info and skip writing to file.")
 def compose(outfile, db, normalize, from_file,
             study, pathogen, library, design, replicate, plate,
