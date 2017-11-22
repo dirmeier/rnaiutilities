@@ -37,33 +37,23 @@ def cli():
 
 
 @cli.command()
+@click.argument("db", type=str)
 @click.argument("path", type=str)
-@click.option(
-  "--db",
-  default=None,
-  help="Sqlite database file."
-       " If unset uses a postgres database listening on port 5432."
-       " Otherwise, if set, uses the database file and opens a "
-       "connection to sqlite.")
 def insert(path, db):
     """
-    Inserts meta data from PATH to a database.
+    Inserts meta data from PATH to a SQLite DB.
     """
 
     Query(db).insert(path)
 
 
 @cli.command()
+@click.argument("db", type=str)
 @click.argument(
   "select",
   type=click.Choice(
     ["study", "pathogen", "library", "plate", "design", "gene", "sirna", "well",
      "featureclass"]))
-@click.option("--db", default=None,
-              help="Sqlite database file."
-                   " If unset uses a postgres database listening on port 5432."
-                   " Otherwise, if set, uses the database file and opens a "
-                   "connection to sqlite.")
 @click.option("--study", default=None,
               help="The study to query for, e.g. like 'infectx', "
                    "or a comma-separated string of libraries, "
@@ -103,7 +93,7 @@ def insert(path, db):
 def select(select, db, study, pathogen, library, design, replicate, plate,
            gene, sirna, well, featureclass):
     """
-    Submits a SELECT query to the database for a single attribute.
+    Submits a SELECT query to a SQLite DB for a single attribute.
     """
 
     q = Query(db)
@@ -123,12 +113,8 @@ def select(select, db, study, pathogen, library, design, replicate, plate,
 
 
 @cli.command()
+@click.argument("db", type=str)
 @click.argument("outfile", type=str)
-@click.option("--db", default=None,
-              help="Sqlite database file."
-                   " If unset uses a postgres database listening on port 5432."
-                   " Otherwise, if set, uses the database file and opens a"
-                   " connection to sqlite.")
 @click.option(
   "--normalize", default="zscore",
   help="The normalization methods to use, e.g. like '{}',"
@@ -188,7 +174,8 @@ def compose(outfile, db, normalize, from_file,
             featureclass, sample,
             debug):
     """
-    Query and sample single cells or bacteria and write to an OUTFILE.
+    Query and sample single cells or bacteria from a SQLite DB and
+    write to an OUTFILE.
     """
 
     if debug:
@@ -215,12 +202,8 @@ def compose(outfile, db, normalize, from_file,
 
 
 @cli.command()
+@click.argument("db", type=str)
 @click.argument("outfile", type=str)
-@click.option("--db", default=None,
-              help="Sqlite database file."
-                   " If unset uses a postgres database listening on port 5432."
-                   " Otherwise, if set, uses the database file and opens a"
-                   " connection to sqlite.")
 @click.option("--study", default=None,
               help="The study to query for, e.g. like 'infectx' "
                    " or a comma-separated string of libraries,"
@@ -248,7 +231,7 @@ def compose(outfile, db, normalize, from_file,
 def query(outfile, db, study, pathogen, library, design, replicate, plate,
           featureclass):
     """
-    Query and sample single cells or bacteria and write the resultset
+    Query and sample single cells or bacteria from a SQLite DB and write the resultset
     to OUTFILE.
     """
 
