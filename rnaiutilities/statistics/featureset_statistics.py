@@ -55,6 +55,7 @@ class FeatureSetStatistics:
         """
         Parse the counts of the feature sets and compute some statistics.
         """
+
         self._statistics()
 
     def _statistics(self):
@@ -136,6 +137,5 @@ class FeatureSetStatistics:
     def _check_file_counts(file_map, size, screen):
         for fl_suffix in file_map:
             if file_map[fl_suffix] != size:
-                logger.warning(
-                  "Screen {} has only {}/{} files for feature {}."
+                logger.warning("Screen {} has only {}/{} files for feature {}."
                       .format(screen, file_map[fl_suffix], size, fl_suffix))

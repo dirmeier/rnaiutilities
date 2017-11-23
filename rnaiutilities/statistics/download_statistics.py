@@ -51,15 +51,14 @@ class DownloadStatistics:
         Check if all files are available readily and compute some numbers.
         """
 
-        logger.setLevel(logging.WARNING)
+        logger.setLevel(logging.DEBUG)
         for plate in self._plate_list:
             platefile_path = self._plate_folder + "/" + plate
             if not Path(platefile_path).exists():
                 logger.warning("{} is missing".format(platefile_path))
             else:
                 if self._has_correct_file_count(platefile_path):
-                    logger.info(
-                      "{} is available".format(platefile_path))
+                    logger.info("{} is available".format(platefile_path))
         logger.setLevel(logging.INFO)
 
     @staticmethod

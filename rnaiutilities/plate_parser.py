@@ -39,7 +39,7 @@ class PlateFilesParser:
     Class for parsing single features files as numpy arrays.
     """
 
-    @enforce.runtime_violation
+    @enforce.runtime_validation()
     def parse(self, pfs: PlateFileSet):
         """
         Parse the PlateFileSets (i.e.: all parsed folders) into tsvs.

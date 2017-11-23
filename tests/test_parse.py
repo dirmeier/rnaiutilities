@@ -19,19 +19,22 @@
 # @email = 'simon.dirmeier@bssae.ethz.ch'
 
 
+import contextlib
 import glob
 import logging
 import os
 import pandas
 import unittest
 import shutil
-
 import pytest
+from io import StringIO
+
+import sys
+
+import re
 
 from rnaiutilities import Parser, Config
 from rnaiutilities.utility.files import read_yaml
-
-logging.basicConfig(level=logging.DEBUG)
 
 
 class TestParser(unittest.TestCase):
@@ -63,15 +66,38 @@ class TestParser(unittest.TestCase):
         conf._output_path = os.path.join(folder, "out", "test_files")
         conf._multiprocessing = False
 
-        TestParser.layoutfile = os.path.join(TestParser.exp_folder,
-                                             "layout.tsv")
+        TestParser.output_stats = os.path.join(
+          folder, "out", "test_files", "stats.tsv")
+        TestParser.layoutfile = os.path.join(
+          TestParser.exp_folder, "layout.tsv")
         TestParser.outfolder = conf._output_path
         if os.path.exists(TestParser.outfolder):
             shutil.rmtree(TestParser.outfolder)
         os.makedirs(TestParser.outfolder)
 
-        parser = Parser(conf)
-        parser.parse()
+        TestParser.parser = Parser(conf)
+        TestParser.parser.parse()
+
+        TestParser.fs_stream = StringIO()
+        TestParser.fs_handler = logging.StreamHandler(TestParser.fs_stream)
+        TestParser.log_fs = logging.getLogger(
+          "rnaiutilities.statistics.featureset_statistics")
+        TestParser.log_fs.setLevel(logging.DEBUG)
+        TestParser.log_fs.addHandler(TestParser.fs_handler)
+
+        TestParser.ds_stream = StringIO()
+        TestParser.ds_handler = logging.StreamHandler(TestParser.ds_stream)
+        TestParser.log_ds = logging.getLogger(
+          "rnaiutilities.statistics.download_statistics")
+        TestParser.log_ds.setLevel(logging.DEBUG)
+        TestParser.log_ds.addHandler(TestParser.ds_handler)
+
+        TestParser.ps_stream = StringIO()
+        TestParser.ps_handler = logging.StreamHandler(TestParser.ps_stream)
+        TestParser.log_ps = logging.getLogger(
+          "rnaiutilities.statistics.parse_statistics")
+        TestParser.log_ps.setLevel(logging.DEBUG)
+        TestParser.log_ps.addHandler(TestParser.ps_handler)
 
     @classmethod
     def tearDownClass(cls):
@@ -156,3 +182,19 @@ class TestParser(unittest.TestCase):
         assert parsed_data[exp_col].values[192 - 1 + 1] == pytest.approx(
           0.0322, 0.01)
         assert parsed_data[exp_col].values[-1] == pytest.approx(0.0287, 0.01)
+
+    def test_parse_statistics(self):
+        TestParser.parser.parse_statistics()
+        TestParser.ps_handler.flush()
+        assert TestParser.ps_stream.getvalue() == ""
+
+    def test_download_statistics(self):
+        TestParser.parser.download_statistics()
+        TestParser.ds_handler.flush()
+        assert re.match(".*STUDY.BACTERIA.BACTERIA.DP.K1.KB03.1A.is.available",
+                        str(TestParser.ds_stream.getvalue()))
+
+    def test_featureset_statistics(self):
+        TestParser.parser.featureset_statistics(TestParser.output_stats)
+        TestParser.fs_handler.flush()
+        assert TestParser.fs_stream.getvalue() == ""

@@ -24,14 +24,14 @@ Main module (entry point) for parsing feature files and computing statistics
 regarding download/parsing.
 """
 
-import enforce
 import logging
 import multiprocessing as mp
 from pathlib import Path
 
+import enforce
+
 from rnaiutilities.config import Config
 from rnaiutilities.globals import USABLE_FEATURES
-
 from rnaiutilities.plate.plate_file_sets import PlateFileSets
 from rnaiutilities.plate.plate_folder_list import PlateFolderList
 from rnaiutilities.plate_parser import PlateFilesParser
@@ -147,7 +147,7 @@ class Parser:
     def featureset_statistics(self, outfile):
         """
         Computes statistics between all possible screens for pairwise feature
-         overlaps. The overlaps can be taken to decide which screens to include.
+        overlaps. The overlaps can be taken to decide which screens to include.
         """
 
         FeatureSetStatistics(

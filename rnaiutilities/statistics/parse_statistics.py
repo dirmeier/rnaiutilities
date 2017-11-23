@@ -63,7 +63,6 @@ class ParseStatistics:
                 logger.warning("{} is missing entirely".format(plate))
             else:
                 self._statistics(platefilesets, plate)
-        logger.info("All's well that ends well")
 
     @staticmethod
     def _statistics(platefilesets, plate):
