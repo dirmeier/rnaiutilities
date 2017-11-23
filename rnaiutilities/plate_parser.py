@@ -21,6 +21,7 @@
 
 import logging
 
+import enforce
 import numpy
 
 from rnaiutilities.plate.plate_feature_matrix import FeatureMatrix
@@ -38,7 +39,8 @@ class PlateFilesParser:
     Class for parsing single features files as numpy arrays.
     """
 
-    def parse(self, pfs):
+    @enforce.runtime_violation
+    def parse(self, pfs: PlateFileSet):
         """
         Parse the PlateFileSets (i.e.: all parsed folders) into tsvs.
 
@@ -46,32 +48,25 @@ class PlateFilesParser:
         represents a plate so every platefileset is a single file.
         """
 
-        if not isinstance(pfs, PlateFileSet):
-            logger.error("Please provide a PlateFileSet object.")
-            return None, None, None
-
         features = self._parse_plate_file_set(pfs)
-        if len(features) == 0:
-            logger.error(
-              "No files found for platefileset: {}".format(pfs.classifier))
-            return None, None, None
-
         mapping = self._parse_plate_mapping(pfs)
-        if len(mapping) == 0:
-            logger.warning("Found no mapping for platefileset: " +
-                           pfs.classifier + "!")
-            return None, None, None
         return pfs, features, mapping
 
     def _parse_plate_file_set(self, pfs):
         logger.info(
-          "Parsing plate file set to memory: " + str(pfs.classifier))
+          "Parsing plate file set to memory: {}".format(str(pfs.classifier)))
         features = {}
         for plate_file in pfs:
-            cf = self._parse_file(plate_file)
-            if cf is None:
-                continue
-            self._add(features, cf, cf.feature_group)
+            try:
+                cf = self._parse_file(plate_file)
+                self._add(features, cf, cf.feature_group)
+            except (
+              ValueError, TypeError, AssertionError, FileNotFoundError) as e:
+                logger.error(
+                  "Could not parse: {} -> {}".format(plate_file, str(e)))
+        if len(features) == 0:
+            raise ValueError(
+              "No files found for platefileset: {}".format(pfs.classifier))
         return features
 
     def _parse_file(self, plate_file):
@@ -85,13 +80,8 @@ class PlateFilesParser:
         featurename = plate_file.featurename
         file = plate_file.filename
         if file is None:
-            logger.error("Could not find file: %s", file)
-            return None
-        matrix = None
-        try:
-            matrix = self._alloc(load_matlab(file), file, featurename)
-        except (ValueError, TypeError, AssertionError) as e:
-            logger.error("Could not statistics: {} -> {}".format(file, str(e)))
+            raise FileNotFoundError("Could not find file: {}".format(file))
+        matrix = self._alloc(load_matlab(file), file, featurename)
         return matrix
 
     @staticmethod
@@ -112,12 +102,11 @@ class PlateFilesParser:
                     mat[i][:len(row)] = row.flatten()
                 except ValueError:
                     mat[i][0] = numpy.Infinity
-            return FeatureMatrix(mat, n_row, max_n_col,
-                                 file, row_lens, f_name)
+            return FeatureMatrix(
+              mat, n_row, max_n_col, file, row_lens, f_name)
         except AssertionError:
-            logger.warning("Could not alloc feature %s of %s",
-                           f_name, file)
-        return None
+            raise AssertionError(
+              "Could not alloc feature %s of %s", f_name, file)
 
     @staticmethod
     def _add(features, cf, feature_group):
@@ -128,4 +117,8 @@ class PlateFilesParser:
     @staticmethod
     def _parse_plate_mapping(pfs):
         logger.info("Loading meta for plate file set: " + str(pfs.classifier))
-        return PlateSirnaGeneMapping(pfs)
+        mapping = PlateSirnaGeneMapping(pfs)
+        if len(mapping) == 0:
+            raise ValueError(
+              "Found no mapping for platefileset: {}".format(pfs.classifier))
+        return mapping

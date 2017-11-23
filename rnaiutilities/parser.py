@@ -99,25 +99,18 @@ class Parser:
         # Parse the files of a single plate folder as tsv
         try:
             platefilesets = PlateFileSets(
-              self._plate_folder +"/"+ plate, self._output_path)
+              self._plate_folder + "/" + plate, self._output_path)
             if len(platefilesets) > 1:
-                logger.warning("Found multiple plate identifiers for: " + plate)
-            ret = self._parse_plate_file_sets(platefilesets)
+                raise ValueError("Found multiple plate identifiers.")
+            return self._parse_plate_file_sets(platefilesets)
         except Exception as ex:
             logger.error("Found error parsing: " + str(plate) + ". " +
                          "Error:" + str(ex))
-            ret = -1
-        return ret
+            return 1
 
     def _parse_plate_file_sets(self, platefilesets):
-        if not isinstance(platefilesets, PlateFileSets):
-            raise TypeError("no PlateFileSets object given")
-
-        try:
-            for platefileset in platefilesets:
-                self._parse_plate_file_set(platefileset)
-        except Exception as ex:
-            logger.error("Some error idk anything can happen here: " + str(ex))
+        for platefileset in platefilesets:
+            self._parse_plate_file_set(platefileset)
         return 0
 
     def _parse_plate_file_set(self, platefileset):
@@ -128,8 +121,7 @@ class Parser:
             logger.info("Doing: " + " ".join(platefileset.meta))
             # parse and write the plate file sets
             pfs, features, mapping = self._parser.parse(platefileset)
-            if pfs is not None:
-                self._writer.write(pfs, features, mapping)
+            self._writer.write(pfs, features, mapping)
         else:
             logger.info(" ".join(map(str, platefileset.meta)) +
                         " already exists. Skipping.")

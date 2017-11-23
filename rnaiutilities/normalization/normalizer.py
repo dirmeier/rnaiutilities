@@ -86,12 +86,13 @@ class Normalizer:
         :type data: DataSet
         """
 
-        logger.info("Normalizing plate.")
         return self._normalize_plate(data)
 
     def _normalize_plate(self, df):
         df = self._replace_inf_with_nan(df, df.feature_columns)
         # do normalisations on the fly
+        logger.info("Normalizing plate using {}.".
+                    format("/".join(self._normalize)))
         for normal in self._normalize:
             f = self.__getattribute__("_" + normal)
             df, _ = f(df, None, df.feature_columns)
