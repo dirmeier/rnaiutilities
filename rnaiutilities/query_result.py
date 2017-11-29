@@ -121,7 +121,7 @@ class QueryResult:
             else:
                 raise ValueError("Could not find files: {}".format(
                   ", ".join(tablefileset.filenames)))
-        except ValueError as e:
+        except Exception as e:
             logger.error("Error occured for tablefileset {}: {}"
                          .format(tablefileset.classifier, e))
         return None
@@ -245,8 +245,7 @@ class QueryResult:
 
         if len(data.feature_columns) != len(self._shared_features):
             raise ValueError(
-              "{} does not have the correct number of features. Skipping."
-                  .format(data.filenames))
+              "Data does not have the correct number of features. Skipping.")
         if data.data is None:
             raise ValueError("Data is none after setting columns.")
         return data
