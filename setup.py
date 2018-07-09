@@ -28,14 +28,14 @@ setup(
   install_requires=[
       'h5py>=2.7.0',
       'ipython>=5.1.0',
-      'numpy>=1.10.0',
-      'scipy>=0.19.0',
-      'pandas>=0.20.1',
+      'numpy>=1.14.0',
+      'scipy>=1.0.0',
+      'pandas>=0.23.3',
       'psycopg2>=2.7.1',
       'pyyaml>=3.12',
       'tables>=3.3.0',
       'click>=6.7',
-      'pytest>=3.0.5',
+      'pytest>=3.6.2',
       'tabulate>=0.7.7',
       'enforce>=0.3.4'
   ],
