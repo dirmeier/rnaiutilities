@@ -239,7 +239,7 @@ class QueryResult:
         # sort columns
         # (this should be a sufficient condition for optimal overlap)
         feat_cols = sorted(feat_cols)
-        data.data = data.data.reindex_axis(
+        data.data = data.data.reindex(
           meta_cols + feat_cols, axis=1, copy=False)
         data.feature_columns = feat_cols
 
