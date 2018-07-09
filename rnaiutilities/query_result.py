@@ -251,8 +251,8 @@ class QueryResult:
         return data
 
     def _filter_data(self, data):
-        well = self.__getattribute__("_" + WELL)
-        gene = self.__getattribute__("_" + GENE)
+        well  = self.__getattribute__("_" + WELL)
+        gene  = self.__getattribute__("_" + GENE)
         sirna = self.__getattribute__("_" + SIRNA)
         logger.info("\tfiltering data on well '{}', gene '{}' and sirna '{}'."
                     .format(well, gene, sirna))
