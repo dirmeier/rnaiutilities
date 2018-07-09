@@ -94,7 +94,7 @@ class TestQuery(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        shutil.rmtree(TestQuery.out_folder)
+        k=1#shutil.rmtree(TestQuery.out_folder)
 
     def setUp(self):
         unittest.TestCase.setUp(self)
