@@ -22,5 +22,6 @@
 Module for various functions.
 """
 
+
 def unique(fl):
     return sorted(list(set(fl)))
