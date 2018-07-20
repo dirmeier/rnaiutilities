@@ -278,7 +278,7 @@ class QueryResult:
         for k, v in kwargs.items():
             if k in QueryResult._filter_attributes_:
                 if v is not None:
-                    reg = "^" + "|".join(v.split(",")) + "$"
+                    reg = "^" + "$|^".join(v.split(",")) + "$"
                     # user provided gene/sirna/well regex to match
                     self.__setattr__("_" + k, reg)
                 else:
