@@ -14,8 +14,7 @@ rnaiutilities
    :alt: doc
 
 
-A collection of python modules and command line tools for processing image-based RNAi screens.
-
+A collection of python tools for processing image-based RNAi screens.
 
 Introduction
 ------------
@@ -31,7 +30,6 @@ The packages are designed for the following workflow:
 * Query the meta DB using ``rnai-query`` and create and combine datasets. For that first meta files generated from the step above are written into a database. Then the DB can be queried against to subset single *genes*, *sirnas*, *pathogens*, etc. and write the *normalized* results.
 
 * To come: ``rnai-analyse`` for analysing large-scale RNAi screens.
-
 
 The package is still under development, so if you'd like to contribute,
 `fork us on GitHub <https://github.com/cbg-ethz/rnaiutilities>`_.
@@ -54,28 +52,11 @@ Download the latest `release <https://github.com/cbg-ethz/rnaiutilities/releases
 If you get errors, I probably forgot some dependency.
 
 
-Command line scripts
---------------------
+Usage
+-----
 
 .. toctree::
    :maxdepth: 2
 
    rnai_parse
    rnai_query
-
-API
-----
-
-.. toctree::
-   :maxdepth: 2
-
-   modules
-
-Examples
---------
-
-.. toctree::
-   :maxdepth: 2
-
-   api
-
