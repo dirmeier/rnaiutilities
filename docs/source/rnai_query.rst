@@ -13,7 +13,8 @@ The following sections will explain how ``rnai-query`` and its subcommands
 are used. So far the following subcommands are available:
 
 * ``rnai-query insert`` for inserting meta information to a database,
-* ``rnai-query compose`` for querying from the database and composing data sets,
+* ``rnai-query query`` for querying the database and writing plates to a file,
+* ``rnai-query compose`` for creating of data sets,
 * ``rnai-query select`` for selecting single variables from the database.
 
 **The steps have to be taken in succession (or at least insert has to be the first command to be executed), so make sure to read it all**.
@@ -57,7 +58,6 @@ that fit the criteria to `OUTFILE`.
 
 The next sections walk you through using ``rnai-query compose``.
 
-
 .. _cmdlineargs-label:
 
 Command line arguments
@@ -70,6 +70,9 @@ respective command line arguments:
 
 --normalize
     The normalization methods to use, e.g. like 'zscore' or a comma-separated string of normalisations such as 'bscore,loess,zscore'. **Defaults to 'zscore'**. If you do **not** want to normalize you need to explicitely set to 'none'.
+
+--from-file
+    You can provide an optional `tsv` file that has been created using `rnai-query query` such that only on these files will be searched. The filters you provide, like `--study` or `--pathogen`, still need to be given.
 
 --study
     The study to query for, e.g. like 'infectx', or a comma-separated string of libraries, such as 'infectx,infectx_published'.
@@ -189,6 +192,38 @@ to *OUTFILE*.
                      --pathogen shigella,bartonella
                      --sample 100
                      database.db OUTFILE
+
+Filter from a pre-made list of plates and the same filters as before.
+
+.. code-block:: bash
+
+  rnai-query compose --from-file file.tsv
+                     --gene pik3ca,mock
+                     --library d
+                     --design p
+                     --pathogen shigella,bartonella
+                     --sample 100
+                     database.db OUTFILE
+
+Querying for plates
+...................
+
+If you are only interested in getting the plates the fullfil some criteria and
+writing them to a file `rnai-query query` does the job.
+
+.. code-block:: bash
+
+  rnai-query query  --gene pik3ca,mock
+                    --library d
+                    --design p
+                    --pathogen shigella,bartonella
+                    --sample 100
+                    database.db OUTFILE
+
+The file you are getting can then be used **input** for `--from-file` for
+`rnai-query compose`. Sometiems this is required because the queries we want to submit to
+the data base are so big that it crashes. The arguments are quite the same as above.
+
 
 Selecting single variables from the database
 ............................................
