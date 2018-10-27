@@ -22,4 +22,6 @@ tix.db
 .idea/tasks.xml
 .idea/uiDesigner.xml
 .idea/workspace.xml
+/build/
+/docs/build
 
