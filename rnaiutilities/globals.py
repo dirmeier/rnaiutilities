@@ -85,3 +85,7 @@ SKIPPABLE_FEATURE_NAMES = list(
 # features to be skipped based on regex during parsing file names
 SKIPPABLE_FEATURE_REGEX = [
     re.compile(".*_subcell.*"), re.compile(".*subobjectflag.*")]
+
+RESPONSES = [
+    "count"
+]

@@ -28,7 +28,7 @@ import pandas
 
 from rnaiutilities.data_set import DataSet
 from rnaiutilities.globals import WELL, GENE, SIRNA, \
-    SAMPLE, ADDED_COLUMNS_FOR_PRINTING
+    SAMPLE, ADDED_COLUMNS_FOR_PRINTING, RESPONSES
 from rnaiutilities.io.io import IO
 from rnaiutilities.normalization.normalizer import Normalizer
 from rnaiutilities.table_file_set import TableFileSet
@@ -80,7 +80,7 @@ class QueryResult:
         :type fh: str
         """
 
-        self._set_normalization(normalize)
+        self._set_normalization(normalize, RESPONSES)
         self._set_sample_size(sample)
         with IO(fh) as io:
             for data in self:
@@ -88,14 +88,14 @@ class QueryResult:
                     io.dump(data)
         logger.info("Successfully wrote table files!")
 
-    def _set_normalization(self, normalize):
+    def _set_normalization(self, normalize, skip_features):
         """
         Set the used normalisations.
 
         :param normalize: string of normalisation technmethodsiques
         """
 
-        self._normalizer.set_normalization(normalize)
+        self._normalizer.set_normalization(normalize, skip_features)
 
     def _set_sample_size(self, sample):
         self._sample = sample if sample is not None else 2 ** 30
@@ -154,7 +154,8 @@ class QueryResult:
         return DataSet(data_merged,
                        tablefileset.feature_classes,
                        tablefileset.features,
-                       tablefileset.classifier)
+                       tablefileset.classifier,
+                       RESPONSES)
 
     @staticmethod
     def _check_table_dimensions(tables, tfs):

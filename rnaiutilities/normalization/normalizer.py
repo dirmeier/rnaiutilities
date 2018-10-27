@@ -45,18 +45,22 @@ class Normalizer:
         """
 
         self._normalize = []
+        self._skip = []
         if args:
             self.set_normalization(*args)
 
-    def set_normalization(self, args):
+    def set_normalization(self, args, skip_features):
         """
         Set the normalisation methods.
 
         :param args: a list if normalisation methods to use, e.g. like 'zscore'.
           Options so far are 'bscore', 'loess' and 'zscore'.
         :type args: list(str) or str
+        :type skip_features: a list of features (or substrings) that should be
+         skipped from normalisation
         """
 
+        self._skip = skip_features
         self._normalize = []
         if not args or args is None:
             return
@@ -105,13 +109,13 @@ class Normalizer:
             df.data.loc[idx, col] = numpy.nan
         return df
 
-    @staticmethod
-    def _zscore(df, well_df, feature_columns):
+    def _zscore(self, df, well_df, feature_columns):
         logger.info("\tstandardizing feature columns.")
         for col in feature_columns:
-            mea = numpy.nanmean(df.data[col])
-            sd = numpy.nanstd(df.data[col])
-            new_col_vals = (df.data[col] - mea) / (sd + 0.00000001)
-            new_col_vals[numpy.isinf(new_col_vals)] = numpy.nan
-            df.data[col] = new_col_vals
+            if all(skip not in col.lower() for skip in self._skip):
+                mea = numpy.nanmean(df.data[col])
+                sd = numpy.nanstd(df.data[col])
+                new_col_vals = (df.data[col] - mea) / (sd + 0.00000001)
+                new_col_vals[numpy.isinf(new_col_vals)] = numpy.nan
+                df.data[col] = new_col_vals
         return df, well_df
