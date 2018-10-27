@@ -40,5 +40,5 @@ Check out the documentation [here](https://cbg-ethz.github.io/rnaiutilities/rnai
 
 ## Author
 
-- Simon Dirmeier <simon.dirmeier@bsse.ethz.ch>
- 
+Simon Dirmeier <simon.dirmeier@bsse.ethz.ch>
+

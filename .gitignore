@@ -9,8 +9,6 @@ tix.db
 /dist/
 /*.egg-info
 /*.egg
-/build/
-/docs/build/
 .idea/
 .idea/dataSources.ids
 .idea/dataSources.xml
