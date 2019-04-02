@@ -1,6 +1,11 @@
 # rnaiutilities <img src="https://raw.githubusercontent.com/dirmeier/rnaiutilities/master/_fig/fig_single_cells.jpg" align="right" width="160px"/>
 
 [![Project Status](http://www.repostatus.org/badges/latest/inactive.svg)](http://www.repostatus.org/#inactive)
+[![Build](https://travis-ci.org/dirmeier/rnaiutilities.svg?branch=master)](https://travis-ci.org/dirmeier/rnaiutilities)
+[![Coverage](https://codecov.io/gh/dirmeier/rnaiutilities/branch/master/graph/badge.svg)](https://codecov.io/gh/dirmeier/rnaiutilities)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/451bb1a5b6bb46a499713f048f296ed4)](https://www.codacy.com/app/simon-dirmeier/rnaiutilities?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dirmeier/rnaiutilities&amp;utm_campaign=Badge_Grade)
+[![Documentation](https://readthedocs.org/projects/rnaiutilities/badge/?version=latest)](https://rnaiutilities.readthedocs.io/en/latest/?badge=latest)
+
 
 A collection of python modules and command line tools for processing image-based RNAi screens.
 
