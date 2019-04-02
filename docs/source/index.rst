@@ -1,19 +1,6 @@
 rnaiutilities
 =============
 
-.. image:: http://www.repostatus.org/badges/latest/active.svg
-   :target: http://www.repostatus.org/#active
-.. image:: https://travis-ci.org/cbg-ethz/rnaiutilities.svg?branch=master
-   :target: https://travis-ci.org/cbg-ethz/rnaiutilities/
-.. image:: https://codecov.io/gh/cbg-ethz/rnaiutilities/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/cbg-ethz/rnaiutilities
-.. image:: https://api.codacy.com/project/badge/Grade/1822ba83768d4d7389ba667a9c839638
-   :target: https://www.codacy.com/app/simon-dirmeier/rnaiutilities_2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=cbg-ethz/rnaiutilities&amp;utm_campaign=Badge_Grade
-.. image:: https://readthedocs.org/projects/rnaiutilities/badge/?version=latest
-   :target: http://rnaiutilities.readthedocs.io/en/latest/
-   :alt: doc
-
-
 A collection of python tools for processing image-based RNAi screens.
 
 Introduction
@@ -32,7 +19,7 @@ The packages are designed for the following workflow:
 * To come: ``rnai-analyse`` for analysing large-scale RNAi screens.
 
 The package is still under development, so if you'd like to contribute,
-`fork us on GitHub <https://github.com/cbg-ethz/rnaiutilities>`_.
+`fork us on GitHub <https://github.com/dirmeier/rnaiutilities>`_.
 
 
 Installation
@@ -42,7 +29,7 @@ Make sure to have ``python3`` installed. ``rnaiutilities`` does not support
 previous versions. The best way to do that is to download `anaconda <https://www.continuum.io/downloads>`_ and create a
 virtual `environment <https://conda.io/docs/using/envs.html>`_.
 
-Download the latest `release <https://github.com/cbg-ethz/rnaiutilities/releases>`_ first and install it using:
+Download the latest `release <https://github.com/dirmeier/rnaiutilities/releases>`_ first and install it using:
 
 .. code-block:: bash
 
